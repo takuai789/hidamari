@@ -84,14 +84,39 @@
   .clock::after { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: var(--accent); }
 
   /* 棚 */
-  .shelf { right: 8%; top: calc(var(--safe-top) + 30%); width: 30%; height: 60px; }
+  .shelf { right: 6%; top: calc(var(--safe-top) + 22%); width: 30%; height: 60px; }
   .shelf .plank { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; border-radius: 3px; background: #b88a5f; box-shadow: 0 4px 6px rgba(90,60,30,0.22); }
   .book { position: absolute; bottom: 8px; border-radius: 2px 2px 0 0; }
   .shelf .pot { position: absolute; right: 6%; bottom: 8px; width: 22px; height: 18px; background: #e7eadf; border-radius: 3px 3px 7px 7px; }
   .shelf .sprig { position: absolute; right: 6%; bottom: 24px; width: 22px; height: 26px; }
 
+  /* ドア（おへや） */
+  .door { right: 3%; bottom: 37%; width: 19%; height: 25%; perspective: 500px; cursor: pointer; }
+  .door .frame { position: absolute; inset: -6px -6px 0 -6px; background: #dcc09d; border-radius: 9px 9px 0 0; box-shadow: 0 4px 10px rgba(90,60,30,0.18); }
+  .door .inside { position: absolute; inset: 0; border-radius: 5px 5px 0 0; background: linear-gradient(#4a3329, #2f201a); overflow: hidden; }
+  .door.lit .inside { background: radial-gradient(ellipse at 50% 60%, #ffd9a0, #c98a55 45%, #4a3329 80%); }
+  .door .leaf { position: absolute; inset: 0; border-radius: 5px 5px 0 0; background: linear-gradient(#caa074, #b78a5c); transform-origin: 0 50%; transition: transform .6s cubic-bezier(.4,0,.2,1); box-shadow: inset 0 0 0 1px rgba(90,60,30,0.18); }
+  .door.open .leaf { transform: rotateY(-72deg); }
+  .door .panel { position: absolute; left: 16%; right: 16%; border-radius: 3px; box-shadow: inset 0 0 0 1.5px rgba(90,60,30,0.2); }
+  .door .panel.a { top: 42%; height: 22%; } .door .panel.b { top: 70%; height: 22%; }
+  .door .peek { position: absolute; left: 50%; top: 9%; width: 36%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: #3a2820; box-shadow: 0 0 0 3px #a97c50; transition: background .6s, box-shadow .6s; }
+  .door.lit .peek { background: radial-gradient(circle, #ffe2b0, #f0b36e 70%); box-shadow: 0 0 0 3px #a97c50, 0 0 14px 3px rgba(255,200,120,0.55); }
+  .door .knob { position: absolute; right: 11%; top: 58%; width: 8px; height: 8px; border-radius: 50%; background: #e7c47c; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+  .door .count { position: absolute; left: 50%; top: 26%; transform: translate(-50%, -50%); font-size: 10px; font-weight: 700; color: #7a4a26; opacity: 0; transition: opacity .4s; }
+  .door.lit .count { opacity: 1; }
+  .pet.gone { display: none; }
+  .avatar { width: 44px; height: 40px; flex-shrink: 0; }
+  .avatar svg { width: 100%; height: 100%; display: block; }
+  .roomRow { display: flex; align-items: center; gap: 12px; min-height: 60px; }
+  .roomRow + .roomRow { border-top: 1px solid rgba(160,120,80,0.14); }
+  .roomRow .who { flex: 1; min-width: 0; }
+  .roomRow .who b { display: block; font-size: 15px; font-weight: 500; }
+  .roomRow .who span { font-size: 12px; color: var(--ink2); }
+  .roomRow button { border: 0; font-family: inherit; font-size: 14px; font-weight: 500; padding: 9px 16px; border-radius: 18px; cursor: pointer; background: #f3e4d3; color: var(--ink); }
+  .roomRow button.call { background: var(--accent); color: #fff; }
+
   /* 床の上のもの */
-  .chest { right: 6%; bottom: 37%; width: 36%; height: 11%; border-radius: 6px 6px 3px 3px; background: linear-gradient(#caa079, #b88c62); box-shadow: 0 5px 8px rgba(80,50,20,0.22); padding: 7% 6% 0; display: flex; flex-direction: column; gap: 8%; }
+  .chest { right: 25%; bottom: 37%; width: 22%; height: 11%; border-radius: 6px 6px 3px 3px; background: linear-gradient(#caa079, #b88c62); box-shadow: 0 5px 8px rgba(80,50,20,0.22); padding: 7% 6% 0; display: flex; flex-direction: column; gap: 8%; }
   .chest .drawer { flex: 1; max-height: 34%; border-radius: 3px; background: rgba(255,255,255,0.12); position: relative; box-shadow: inset 0 0 0 1px rgba(90,60,30,0.15); }
   .chest .drawer::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 3px; margin: -1.5px -6px; border-radius: 2px; background: #8b6a4c; }
   .chest .mug { position: absolute; left: 16%; bottom: 100%; width: 16px; height: 15px; border-radius: 2px 2px 5px 5px; background: #f3efe6; }
@@ -112,22 +137,22 @@
     background: radial-gradient(circle at 34% 50%, rgba(255,205,130,0.7), rgba(255,185,115,0.25) 32%, transparent 62%);
     mix-blend-mode: screen; opacity: 0; transition: opacity 1.4s; z-index: 61; }
   .glow.on { opacity: 1; }
-  .plant { right: 2%; bottom: 25%; width: 70px; height: 110px; z-index: 3; pointer-events: none; }
+  .plant { right: 21%; bottom: 27%; width: 70px; height: 110px; z-index: 3; pointer-events: none; }
 
   /* 明るさ */
   .shadeLayer { inset: 0; pointer-events: none; z-index: 60; background: var(--shadeColor, #fff); mix-blend-mode: multiply; transition: background 1.6s; }
 
   /* ===== ペット ===== */
-  .pet { left: 50%; bottom: 18%; width: min(30vw, 128px); aspect-ratio: 120 / 110;
+  .pet { position: absolute; left: 50%; bottom: 18%; width: calc(min(30vw, 128px) * var(--w, 1)); aspect-ratio: 120 / 110;
     transform: translateX(-50%) scale(var(--s, 1)); transform-origin: 50% 100%;
-    transition-property: left, bottom, transform; transition-timing-function: linear; z-index: 10; }
+    transition-property: left, bottom, transform, opacity; transition-timing-function: linear; z-index: 10; }
   .pet-shadow { position: absolute; left: 15%; right: 15%; bottom: -3%; height: 12%; border-radius: 50%; background: rgba(70,40,20,0.22); }
   .pet .bob { position: absolute; inset: 0; }
   .pet .breath { position: absolute; inset: 0; transform-origin: 50% 95%; transition: transform 4s ease-in-out; }
   .pet .flip { position: absolute; inset: 0; transform: scaleX(var(--dir, 1)); transition: transform .35s; }
   .pet svg { width: 100%; height: 100%; overflow: visible; display: block; }
   .pet .eyes { transform: translateX(calc(var(--look, 0) * 1px)); transition: transform .4s; }
-  .pet .eyes-open { transform-origin: 60px 60px; animation: blink 5.5s infinite; }
+  .pet .eyes-open { transform-box: fill-box; transform-origin: center; animation: blink 5.5s infinite; }
   @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96.5% { transform: scaleY(0.1); } }
   .pet .eyes-happy, .pet .eyes-sleep, .pet .mouth-open { display: none; }
   .pet.happy .eyes-open, .pet.sleep .eyes-open { display: none; }
@@ -144,6 +169,10 @@
   @keyframes snooze { 0%,100% { transform: scale(1.06,0.92); } 50% { transform: scale(1.09,0.89); } }
   .pet.jump .bob { animation: jump .6s ease-out 1; }
   @keyframes jump { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-22%); } }
+  .pet .tail { transform-box: fill-box; transform-origin: 15% 85%; }
+  .pet.happy .tail, .pet.walk .tail { animation: wag .26s ease-in-out infinite alternate; }
+  @keyframes wag { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
+  .pet.speaking { z-index: 50 !important; }
   .zzz { position: absolute; right: -4%; top: -14%; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.9); opacity: 0; pointer-events: none; letter-spacing: 2px; }
   .pet.sleep .zzz { animation: zzz 3s ease-in-out infinite; }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0,6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(12px,-18px); } }
@@ -252,6 +281,11 @@
       <div class="plank"></div>
     </div>
 
+    <div class="door" id="door">
+      <div class="frame"></div>
+      <div class="inside"></div>
+      <div class="leaf"><div class="peek"></div><div class="panel a"></div><div class="panel b"></div><div class="knob"></div></div>
+    </div>
     <div class="chest"><div class="drawer"></div><div class="drawer"></div><div class="mug"></div><div class="vase"></div></div>
     <div class="rug"></div>
     <div class="cushion"></div>
@@ -270,37 +304,6 @@
     </svg>
 
     <div class="halo" id="halo"></div>
-
-    <div class="pet" id="pet">
-      <div class="pet-shadow"></div>
-      <div class="bob"><div class="breath" id="petBreath"><div class="flip">
-        <svg viewBox="0 0 120 110">
-          <defs>
-            <radialGradient id="bodyG" cx="40%" cy="30%" r="75%">
-              <stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#fff6ea"/><stop offset="1" stop-color="#f6e4cf"/>
-            </radialGradient>
-          </defs>
-          <path d="M60 10 C60 4 64 0 70 0 C70 6 66 10 60 10 Z" fill="#9fc27f"/>
-          <path d="M60 10 C60 5 56 2 51 3 C52 8 56 10 60 10 Z" fill="#b3d192"/>
-          <path d="M60 10 V16" stroke="#8aad6a" stroke-width="2" stroke-linecap="round"/>
-          <ellipse cx="40" cy="103" rx="11" ry="5" fill="#f1dcc3"/>
-          <ellipse cx="80" cy="103" rx="11" ry="5" fill="#f1dcc3"/>
-          <path d="M60 14 C93 14 112 42 112 70 C112 94 90 104 60 104 C30 104 8 94 8 70 C8 42 27 14 60 14 Z" fill="url(#bodyG)" stroke="#ecd9c2" stroke-width="1.5"/>
-          <ellipse cx="34" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/>
-          <ellipse cx="86" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/>
-          <g class="eyes">
-            <g class="eyes-open"><ellipse cx="44" cy="62" rx="4.2" ry="5.6" fill="#3b2f2a"/><ellipse cx="76" cy="62" rx="4.2" ry="5.6" fill="#3b2f2a"/>
-              <circle cx="45.5" cy="60" r="1.4" fill="#fff"/><circle cx="77.5" cy="60" r="1.4" fill="#fff"/></g>
-            <g class="eyes-happy" fill="none" stroke="#3b2f2a" stroke-width="3" stroke-linecap="round"><path d="M38 64 Q44 56 50 64"/><path d="M70 64 Q76 56 82 64"/></g>
-            <g class="eyes-sleep" fill="none" stroke="#3b2f2a" stroke-width="2.6" stroke-linecap="round"><path d="M38 62 Q44 67 50 62"/><path d="M70 62 Q76 67 82 62"/></g>
-            <path class="mouth" d="M55 72 Q57.5 75.5 60 72 Q62.5 75.5 65 72" fill="none" stroke="#3b2f2a" stroke-width="2" stroke-linecap="round"/>
-            <ellipse class="mouth-open" cx="60" cy="74" rx="4" ry="3.6" fill="#b85c5c"/>
-          </g>
-        </svg>
-      </div></div></div>
-      <div class="zzz">z z</div>
-      <div class="bubble" id="bubble"></div>
-    </div>
 
     <div class="shadeLayer" id="shadeLayer"></div>
     <div class="glow" id="glow"></div>
@@ -340,16 +343,25 @@
   <div class="grab"></div>
   <h3>せってい</h3>
   <div class="field">
-    <div class="row"><label for="nameInput">なまえ</label><input id="nameInput" maxlength="10" placeholder="もち" enterkeyhint="done" /></div>
+    <div class="row"><label for="nameInput">おもち</label><input id="nameInput" maxlength="10" placeholder="もち" enterkeyhint="done" /></div>
+    <div class="row"><label for="shibaInput">しば犬</label><input id="shibaInput" maxlength="10" placeholder="こてつ" enterkeyhint="done" /></div>
+    <div class="row"><label for="poodleInput">トイプードル</label><input id="poodleInput" maxlength="10" placeholder="ココ" enterkeyhint="done" /></div>
     <div class="row"><label>いっしょにいた時間</label><span class="val" id="totalVal">0分</span></div>
   </div>
   <div class="field">
     <div class="row"><button class="link" id="exportBtn">データを書き出す</button></div>
     <div class="row"><button class="link" id="importBtn">データを取り込む</button></div>
   </div>
-  <p class="note">部屋の空は、いまの時刻に合わせて変わります。床をタップすると、そこまで歩いてきます。</p>
+  <p class="note">部屋の空は、いまの時刻に合わせて変わります。床をタップすると、みんなそこまで歩いてきます。ドアをタップすると、おへやに出し入れできます。</p>
   <div id="versionLabel"></div>
   <input type="file" id="importFile" accept="application/json,.json" hidden />
+</div>
+<div class="sheetBg" id="roomSheetBg"></div>
+<div class="sheet" id="roomSheet">
+  <div class="grab"></div>
+  <h3>おへや</h3>
+  <div class="field" id="roomList"></div>
+  <p class="note">おへやに入った子は、画面には出てきません。よぶと、ドアから出てきます。</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -361,7 +373,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '1.0.0';
+  const APP_VERSION = '1.2.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -379,7 +391,7 @@
   function kvPut(val) { return new Promise((res) => { try { const r = _db.transaction('kv', 'readwrite').objectStore('kv').put(val); r.onsuccess = () => res(); r.onerror = () => res(); } catch (e) { res(); } }); }
 
   // ---------- 状態 ----------
-  const S = { id: 'pet', name: 'もち', totalSec: 0, sound: 'none', updatedAt: 0 };
+  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', inRoom: { mochi: false, shiba: false, poodle: false }, totalSec: 0, sound: 'none', updatedAt: 0 };
   let lightOff = false;
   async function save() { S.updatedAt = Date.now(); await kvPut({ ...S }); }
 
@@ -448,207 +460,390 @@
     dusk: ['もうすぐ夜だね', 'あかりがついたよ', 'きょうもおつかれさま'],
     night: ['そろそろ休もうか', '夜はしずかでいいね', '今日のことはもうおしまい', 'ゆっくり眠れますように'],
     any: ['ここにいるよ', '深呼吸しよっか', 'きてくれてうれしい', 'ぼーっとしよ', 'なにもしなくていいよ', 'ゆっくりでいいよ', 'ふわぁ…'],
-    pet: ['えへへ', 'もっと〜', 'くすぐったい', 'ふふっ', 'すき', 'きもちいい…'],
     greet: { dawn: 'おはよう、はやいね', day: 'おかえり', evening: 'おかえり、おつかれさま', dusk: 'おかえり', night: 'おかえり。夜だね' },
   };
-  let bubbleT, lastSpoke = 0;
-  function say(text, ms = 3200) {
-    const b = $('#bubble'); b.textContent = text; b.classList.add('show');
-    lastSpoke = Date.now(); clearTimeout(bubbleT);
-    bubbleT = setTimeout(() => b.classList.remove('show'), ms);
-  }
+  const KIND_LINES = {
+    mochi:  { pet: ['えへへ', 'もっと〜', 'くすぐったい', 'ふふっ', 'すき', 'きもちいい…'], eat: ['おいしい！', 'ごちそうさま', 'しあわせ〜', 'おなかいっぱい'], wow: 'わぁ！', sleepy: 'むにゃ…' },
+    shiba:  { idle: ['わん', 'くんくん…', 'ふんっ', 'ひなた、すき', 'しっぽ ふりふり'], pet: ['わふっ', 'くぅ〜ん', 'もっとなでて', 'そこそこ'], eat: ['うまっ', 'わんっ！', 'ごちそうさま'], wow: 'わんっ！', sleepy: 'すぴー…' },
+    poodle: { idle: ['きゃん！', 'ふわふわでしょ', 'あそぼ〜', 'くるくる〜', 'ねむねむ'], pet: ['くぅん', 'えへへ', 'ぷるぷる', 'すき〜'], eat: ['おいしい〜', 'きゃん！', 'もっと〜'], wow: 'きゃん！', sleepy: 'くー…' },
+  };
+  let lastSpoke = 0;
   function randomLine() { return Math.random() < 0.55 ? pick(LINES[phase()]) : pick(LINES.any); }
 
-  // ---------- ペット ----------
-  const petEl = $('#pet');
-  const P = { x: 50, y: 18, dir: 1, mode: 'idle', token: 0 };
+  // ---------- なかまたちの絵 ----------
+  const EYES = (lx, rx, y) => `
+    <g class="eyes-open"><ellipse cx="${lx}" cy="${y}" rx="4.2" ry="5.6" fill="#3b2f2a"/><ellipse cx="${rx}" cy="${y}" rx="4.2" ry="5.6" fill="#3b2f2a"/>
+      <circle cx="${lx + 1.5}" cy="${y - 2}" r="1.4" fill="#fff"/><circle cx="${rx + 1.5}" cy="${y - 2}" r="1.4" fill="#fff"/></g>
+    <g class="eyes-happy" fill="none" stroke="#3b2f2a" stroke-width="3" stroke-linecap="round"><path d="M${lx - 6} ${y + 2} Q${lx} ${y - 6} ${lx + 6} ${y + 2}"/><path d="M${rx - 6} ${y + 2} Q${rx} ${y - 6} ${rx + 6} ${y + 2}"/></g>
+    <g class="eyes-sleep" fill="none" stroke="#3b2f2a" stroke-width="2.6" stroke-linecap="round"><path d="M${lx - 6} ${y} Q${lx} ${y + 5} ${lx + 6} ${y}"/><path d="M${rx - 6} ${y} Q${rx} ${y + 5} ${rx + 6} ${y}"/></g>`;
+  const MOUTH = (y) => `<path class="mouth" d="M55 ${y} Q57.5 ${y + 3.5} 60 ${y} Q62.5 ${y + 3.5} 65 ${y}" fill="none" stroke="#3b2f2a" stroke-width="2" stroke-linecap="round"/>
+    <ellipse class="mouth-open" cx="60" cy="${y + 2}" rx="4" ry="3.6" fill="#b85c5c"/>`;
+
+  const SVG_MOCHI = `<svg viewBox="0 0 120 110">
+    <defs><radialGradient id="bodyG" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#fff6ea"/><stop offset="1" stop-color="#f6e4cf"/></radialGradient></defs>
+    <path d="M60 10 C60 4 64 0 70 0 C70 6 66 10 60 10 Z" fill="#9fc27f"/><path d="M60 10 C60 5 56 2 51 3 C52 8 56 10 60 10 Z" fill="#b3d192"/>
+    <path d="M60 10 V16" stroke="#8aad6a" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="40" cy="103" rx="11" ry="5" fill="#f1dcc3"/><ellipse cx="80" cy="103" rx="11" ry="5" fill="#f1dcc3"/>
+    <path d="M60 14 C93 14 112 42 112 70 C112 94 90 104 60 104 C30 104 8 94 8 70 C8 42 27 14 60 14 Z" fill="url(#bodyG)" stroke="#ecd9c2" stroke-width="1.5"/>
+    <ellipse cx="34" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/><ellipse cx="86" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/>
+    <g class="eyes">${EYES(44, 76, 62)}${MOUTH(72)}</g></svg>`;
+
+  const SVG_SHIBA = `<svg viewBox="0 0 120 110">
+    <g class="tail"><path d="M86 86 C104 86 111 70 103 61 C96 54 85 60 89 68 C92 74 100 71 98 66" fill="none" stroke="#E39B55" stroke-width="9" stroke-linecap="round"/>
+      <path d="M97 64 C100 69 94 73 90 68" fill="none" stroke="#FFF4E2" stroke-width="3" stroke-linecap="round"/></g>
+    <ellipse cx="60" cy="88" rx="30" ry="19" fill="#E39B55" stroke="#CF8543" stroke-width="1.5"/>
+    <ellipse cx="60" cy="91" rx="16" ry="14" fill="#FFF4E2"/>
+    <ellipse cx="46" cy="104" rx="9" ry="5" fill="#FFF4E2" stroke="#ecd6b8" stroke-width="1"/><ellipse cx="74" cy="104" rx="9" ry="5" fill="#FFF4E2" stroke="#ecd6b8" stroke-width="1"/>
+    <path d="M26 42 L27 11 Q28 6 32 8 L53 27 Z" fill="#E39B55" stroke="#CF8543" stroke-width="1.5" stroke-linejoin="round"/><path d="M31 33 L31 16 L45 28 Z" fill="#FFF4E2"/>
+    <path d="M94 42 L93 11 Q92 6 88 8 L67 27 Z" fill="#E39B55" stroke="#CF8543" stroke-width="1.5" stroke-linejoin="round"/><path d="M89 33 L89 16 L75 28 Z" fill="#FFF4E2"/>
+    <ellipse cx="60" cy="52" rx="38" ry="32" fill="#E39B55" stroke="#CF8543" stroke-width="1.5"/>
+    <path d="M23 58 C28 77 43 84 60 84 C77 84 92 77 97 58 C88 63 78 61 72 57 C66 61 54 61 48 57 C42 61 32 63 23 58 Z" fill="#FFF4E2"/>
+    <ellipse cx="46" cy="42" rx="4.2" ry="2.6" fill="#FFF4E2"/><ellipse cx="74" cy="42" rx="4.2" ry="2.6" fill="#FFF4E2"/>
+    <ellipse cx="33" cy="67" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.55"/><ellipse cx="87" cy="67" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.55"/>
+    <g class="eyes">${EYES(47, 73, 52)}<ellipse cx="60" cy="63" rx="4.4" ry="3.2" fill="#3b2f2a"/>${MOUTH(67.5)}</g></svg>`;
+
+  function fluff(circles, fill, edge) {
+    return circles.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r + 1.8}" fill="${edge}"/>`).join('')
+      + circles.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>`).join('');
+  }
+  const PF = '#D9A06E', PE = '#C48755';
+  const earL = [[27, 55, 10], [24, 68, 10], [27, 81, 9]];
+  const SVG_POODLE = `<svg viewBox="0 0 120 110">
+    <g class="tail">${fluff([[100, 76, 8]], PF, PE)}</g>
+    ${fluff([[60, 91, 20], [45, 97, 11], [75, 97, 11], [46, 104, 7], [74, 104, 7]], PF, PE)}
+    ${fluff([[60, 54, 29], [45, 28, 11], [60, 22, 12], [75, 28, 11], [38, 40, 9], [82, 40, 9]], PF, PE)}
+    ${fluff(earL, PF, PE)}${fluff(earL.map(([x, y, r]) => [120 - x, y, r]), PF, PE)}
+    <ellipse cx="60" cy="66" rx="14" ry="10" fill="#EDC9A0"/>
+    <ellipse cx="38" cy="62" rx="5.5" ry="3.5" fill="#f4a3a3" opacity="0.55"/><ellipse cx="82" cy="62" rx="5.5" ry="3.5" fill="#f4a3a3" opacity="0.55"/>
+    <g class="eyes">${EYES(48, 72, 50)}<ellipse cx="60" cy="62" rx="3.8" ry="2.9" fill="#3b2f2a"/>${MOUTH(66)}</g></svg>`;
+
+  // ---------- なかまたち ----------
+  const room = $('#room');
   const FLOOR = { xMin: 16, xMax: 84, yMin: 9, yMax: 29 };
   function depthScale(y) { return 1.14 - ((y - FLOOR.yMin) / (FLOOR.yMax - FLOOR.yMin)) * 0.3; }
-  function setPos(x, y, dur) {
-    petEl.style.transitionDuration = dur + 's';
-    petEl.style.left = x + '%'; petEl.style.bottom = y + '%';
-    petEl.style.setProperty('--s', depthScale(y).toFixed(3));
-    petEl.style.zIndex = String(10 + Math.round((FLOOR.yMax - y)));
-    P.x = x; P.y = y;
-  }
-  function face(dir) { P.dir = dir; petEl.style.setProperty('--dir', dir); petEl.style.setProperty('--look', 0); }
-  function lookAt(x) { face(x < P.x ? -1 : 1); }
-  function cls(name, on) { petEl.classList.toggle(name, on); }
-  async function moveTo(x, y, speed = 6) {
-    const tok = ++P.token;
-    const dist = Math.hypot(x - P.x, (y - P.y) * 1.6);
-    if (dist < 0.8) return tok === P.token;
-    if (Math.abs(x - P.x) > 1) face(x < P.x ? -1 : 1);
-    const dur = Math.max(0.6, dist / speed);
-    cls('sit', false); cls('walk', true);
-    setPos(x, y, dur);
-    await sleep(dur * 1000);
-    if (tok !== P.token) return false;
-    cls('walk', false);
-    return true;
-  }
-  function stopMove() {
-    P.token++;
-    const r = petEl.getBoundingClientRect(), room = $('#room').getBoundingClientRect();
-    const x = ((r.left + r.width / 2 - room.left) / room.width) * 100;
-    const y = ((room.bottom - r.bottom) / room.height) * 100;
-    setPos(clamp(x, FLOOR.xMin, FLOOR.xMax), clamp(y, FLOOR.yMin, FLOOR.yMax), 0);
-    cls('walk', false);
-  }
-  function hearts(n = 3) {
-    const room = $('#room');
-    for (let i = 0; i < n; i++) {
-      setTimeout(() => {
-        const h = document.createElement('div'); h.className = 'heart'; h.textContent = pick(['♡', '♥', '♡']);
-        h.style.color = pick(['#f08a8a', '#f4a3a3', '#e8916b']);
-        h.style.left = (P.x + rand(-6, 6)) + '%';
-        h.style.bottom = (P.y + 13 * depthScale(P.y)) + '%';
-        h.style.setProperty('--dx', rand(-24, 24) + 'px');
-        room.appendChild(h); setTimeout(() => h.remove(), 1700);
-      }, i * 220);
+  let allPets = [], pets = [], mochi = null; // pets = いまリビングにいる子
+  const speaker = () => pets[0] || null;
+  function refreshPets() { pets = allPets.filter((p) => !p.away && p.mode !== 'leaving'); }
+
+  class Pet {
+    constructor(kind, svg, w, start) {
+      this.kind = kind; this.w = w; this.x = start[0]; this.y = start[1]; this.dir = 1; this.mode = 'idle'; this.token = 0;
+      const el = document.createElement('div');
+      el.className = 'pet ' + kind; el.style.setProperty('--w', w);
+      el.innerHTML = `<div class="pet-shadow"></div><div class="bob"><div class="breath"><div class="flip">${svg}</div></div></div><div class="zzz">z z</div><div class="bubble"></div>`;
+      room.insertBefore(el, $('#shadeLayer'));
+      this.el = el; this.bubble = el.querySelector('.bubble'); this.breathEl = el.querySelector('.breath');
+      el.addEventListener('click', (e) => { e.stopPropagation(); this.onTap(); });
+      this.setPos(this.x, this.y, 0); this.face(Math.random() < 0.5 ? -1 : 1);
+    }
+    cls(n, on) { this.el.classList.toggle(n, on); }
+    setPos(x, y, dur) {
+      const el = this.el;
+      el.style.transitionDuration = dur + 's';
+      el.style.left = x + '%'; el.style.bottom = y + '%';
+      el.style.setProperty('--s', depthScale(y).toFixed(3));
+      el.style.zIndex = String(10 + Math.round((FLOOR.yMax - y)));
+      this.x = x; this.y = y;
+    }
+    face(d) { this.dir = d; this.el.style.setProperty('--dir', d); }
+    lookAt(x) { if (Math.abs(x - this.x) > 1) this.face(x < this.x ? -1 : 1); }
+    async moveTo(x, y, speed = 6) {
+      const tok = ++this.token;
+      const dist = Math.hypot(x - this.x, (y - this.y) * 1.6);
+      if (dist < 0.8) return true;
+      this.lookAt(x);
+      const dur = Math.max(0.6, dist / speed);
+      this.cls('sit', false); this.cls('walk', true);
+      this.setPos(x, y, dur);
+      await sleep(dur * 1000);
+      if (tok !== this.token) return false;
+      this.cls('walk', false);
+      return true;
+    }
+    stopMove() {
+      this.token++;
+      const r = this.el.getBoundingClientRect(), rm = room.getBoundingClientRect();
+      const x = ((r.left + r.width / 2 - rm.left) / rm.width) * 100;
+      const y = ((rm.bottom - r.bottom) / rm.height) * 100;
+      this.setPos(clamp(x, FLOOR.xMin, FLOOR.xMax), clamp(y, FLOOR.yMin, FLOOR.yMax), 0);
+      this.cls('walk', false);
+    }
+    say(text, ms = 3200) {
+      allPets.forEach((p) => p !== this && p.hush());
+      this.bubble.textContent = text; this.bubble.classList.add('show'); this.cls('speaking', true);
+      lastSpoke = Date.now(); clearTimeout(this.bt);
+      this.bt = setTimeout(() => this.hush(), ms);
+    }
+    hush() { clearTimeout(this.bt); this.bubble.classList.remove('show'); this.cls('speaking', false); }
+    happy(ms = 1600) {
+      this.cls('happy', false); void this.el.offsetWidth; this.cls('happy', true);
+      clearTimeout(this.ht); this.ht = setTimeout(() => this.cls('happy', false), ms);
+    }
+    hop() { this.cls('jump', true); setTimeout(() => this.cls('jump', false), 650); }
+    hearts(n = 3) {
+      for (let i = 0; i < n; i++) {
+        setTimeout(() => {
+          const h = document.createElement('div'); h.className = 'heart'; h.textContent = pick(['♡', '♥', '♡']);
+          h.style.color = pick(['#f08a8a', '#f4a3a3', '#e8916b']);
+          h.style.left = (this.x + rand(-6, 6)) + '%';
+          h.style.bottom = (this.y + 13 * depthScale(this.y) * this.w) + '%';
+          h.style.setProperty('--dx', rand(-24, 24) + 'px');
+          room.appendChild(h); setTimeout(() => h.remove(), 1700);
+        }, i * 220);
+      }
+    }
+    line(type) { const L = KIND_LINES[this.kind]; return L[type] ? pick(L[type]) : randomLine(); }
+    onTap() {
+      if (this.mode === 'breath') return;
+      if (this.mode === 'sleep') { this.say(KIND_LINES[this.kind].sleepy, 1800); return; }
+      if (this.mode === 'idle') { this.stopMove(); this.cls('sit', false); }
+      this.happy(); this.hearts(3); this.say(this.line('pet'), 1800);
+    }
+    freeSpot() {
+      let best = null, bestD = -1;
+      for (let i = 0; i < 10; i++) {
+        const x = rand(FLOOR.xMin, FLOOR.xMax), y = rand(FLOOR.yMin, FLOOR.yMax);
+        const d = Math.min(...pets.filter((p) => p !== this).map((p) => Math.hypot(p.x - x, (p.y - y) * 1.6)), 999);
+        if (d > 22) return [x, y];
+        if (d > bestD) { bestD = d; best = [x, y]; }
+      }
+      return best;
+    }
+    async wander(delay) {
+      await sleep(delay);
+      while (true) {
+        await sleep(rand(3500, 9000));
+        if (this.mode !== 'idle' || document.hidden) continue;
+        const r = Math.random();
+        if (r < 0.55) { const [x, y] = this.freeSpot(); await this.moveTo(x, y, rand(4.5, 7) * (this.kind === 'poodle' ? 1.2 : 1)); }
+        else if (r < 0.72) this.cls('sit', true);
+        else if (r < 0.86) { this.cls('sit', false); this.face(this.x > 40 ? -1 : 1); }
+        else { this.cls('sit', false); this.hop(); }
+        if (this.mode === 'idle' && Date.now() - lastSpoke > 20000 && Math.random() < 0.3) this.say(this.line('idle'));
+      }
     }
   }
-  let happyT;
-  function beHappy(ms = 1600) {
-    cls('happy', false); void petEl.offsetWidth; cls('happy', true);
-    clearTimeout(happyT); happyT = setTimeout(() => cls('happy', false), ms);
-  }
 
-  // なでる
-  petEl.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (P.mode === 'breath') return;
-    if (P.mode === 'sleep') { say('むにゃ…', 1800); return; }
-    if (P.mode === 'idle') { stopMove(); cls('sit', false); }
-    beHappy(); hearts(3);
-    say(pick(LINES.pet), 1800);
-  });
-
-  // 床タップでそこへ歩く
-  $('#room').addEventListener('click', async (e) => {
-    if (e.target.closest('.pet, button')) return;
-    const room = $('#room').getBoundingClientRect();
-    const xp = ((e.clientX - room.left) / room.width) * 100;
-    const yp = ((room.bottom - e.clientY) / room.height) * 100;
-    if (P.mode !== 'idle') return;
-    if (yp > 40) { lookAt(xp); petEl.style.setProperty('--look', 0); return; }
+  // なでる：各Petのクリック / 床タップでみんな寄ってくる
+  room.addEventListener('click', async (e) => {
+    if (e.target.closest('.pet, button, .door')) return;
+    const rm = room.getBoundingClientRect();
+    const xp = ((e.clientX - rm.left) / rm.width) * 100;
+    const yp = ((rm.bottom - e.clientY) / rm.height) * 100;
+    const idle = pets.filter((p) => p.mode === 'idle');
+    if (!idle.length) return;
+    if (yp > 40) { idle.forEach((p) => p.lookAt(xp)); return; }
     const r = document.createElement('div'); r.className = 'ripple';
     r.style.left = xp + '%'; r.style.bottom = yp + '%';
-    $('#room').appendChild(r); setTimeout(() => r.remove(), 750);
-    const ok = await moveTo(clamp(xp, FLOOR.xMin, FLOOR.xMax), clamp(yp - 2, FLOOR.yMin, FLOOR.yMax), 9);
-    if (ok && P.mode === 'idle' && Math.random() < 0.4) { cls('jump', true); setTimeout(() => cls('jump', false), 650); }
+    room.appendChild(r); setTimeout(() => r.remove(), 750);
+    idle.sort((a, b) => Math.hypot(a.x - xp, a.y - yp) - Math.hypot(b.x - xp, b.y - yp));
+    const OFF = [[0, 0], [-25, 4], [25, 4]];
+    const tx = clamp(xp, 36, 64), ty = clamp(yp - 2, FLOOR.yMin, FLOOR.yMax - 4);
+    idle.forEach(async (p, i) => {
+      await sleep(i * 180);
+      const ok = await p.moveTo(clamp(tx + OFF[i][0], 11, 89), clamp(ty + OFF[i][1], FLOOR.yMin, FLOOR.yMax), 9);
+      if (ok && p.mode === 'idle') { p.lookAt(xp); if (Math.random() < 0.4) p.hop(); }
+    });
   });
-
-  // ぶらぶら
-  async function wander() {
-    while (true) {
-      await sleep(rand(3500, 8500));
-      if (P.mode !== 'idle' || document.hidden) continue;
-      const r = Math.random();
-      if (r < 0.55) {
-        cls('sit', false);
-        await moveTo(rand(FLOOR.xMin, FLOOR.xMax), rand(FLOOR.yMin, FLOOR.yMax), rand(4.5, 7));
-      } else if (r < 0.72) {
-        cls('sit', true);
-      } else if (r < 0.86) {
-        cls('sit', false); face(P.x > 40 ? -1 : 1); // 窓のほうを見る
-      } else {
-        cls('sit', false); cls('jump', true); setTimeout(() => cls('jump', false), 650);
-      }
-      if (P.mode === 'idle' && Date.now() - lastSpoke > 25000 && Math.random() < 0.35) say(randomLine());
-    }
-  }
 
   // ---------- ごはん ----------
-  const FOODS = ['🍙', '🍓', '🍡', '🍵', '🍪', '🍑', '🍠', '🥛'];
-  let foodIdx = Math.floor(Math.random() * FOODS.length);
+  const FOODS = { mochi: ['🍙', '🍓', '🍡', '🍵', '🍑', '🍠'], shiba: ['🦴', '🍖', '🍠'], poodle: ['🍪', '🧁', '🍓'] };
+  const foodIdx = { mochi: 0, shiba: 0, poodle: 0 };
+  let feeding = false, foodXs = [];
   $('#btnFood').addEventListener('click', async () => {
-    if (P.mode === 'sleep') { toast('ぐっすり寝てるみたい'); return; }
-    if (P.mode !== 'idle') return;
-    P.mode = 'eat'; stopMove(); cls('sit', false);
+    if (lightOff) { toast('みんなぐっすり寝てるみたい'); return; }
+    if (feeding || breathing) return;
+    if (!pets.length) { toast('いまは だれもいないよ'); return; }
+    const eaters = pets.filter((p) => p.mode === 'idle');
+    if (!eaters.length) return;
+    feeding = true; foodXs = [];
+    await Promise.all(eaters.map((p, i) => feed(p, i * 450, i === 0)));
+    feeding = false;
+  });
+  async function feed(p, delay, first) {
+    p.mode = 'eat'; p.stopMove(); p.cls('sit', false);
+    await sleep(delay);
+    const list = FOODS[p.kind];
     const food = document.createElement('div'); food.className = 'food dropIn';
-    food.textContent = FOODS[foodIdx]; foodIdx = (foodIdx + 1) % FOODS.length;
-    const side = P.x > 50 ? -1 : 1;
-    const fx = clamp(P.x + side * rand(26, 34), 12, 88);
-    const fy = clamp(P.y + rand(-3, 3), FLOOR.yMin, FLOOR.yMax);
+    food.textContent = list[foodIdx[p.kind]++ % list.length];
+    // 他の子や他のごはんから離れた側に置く
+    const others = pets.filter((q) => q !== p).map((q) => q.x).concat(foodXs);
+    const cands = [-1, 1].map((sd) => clamp(p.x + sd * rand(24, 30), 10, 90));
+    const fx = cands.sort((a, b) => Math.min(...others.map((o) => Math.abs(o - b)), 99) - Math.min(...others.map((o) => Math.abs(o - a)), 99))[0];
+    foodXs.push(fx);
+    const fy = clamp(p.y + rand(-2, 2), FLOOR.yMin, FLOOR.yMax);
     food.style.left = fx + '%'; food.style.bottom = fy + '%';
     food.style.zIndex = String(10 + Math.round(FLOOR.yMax - fy));
-    food.style.fontSize = (30 * depthScale(fy)) + 'px';
-    $('#room').appendChild(food);
-    lookAt(fx); say('わぁ！', 1200);
+    food.style.fontSize = (28 * depthScale(fy)) + 'px';
+    room.appendChild(food);
+    p.lookAt(fx); if (first) p.say(KIND_LINES[p.kind].wow, 1200);
     await sleep(700);
-    await moveTo(fx + (fx > P.x ? -20 : 20), fy + 0.3, 8);
-    lookAt(fx);
-    cls('eat', true);
+    const gap = 19 * p.w;
+    await p.moveTo(fx + (fx > p.x ? -gap : gap), fy + 0.3, 8);
+    p.lookAt(fx);
+    p.cls('eat', true);
     for (let i = 0; i < 3; i++) {
-      cls('chomp', true); await sleep(380); cls('chomp', false); await sleep(380);
+      p.cls('chomp', true); await sleep(380); p.cls('chomp', false); await sleep(380);
       food.style.transform = `translateX(-50%) scale(${1 - (i + 1) * 0.3})`;
     }
-    food.remove(); cls('eat', false);
-    beHappy(); hearts(4);
-    say(pick(['おいしい！', 'ごちそうさま', 'しあわせ〜', 'おなかいっぱい']), 2200);
-    P.mode = 'idle';
-  });
+    food.remove(); p.cls('eat', false);
+    p.happy(); p.hearts(3);
+    p.say(p.line('eat'), 2000);
+    p.mode = 'idle';
+  }
 
   // ---------- あかり ----------
+  const SLEEP_SPOTS = { mochi: [28, 15.5], shiba: [62, 10], poodle: [80, 19] };
   function updateLightBtn() {
     $('#btnLight').classList.toggle('active', lightOff);
     $('#lightLabel').textContent = lightOff ? 'おきる' : 'おやすみ';
   }
-  $('#btnLight').addEventListener('click', async () => {
-    if (P.mode === 'breath' || P.mode === 'eat') return;
+  $('#btnLight').addEventListener('click', () => {
+    if (breathing || feeding) return;
     lightOff = !lightOff; updateLightBtn(); applyTime();
     if (lightOff) {
-      P.mode = 'sleep-going'; say('おやすみ…', 1600);
-      await moveTo(28, 15.5, 6);
-      if (!lightOff) return;
-      face(1); cls('sit', false); cls('sleep', true); P.mode = 'sleep';
+      speaker()?.say(pets.length > 1 ? 'みんな、おやすみ…' : 'おやすみ…', 1800);
+      pets.forEach(async (p) => {
+        p.mode = 'sleep-going';
+        const [x, y] = SLEEP_SPOTS[p.kind];
+        await p.moveTo(x, y, 6);
+        if (!lightOff || p.away || p.mode !== 'sleep-going') return;
+        p.face(p.kind === 'shiba' ? -1 : 1); p.cls('sit', false); p.cls('sleep', true); p.mode = 'sleep';
+      });
     } else {
-      P.token++; cls('walk', false); cls('sleep', false); P.mode = 'idle';
-      setTimeout(() => say(phase() === 'night' ? 'まだ夜だよ…' : 'ふわぁ、おはよ', 2200), 300);
+      pets.forEach((p) => { p.token++; p.cls('walk', false); p.cls('sleep', false); p.mode = 'idle'; });
+      setTimeout(() => speaker()?.say(phase() === 'night' ? 'まだ夜だよ…' : 'ふわぁ、おはよ', 2200), 300);
+      setTimeout(() => { if (!lightOff && pets.length > 1) pick(pets.slice(1)).hop(); }, 1200);
     }
   });
 
-  // ---------- 深呼吸 ----------
-  let breathRun = 0;
+  // ---------- 深呼吸（みんなで） ----------
+  const BREATH_SPOTS = { mochi: [50, 17], shiba: [24, 21], poodle: [76, 21] };
+  let breathRun = 0, breathing = false;
+  function setBreath(scale, sec) {
+    pets.forEach((p) => { p.breathEl.style.transitionDuration = sec + 's'; p.breathEl.style.transform = `scale(${scale})`; });
+    const halo = $('#halo'); halo.style.transitionDuration = sec + 's';
+    halo.style.transform = `translate(-50%, 30%) scale(${scale > 1 ? 1 : 0.55})`;
+  }
   $('#btnBreath').addEventListener('click', async () => {
-    if (P.mode === 'sleep') { toast('起こしてからにしよう'); return; }
-    if (P.mode !== 'idle') return;
-    P.mode = 'breath'; const run = ++breathRun;
-    $('#bubble').classList.remove('show');
-    cls('sit', false);
+    if (lightOff) { toast('起こしてからにしよう'); return; }
+    if (breathing || feeding || allPets.some((p) => p.mode === 'leaving' || p.mode === 'coming')) return;
+    breathing = true; const run = ++breathRun;
+    pets.forEach((p) => { p.hush(); p.stopMove(); p.cls('sit', false); p.mode = 'breath'; });
     document.body.classList.add('breathing');
-    $('#breathWord').textContent = 'いっしょに'; $('#breathCount').textContent = '';
-    await moveTo(50, 17, 8); face(1);
-    const br = $('#petBreath'), halo = $('#halo'), word = $('#breathWord'), cnt = $('#breathCount');
+    const word = $('#breathWord'), cnt = $('#breathCount');
+    word.textContent = 'いっしょに'; cnt.textContent = '';
+    await Promise.all(pets.map((p) => p.moveTo(...BREATH_SPOTS[p.kind], 8)));
+    if (run !== breathRun) return;
+    pets.forEach((p) => p.face(p.x > 55 ? -1 : 1));
     await sleep(1200);
     const CYCLES = 5;
     for (let i = 1; i <= CYCLES && run === breathRun; i++) {
       cnt.textContent = i + ' / ' + CYCLES;
-      word.textContent = 'すって';
-      br.style.transitionDuration = '4s'; halo.style.transitionDuration = '4s';
-      br.style.transform = 'scale(1.28)'; halo.style.transform = 'translate(-50%, 30%) scale(1)';
+      word.textContent = 'すって'; setBreath(1.26, 4);
       await sleep(4000); if (run !== breathRun) break;
       word.textContent = 'とめて';
       await sleep(2000); if (run !== breathRun) break;
-      word.textContent = 'はいて';
-      br.style.transitionDuration = '6s'; halo.style.transitionDuration = '6s';
-      br.style.transform = 'scale(1)'; halo.style.transform = 'translate(-50%, 30%) scale(.55)';
+      word.textContent = 'はいて'; setBreath(1, 6);
       await sleep(6000);
     }
     if (run === breathRun) endBreath(true);
   });
   function endBreath(done) {
-    breathRun++;
-    const br = $('#petBreath'), halo = $('#halo');
-    br.style.transitionDuration = '1s'; br.style.transform = 'scale(1)';
-    halo.style.transitionDuration = '1s'; halo.style.transform = 'translate(-50%, 30%) scale(.55)';
+    breathRun++; breathing = false;
+    setBreath(1, 1);
     document.body.classList.remove('breathing');
-    P.mode = 'idle';
-    beHappy(); if (done) hearts(3);
-    setTimeout(() => say(done ? 'すっきりしたね' : 'またやろうね', 2400), 400);
+    pets.forEach((p) => { p.token++; p.cls('walk', false); p.mode = 'idle'; p.happy(); if (done) p.hearts(2); });
+    setTimeout(() => speaker()?.say(done ? 'すっきりしたね' : 'またやろうね', 2400), 400);
   }
-  $('#breathEnd').addEventListener('click', (e) => { e.stopPropagation(); if (P.mode === 'breath') endBreath(false); });
+  $('#breathEnd').addEventListener('click', (e) => { e.stopPropagation(); if (breathing) endBreath(false); });
+
+  // ---------- おへや（奥の部屋に出し入れ） ----------
+  const DOOR = { x: 87.5, y: FLOOR.yMax, inY: 36 };
+  const door = $('#door');
+  const KIND_LABEL = { mochi: 'おもち', shiba: 'しば犬', poodle: 'トイプードル' };
+  const NAME_KEY = { mochi: 'name', shiba: 'shibaName', poodle: 'poodleName' };
+  const BACK_LINE = { mochi: 'ただいま〜', shiba: 'わんっ！', poodle: 'きゃん！' };
+  const BYE_LINE = { mochi: 'ちょっとおへやにいるね', shiba: 'くぅん（またね）', poodle: 'またあとでね〜' };
+  let doorBusy = 0, doorT;
+  function openDoor() { doorBusy++; clearTimeout(doorT); door.classList.add('open'); }
+  function closeDoor(ms = 500) { doorT = setTimeout(() => { if (--doorBusy <= 0) { doorBusy = 0; door.classList.remove('open'); } }, ms); }
+  function updateDoor() {
+    const n = allPets.filter((p) => p.away).length;
+    door.classList.toggle('lit', n > 0);
+    renderHud();
+  }
+  async function sendToRoom(p) {
+    if (p.away || p.mode === 'leaving' || p.mode === 'coming') return;
+    p.mode = 'leaving'; refreshPets(); pets = pets.filter((q) => q !== p);
+    p.token++; p.cls('sleep', false); p.cls('sit', false); p.cls('happy', false);
+    p.say(BYE_LINE[p.kind], 1600);
+    p.stopMove();
+    await p.moveTo(DOOR.x, DOOR.y, 7);
+    openDoor(); p.face(1);
+    await sleep(450);
+    p.hush();
+    p.cls('walk', true);
+    p.el.style.transitionDuration = '0.9s';
+    p.el.style.bottom = DOOR.inY + '%'; p.el.style.opacity = '0';
+    p.el.style.setProperty('--s', (depthScale(DOOR.y) * 0.85).toFixed(3));
+    await sleep(900);
+    p.cls('walk', false); p.cls('gone', true);
+    p.away = true; p.mode = 'away';
+    S.inRoom[p.kind] = true; save(); updateDoor(); closeDoor(300);
+  }
+  async function callFromRoom(p) {
+    if (!p.away) return;
+    openDoor();
+    await sleep(500);
+    p.away = false; p.mode = 'coming';
+    p.el.style.transitionDuration = '0s';
+    p.el.style.left = DOOR.x + '%'; p.el.style.bottom = DOOR.inY + '%'; p.el.style.opacity = '0';
+    p.el.style.setProperty('--s', (depthScale(DOOR.y) * 0.85).toFixed(3));
+    p.x = DOOR.x; p.y = DOOR.inY;
+    p.cls('gone', false); void p.el.offsetWidth;
+    p.face(-1); p.cls('walk', true);
+    p.el.style.opacity = '1';
+    p.setPos(DOOR.x, DOOR.y, 0.9);
+    await sleep(900);
+    p.cls('walk', false);
+    S.inRoom[p.kind] = false; save(); updateDoor(); closeDoor(400);
+    const tx = rand(45, 70), ty = rand(FLOOR.yMin + 4, FLOOR.yMax - 4);
+    await p.moveTo(tx, ty, 7);
+    if (lightOff) {
+      p.mode = 'sleep-going'; refreshPets();
+      const [x, y] = SLEEP_SPOTS[p.kind]; await p.moveTo(x, y, 6);
+      if (lightOff && p.mode === 'sleep-going') { p.cls('sleep', true); p.mode = 'sleep'; }
+      return;
+    }
+    p.mode = 'idle'; refreshPets();
+    p.hop(); p.happy(); p.hearts(2); p.say(BACK_LINE[p.kind], 2000);
+  }
+  function renderRoomSheet() {
+    const svgs = { mochi: SVG_MOCHI, shiba: SVG_SHIBA, poodle: SVG_POODLE };
+    $('#roomList').innerHTML = allPets.map((p, i) => `
+      <div class="roomRow">
+        <div class="avatar">${svgs[p.kind]}</div>
+        <div class="who"><b>${escapeHtml(S[NAME_KEY[p.kind]] || '')}</b><span>${KIND_LABEL[p.kind]} ・ ${p.away ? 'おへやにいるよ' : 'リビング'}</span></div>
+        <button data-i="${i}" class="${p.away ? 'call' : ''}">${p.away ? 'よぶ' : 'おへやへ'}</button>
+      </div>`).join('');
+  }
+  function escapeHtml(t) { return String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function openRoomSheet() { renderRoomSheet(); $('#roomSheetBg').classList.add('show'); $('#roomSheet').classList.add('show'); }
+  function closeRoomSheet() { $('#roomSheetBg').classList.remove('show'); $('#roomSheet').classList.remove('show'); }
+  door.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (breathing) return;
+    openRoomSheet();
+  });
+  $('#roomSheetBg').addEventListener('click', closeRoomSheet);
+  $('#roomList').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-i]'); if (!b) return;
+    const p = allPets[+b.dataset.i];
+    if (feeding) { toast('ごはんのあとにしよう'); return; }
+    closeRoomSheet();
+    setTimeout(() => (p.away ? callFromRoom(p) : sendToRoom(p)), 350);
+  });
 
   // ---------- おと（WebAudioで合成） ----------
   const SOUNDS = ['none', 'rain', 'fire', 'wave'];
@@ -736,7 +931,8 @@
     const h = Math.floor(m / 60); return h + '時間' + (m % 60 ? (m % 60) + '分' : '');
   }
   function renderHud() {
-    $('#petName').textContent = S.name || 'もち';
+    const here = [['mochi', S.name || 'もち'], ['shiba', S.shibaName || 'こてつ'], ['poodle', S.poodleName || 'ココ']].filter(([k]) => !(S.inRoom && S.inRoom[k])).map(([, n]) => n);
+    $('#petName').textContent = here.length ? here.join('・') : 'しずかな部屋';
     $('#together').textContent = 'いっしょに ' + fmtTime(S.totalSec);
     $('#totalVal').textContent = fmtTime(S.totalSec);
   }
@@ -753,16 +949,18 @@
   });
 
   // ---------- 設定シート ----------
-  function openSheet() { $('#nameInput').value = S.name; renderHud(); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
+  const NAME_FIELDS = [['#nameInput', 'name', 0], ['#shibaInput', 'shibaName', 1], ['#poodleInput', 'poodleName', 2]];
+  function openSheet() { NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
   function closeSheet() {
-    $('#nameInput').blur();
-    const v = $('#nameInput').value.trim();
-    if (v && v !== S.name) { S.name = v; save(); renderHud(); setTimeout(() => say('いいなまえ！', 2000), 350); }
+    let changed = null;
+    NAME_FIELDS.forEach(([sel, key, i]) => { const el = $(sel); el.blur(); const v = el.value.trim(); if (v && v !== S[key]) { S[key] = v; changed = allPets[i]; } });
+    if (changed && changed.away) changed = null;
+    if (changed) { save(); renderHud(); setTimeout(() => { changed.happy(); changed.say(changed.kind === 'mochi' ? 'いいなまえ！' : KIND_LINES[changed.kind].wow, 2000); }, 350); }
     $('#sheetBg').classList.remove('show'); $('#sheet').classList.remove('show');
   }
   $('#settingsBtn').addEventListener('click', openSheet);
   $('#sheetBg').addEventListener('click', closeSheet);
-  $('#nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); });
+  NAME_FIELDS.forEach(([sel]) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); }));
 
   const SCHEMA = 'hidamari.v1';
   $('#exportBtn').addEventListener('click', () => {
@@ -779,9 +977,9 @@
       const data = JSON.parse(await f.text());
       if (data.schema !== SCHEMA || !data.pet) { toast('ひだまりのデータではないみたい'); return; }
       const p = data.pet;
-      if ((p.updatedAt || 0) > S.updatedAt) { S.name = p.name || S.name; }
+      if ((p.updatedAt || 0) > S.updatedAt) { S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; }
       S.totalSec = Math.max(S.totalSec, p.totalSec || 0); // 時間は増えるだけ
-      await save(); renderHud(); $('#nameInput').value = S.name; toast('取り込んだよ');
+      await save(); renderHud(); NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); toast('取り込んだよ');
     } catch (err) { toast('読み込めなかった'); }
   });
 
@@ -792,9 +990,15 @@
     try { await openDB(); const saved = await kvGet('pet'); if (saved) Object.assign(S, saved); } catch (e) {}
     $('#versionLabel').textContent = 'v' + APP_VERSION;
     renderHud(); updateSoundBtn(); updateLightBtn(); applyTime();
-    setPos(50, 18, 0); face(1);
-    setTimeout(() => { beHappy(); say(LINES.greet[phase()], 2800); }, 700);
-    wander();
+    S.inRoom = Object.assign({ mochi: false, shiba: false, poodle: false }, S.inRoom || {});
+    mochi = new Pet('mochi', SVG_MOCHI, 1, [50, 17]);
+    allPets = [mochi, new Pet('shiba', SVG_SHIBA, 1.0, [27, 24]), new Pet('poodle', SVG_POODLE, 0.84, [70, 13])];
+    allPets[0].face(1); allPets[1].face(1); allPets[2].face(-1);
+    allPets.forEach((p) => { if (S.inRoom[p.kind]) { p.away = true; p.mode = 'away'; p.cls('gone', true); } });
+    refreshPets(); updateDoor();
+    setTimeout(() => { const sp = speaker(); if (sp) { sp.happy(); sp.say(sp.kind === 'mochi' ? LINES.greet[phase()] : KIND_LINES[sp.kind].wow, 2800); } }, 700);
+    setTimeout(() => { pets.slice(1).forEach((p, i) => (i ? p.hop() : p.happy())); }, 1200);
+    allPets.forEach((p, i) => p.wander(i * 1700));
   })();
 
   function setupViewportTracking() {

@@ -402,6 +402,9 @@
   .row input { flex: 1; min-width: 0; text-align: right; border: 0; outline: none; font-family: inherit; font-size: 16px; color: var(--ink); background: none; -webkit-user-select: text; user-select: text; }
   .row .val { font-size: 14px; color: var(--ink2); }
   .row button.link { border: 0; background: none; color: var(--accent); font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; padding: 10px 0; width: 100%; text-align: left; }
+  .vrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; }
+  .vrow + .vrow { border-top: 1px solid rgba(160,120,80,0.1); }
+  .vrow .vl { font-size: 14px; white-space: nowrap; }
   .secLabel { font-size: 12px; color: var(--ink2); padding: 0 6px 6px; }
   .prow { padding: 10px 0; }
   .prow + .prow { border-top: 1px solid rgba(160,120,80,0.14); }
@@ -545,7 +548,7 @@
   <div class="secLabel">おとの大きさ</div>
   <div class="field"><div class="row volRow"><span class="vmin">🔈</span><input type="range" id="volSlider" min="0" max="100" step="1" /><span class="vmax">🔊</span></div></div>
   <div class="secLabel">窓の景色</div>
-  <div class="field"><div class="prow"><div class="pchips" id="winModeChips"></div>
+  <div class="field"><div class="prow"><div id="winModeChips"></div>
     <button class="link small" id="winPhotoBtn">写真をえらぶ</button>
     <input type="file" id="winPhotoFile" accept="image/*" hidden /></div></div>
   <div class="secLabel">へやの名前</div>
@@ -610,7 +613,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '1.8.0';
+  const APP_VERSION = '1.9.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -1550,7 +1553,93 @@
     rain: ['#7b8594', '#a2acb8', '#c6ced7'], rainNight: ['#11151f', '#1d2432', '#2c3444'],
   };
   const LAND_TINT = { dawn: 'rgba(255,165,140,0.20)', day: null, evening: 'rgba(255,135,70,0.24)', dusk: 'rgba(70,45,115,0.45)', night: 'rgba(6,12,42,0.74)' };
-  function sceneKey() { return phase() + (S.sound === 'rain' ? '-rain' : ''); }
+  const DEFAULT_VIEW = { living: 'mountain', washitsu: 'sea', bedroom: 'mountain' };
+  const roomViewOf = (id) => (S.roomView && S.roomView[id]) || DEFAULT_VIEW[id] || 'mountain';
+  function viewType() { const v = roomViewOf(S.curRoom); return v === 'photo' && !photoURL ? 'mountain' : v; }
+  function sceneKey() { return viewType() + '-' + phase() + (S.sound === 'rain' ? '-rain' : ''); }
+  function mixHex(a, b, k) { const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16); const c = (s) => Math.round(((x >> s) & 255) * (1 - k) + ((y >> s) & 255) * k); return `rgb(${c(16)},${c(8)},${c(0)})`; }
+  const seaShoreY = (x, W, H) => H * (0.80 + 0.025 * Math.sin((x / W) * 3.2 + 0.6));
+  function drawSeaLand(lc, W, H, sky) {
+    const hY = H * 0.5;
+    // 遠くの島
+    [[0.02, 0.36, 0.05], [0.66, 0.97, 0.032]].forEach(([a, b, amp], k) => {
+      const len = W * (b - a), pts = ridge(mulberry32(40 + k), len, hY - H * amp * 0.6, H * amp, 0.55, 5);
+      lc.beginPath(); lc.moveTo(W * a, hY + 1);
+      pts.forEach(([x, y]) => { const env = Math.sin(Math.PI * x / len); lc.lineTo(W * a + x, hY - Math.max(0, hY - y) * env); });
+      lc.lineTo(W * b, hY + 1); lc.closePath();
+      lc.fillStyle = '#7f96b4'; lc.fill(); lc.fillStyle = hexA(sky[2], 0.45); lc.fill();
+    });
+    // 海
+    const shore = H * 0.83;
+    const sg = lc.createLinearGradient(0, hY, 0, shore);
+    sg.addColorStop(0, mixHex(sky[2], '#6fa7cc', 0.45)); sg.addColorStop(0.3, '#4f93bf'); sg.addColorStop(0.78, '#3a86a6'); sg.addColorStop(1, '#5fbcb8');
+    lc.fillStyle = sg; lc.fillRect(0, hY, W, shore - hY + 2);
+    const tx = mulberry32(61);
+    for (let i = 0; i < 170; i++) { const u = Math.pow(tx(), 1.8), y = hY + 2 + u * (shore - hY), w = 4 + u * 26 + tx() * 10; lc.fillStyle = `rgba(20,60,90,${0.08 + tx() * 0.1})`; lc.fillRect(tx() * W, y, w, 0.8 + u * 1.2); }
+    lc.fillStyle = hexA(sky[2], 0.5); lc.fillRect(0, hY, W, 1.5);
+    // 砂浜
+    const beach = () => { lc.beginPath(); lc.moveTo(0, seaShoreY(0, W, H)); for (let x = 0; x <= W; x += 6) lc.lineTo(x, seaShoreY(x, W, H)); lc.lineTo(W, H); lc.lineTo(0, H); lc.closePath(); };
+    beach(); const bg2 = lc.createLinearGradient(0, H * 0.78, 0, H); bg2.addColorStop(0, '#cdb48a'); bg2.addColorStop(0.12, '#dcc59c'); bg2.addColorStop(1, '#ecdcb9');
+    lc.fillStyle = bg2; lc.fill();
+    const sp = mulberry32(62);
+    for (let i = 0; i < 220; i++) { const x = sp() * W, y = seaShoreY(x, W, H) + sp() * (H - seaShoreY(x, W, H)); lc.fillStyle = `rgba(${sp() < 0.5 ? '150,120,80' : '255,250,235'},${0.15 + sp() * 0.2})`; lc.fillRect(x, y, 1.5, 1.2); }
+    const rk = mulberry32(63);
+    [[0.08, 0.9], [0.15, 0.93], [0.88, 0.95]].forEach(([fx, fy]) => { const r = W * (0.018 + rk() * 0.02); lc.fillStyle = ['#8c8a82', '#77756e'][Math.floor(rk() * 2)]; lc.beginPath(); lc.ellipse(W * fx, H * fy, r * 1.5, r, 0, 0, Math.PI * 2); lc.fill(); });
+    lc.strokeStyle = '#6f8a4e'; lc.lineCap = 'round';
+    for (let i = 0; i < 26; i++) { const left = i < 12, x = left ? W * (0.0 + (i / 12) * 0.12) : W * (0.86 + ((i - 12) / 14) * 0.14), h = H * (0.03 + ((i * 7) % 5) / 140);
+      lc.lineWidth = 1.4; lc.beginPath(); lc.moveTo(x, H); lc.quadraticCurveTo(x + (left ? 4 : -4), H - h * 0.6, x + (left ? 7 : -7), H - h); lc.stroke(); }
+  }
+  function drawSeaGlitter(ctx, W, H) {
+    const ph = phase(); if (S.sound === 'rain') return;
+    const night = ph === 'night' || ph === 'dusk';
+    const sx = W * (night ? 0.26 : { dawn: 0.28, day: 0.76, evening: 0.7 }[ph]), hY = H * 0.5, shore = H * 0.8;
+    for (let y = hY + 1; y < shore; y += 2) {
+      const k = (y - hY) / (shore - hY), w = W * (0.015 + 0.16 * k);
+      const g = ctx.createLinearGradient(sx - w, 0, sx + w, 0);
+      const c = night ? '255,245,210' : ph === 'day' ? '255,255,235' : '255,205,140';
+      const a = (night ? 0.16 : 0.26) * (1 - k * 0.6);
+      g.addColorStop(0, `rgba(${c},0)`); g.addColorStop(0.5, `rgba(${c},${a})`); g.addColorStop(1, `rgba(${c},0)`);
+      ctx.fillStyle = g; ctx.fillRect(sx - w, y, w * 2, 2);
+    }
+  }
+  function drawSeaLive(ctx, W, H, t, small) {
+    const ph = phase(), night = ph === 'night' || ph === 'dusk', rain = S.sound === 'rain';
+    const hY = H * 0.5, shoreMid = H * 0.8;
+    // 岸へ寄せてくる波
+    const n = small ? 10 : 20;
+    for (let i = 0; i < n; i++) {
+      const u = (((i / n) + t / 14) % 1 + 1) % 1, y = hY + (shoreMid - hY) * Math.pow(u, 1.5);
+      const len = W * (0.04 + 0.38 * u), x = W * ((((i * 0.37) % 1) * 1.2) - 0.1) + Math.sin(t * 0.2 + i) * 10;
+      const a = (night ? 0.25 : 0.6) * Math.sin(Math.PI * u);
+      ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = (small ? 0.5 : 0.8) + u * (small ? 1 : 2);
+      ctx.beginPath(); ctx.moveTo(x - len / 2, y); ctx.quadraticCurveTo(x - len / 4, y - 1.5 - u * 3, x, y); ctx.quadraticCurveTo(x + len / 4, y + 1, x + len / 2, y); ctx.stroke();
+    }
+    // 光の反射のきらめき
+    if (!rain) {
+      const sx = W * (night ? 0.26 : { dawn: 0.28, day: 0.76, evening: 0.7 }[ph]), slot = Math.floor(t * 2.5);
+      for (let i = 0; i < (small ? 14 : 36); i++) {
+        const r = mulberry32(slot * 131 + i), k = r(), y = hY + 2 + Math.pow(k, 1.3) * (shoreMid - hY - 4), w = W * (0.015 + 0.16 * k);
+        const x = sx + (r() - 0.5) * 2 * w, al = (night ? 0.5 : 0.85) * (0.4 + 0.6 * Math.abs(Math.sin(t * 6 + i)));
+        ctx.fillStyle = night ? `rgba(255,245,210,${al})` : `rgba(255,255,240,${al})`; ctx.fillRect(x, y, (small ? 2 : 4) + k * 5, small ? 0.8 : 1.2);
+      }
+    }
+    // 小さな船（水平線をゆっくり）
+    const bx = ((t * W * 0.008 + W * 0.3) % (W * 1.3)) - W * 0.15, by = hY + H * 0.004, bs = W * (small ? 0.03 : 0.022);
+    ctx.fillStyle = night ? 'rgba(40,40,60,0.8)' : 'rgba(70,60,60,0.85)'; ctx.fillRect(bx - bs, by - bs * 0.25, bs * 2, bs * 0.3);
+    ctx.fillStyle = night ? 'rgba(160,160,180,0.7)' : 'rgba(255,255,255,0.95)'; ctx.beginPath(); ctx.moveTo(bx, by - bs * 1.6); ctx.lineTo(bx + bs * 0.8, by - bs * 0.3); ctx.lineTo(bx, by - bs * 0.3); ctx.closePath(); ctx.fill();
+    // 波打ちぎわ（寄せては返す）
+    const wash = Math.sin(t * 0.45) * H * 0.012;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 4) { const y = seaShoreY(x, W, H) - H * 0.004 + wash + Math.sin(x * 0.05 + t * 1.3) * 1.5; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.strokeStyle = `rgba(255,255,255,${night ? 0.35 : 0.85})`; ctx.lineWidth = small ? 1.2 : 2.6; ctx.stroke();
+    ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+    ctx.save(); ctx.clip();
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 6) { const y = seaShoreY(x, W, H) - H * 0.018 + wash * 0.6; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    for (let x = W; x >= 0; x -= 6) ctx.lineTo(x, seaShoreY(x, W, H) + wash + 2);
+    ctx.closePath(); ctx.fillStyle = `rgba(255,255,255,${night ? 0.08 : 0.22})`; ctx.fill();
+    ctx.restore();
+  }
   function ridge(rng, w, baseY, amp, rough, n = 7) {
     const N = 2 ** n, pts = new Array(N + 1);
     pts[0] = baseY + (rng() - 0.5) * amp; pts[N] = baseY + (rng() - 0.5) * amp;
@@ -1585,7 +1674,7 @@
       for (let k = 0; k < 6; k++) {
         const x = baseX + (rng() - 0.5) * s * 1.6, yy = y + (rng() - 0.5) * s * 0.35, r = s * (0.35 + rng() * 0.4);
         const g = ctx.createRadialGradient(x, yy, 0, x, yy, r);
-        g.addColorStop(0, `rgba(${col},${rain ? 0.5 : night ? 0.25 : 0.55})`); g.addColorStop(1, `rgba(${col},0)`);
+        g.addColorStop(0, `rgba(${col},${rain ? 0.5 : night ? 0.13 : 0.55})`); g.addColorStop(1, `rgba(${col},0)`);
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, yy, r, 0, Math.PI * 2); ctx.fill();
       }
     }
@@ -1624,7 +1713,10 @@
     // 陸（あとで時間帯の色をかぶせるため別キャンバス）
     const land = document.createElement('canvas'); land.width = canvas.width; land.height = canvas.height;
     const lc = land.getContext('2d'); lc.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const haze = sky[2];
+    const haze = sky[2], vtype = viewType();
+    let rp = null;
+    if (vtype === 'sea') drawSeaLand(lc, W, H, sky);
+    else {
     const LAYERS = [
       { base: 0.40, amp: 0.22, rough: 0.52, top: '#9fb3cf', bot: '#b9c8dc', snow: true },
       { base: 0.47, amp: 0.15, rough: 0.55, top: '#7d95b3', bot: '#9fb2c8' },
@@ -1670,7 +1762,7 @@
     const tr2 = mulberry32(55);
     for (let i = 0; i < 260; i++) { const x = tr2() * W, y = H * (0.67 + tr2() * 0.33); lc.fillStyle = `rgba(${tr2() < 0.5 ? '40,70,30' : '150,180,100'},${0.12 + tr2() * 0.15})`; lc.fillRect(x, y, 2 + tr2() * 6, 1.2); }
     // 川
-    const rp = riverGeom(W, H);
+    rp = riverGeom(W, H);
     riverPath(lc, rp);
     const wg = lc.createLinearGradient(0, H * 0.65, 0, H);
     wg.addColorStop(0, hexA(sky[2], 1)); wg.addColorStop(0.5, hexA(sky[1], 1)); wg.addColorStop(1, hexA(sky[0], 1));
@@ -1685,17 +1777,19 @@
     const rk = mulberry32(77);
     for (let i = 0; i < 14; i++) { const p = rp[10 + Math.floor(rk() * 29)], side = rk() < 0.5 ? -1 : 1; const x = p.x + side * (p.w / 2 + rk() * 6), r = (2 + rk() * 5) * (0.4 + p.t);
       lc.fillStyle = ['#8a8a80', '#9a988c', '#76766c'][i % 3]; lc.beginPath(); lc.ellipse(x, p.y, r * 1.4, r, 0, 0, Math.PI * 2); lc.fill(); }
+    }
     // 時間帯の色
     const tint = LAND_TINT[ph];
     if (tint) { lc.globalCompositeOperation = 'source-atop'; lc.setTransform(1, 0, 0, 1, 0, 0); lc.fillStyle = tint; lc.fillRect(0, 0, land.width, land.height); lc.globalCompositeOperation = 'source-over'; }
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(land, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (vtype === 'sea') drawSeaGlitter(ctx, W, H);
     if (!rain && (ph === 'evening' || ph === 'dawn')) {
       const pos = ph === 'dawn' ? [0.28, 0.44] : [0.7, 0.4];
       const lg2 = ctx.createRadialGradient(W * pos[0], H * pos[1], 0, W * pos[0], H * pos[1], W * 0.8);
       lg2.addColorStop(0, 'rgba(255,190,120,0.28)'); lg2.addColorStop(1, 'rgba(255,190,120,0)');
       ctx.fillStyle = lg2; ctx.fillRect(0, 0, W, H);
     }
-    return { W, H, rp, key };
+    return { W, H, rp, key, type: vtype };
   }
 
   // 部屋の小さな窓
@@ -1705,7 +1799,7 @@
   $('#sky').prepend(winTint); $('#sky').prepend(winImg); $('#sky').prepend(winCanvas);
   let smallKey = '', photoURL = null, smallScene = null;
   const PHOTO_TINT = { dawn: 'rgba(255,170,140,0.18)', day: 'rgba(0,0,0,0)', evening: 'rgba(255,140,70,0.22)', dusk: 'rgba(80,50,120,0.4)', night: 'rgba(8,14,45,0.6)' };
-  function usePhoto() { return S.windowMode === 'photo' && photoURL; }
+  function usePhoto() { return roomViewOf(S.curRoom) === 'photo' && photoURL; }
   function refreshWindow(force) {
     const sky = $('#sky'), r = sky.getBoundingClientRect();
     document.body.classList.toggle('photoWin', !!usePhoto());
@@ -1720,6 +1814,10 @@
   // ---------- 窓の外をながめる ----------
   const view = $('#winView'), vCanvas = $('#winCanvas'), vDyn = $('#winDyn');
   let vScene = null, vStatic = null, vRaf = 0, vStart = 0, bottoT = null, bottoEnd = 0;
+  const VIEW_LINES_SEA = {
+    dawn: ['うみから朝がくるね', 'しずかな朝のうみ'], day: ['うみ、きれいだね', 'なみの音がきこえそう', 'ふね、見えるかな', 'ずっと見てられるね'],
+    evening: ['夕日が うみにうつってる', 'うみがオレンジ色だ'], dusk: ['もうすぐ夜だね', 'うみの色がかわっていく'], night: ['月が うみにうつってる', '夜のうみ、しずかだね'],
+  };
   const VIEW_LINES = {
     dawn: ['空が明るくなってきたね', '朝の山、きれい'], day: ['やまが よく見えるね', '川がきらきらしてる', 'ずっと見てられるね'],
     evening: ['夕日、きれいだね', 'やまが オレンジ色だ'], dusk: ['もうすぐ夜だね', '空のいろ、すき'], night: ['ほし、いっぱいだね', '夜の山も いいね', 'しずかだね'],
@@ -1744,7 +1842,7 @@
     vDyn.width = Math.round(W * Math.min(devicePixelRatio || 1, 2)); vDyn.height = Math.round(H * Math.min(devicePixelRatio || 1, 2));
     vStart = performance.now(); vLive.last = 0; cancelAnimationFrame(vRaf); vRaf = requestAnimationFrame(drawDyn);
     const rain = S.sound === 'rain';
-    viewSpeaker(rain ? 'あめ、しずかだね' : pick(VIEW_LINES[phase()]));
+    viewSpeaker(rain ? 'あめ、しずかだね' : pick((viewType() === 'sea' ? VIEW_LINES_SEA : VIEW_LINES)[phase()]));
     if (botto) setTimeout(startBotto, 700);
   }
   function closeWindowView() {
@@ -1765,12 +1863,14 @@
         dir, speed, size, phase: Math.random() * 6, wob: Math.random() * 6 });
     }
   }
-  function drawLive(ctx, W, H, rp, t, dt, st, small) {
+  function drawLive(ctx, W, H, scene, t, dt, st, small) {
     const ph = phase(), night = ph === 'night' || ph === 'dusk', rain = S.sound === 'rain';
+    const sea = scene && scene.type === 'sea', rp = scene && scene.rp;
     // 雲（ゆっくり流れる。手前ほど速い）
     drawClouds(ctx, W, H, t * W * 0.018, sceneKey());
+    if (sea) drawSeaLive(ctx, W, H, t, small);
     // 霧
-    for (let k = 0; k < 2; k++) {
+    if (!sea) for (let k = 0; k < 2; k++) {
       const y = H * (k ? 0.6 : 0.52), x = ((t * W * (0.02 + k * 0.012) + k * W * 0.6) % (W * 1.8)) - W * 0.4;
       const mg = ctx.createRadialGradient(x, y, 0, x, y, W * 0.55);
       mg.addColorStop(0, `rgba(255,255,255,${night ? 0.07 : 0.2})`); mg.addColorStop(1, 'rgba(255,255,255,0)');
@@ -1781,7 +1881,7 @@
       ctx.save(); riverPath(ctx, rp); ctx.clip();
       const n = small ? 34 : 70, L = rp.length - 1;
       for (let i = 0; i < n; i++) {
-        const sp = 0.07 + (i % 7) * 0.012;
+        const sp = 0.028 + (i % 7) * 0.005;
         const u = ((((i * 0.6180339) % 1 + t * sp) % 1) + 1) % 1;
         const f = Math.pow(u, 0.8) * L, i0 = Math.floor(f), a = rp[i0], b = rp[Math.min(i0 + 1, L)], k = f - i0;
         const x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k, w = a.w + (b.w - a.w) * k;
@@ -1795,7 +1895,7 @@
       // 岸の泡
       for (let side = -1; side <= 1; side += 2) {
         ctx.strokeStyle = `rgba(255,255,255,${night ? 0.12 : 0.45})`; ctx.lineWidth = small ? 0.8 : 1.4;
-        ctx.setLineDash([3 + (small ? 0 : 3), 7]); ctx.lineDashOffset = -t * (small ? 14 : 30) * side * side;
+        ctx.setLineDash([3 + (small ? 0 : 3), 7]); ctx.lineDashOffset = -t * (small ? 5 : 11);
         ctx.beginPath();
         rp.forEach((p, j) => { const x = p.x + side * (p.w / 2 - 2 - p.w * 0.03); j ? ctx.lineTo(x, p.y) : ctx.moveTo(x, p.y); });
         ctx.stroke(); ctx.setLineDash([]);
@@ -1818,7 +1918,7 @@
     } else st.birds = [];
     // 夜：ほたると流れ星
     if (ph === 'night' && !rain) {
-      const nF = small ? 7 : 14;
+      const nF = sea ? 0 : small ? 7 : 14;
       for (let i = 0; i < nF; i++) {
         const x = W * (0.15 + ((i * 53) % 70) / 100) + Math.sin(t * 0.6 + i) * W * 0.045, y = H * (0.7 + ((i * 29) % 25) / 100) + Math.cos(t * 0.8 + i * 2) * H * 0.012;
         const al = 0.5 + 0.5 * Math.sin(t * 2.2 + i * 1.7), r = small ? 4 : 8;
@@ -1836,6 +1936,7 @@
       }
     }
     // 手前の草
+    if (sea) return;
     const gcol = { dawn: '#4a6a3a', day: '#3f6b35', evening: '#55602f', dusk: '#2e3a30', night: '#121e18' }[ph];
     ctx.strokeStyle = gcol; ctx.lineCap = 'round';
     const nG = small ? 40 : 90;
@@ -1855,7 +1956,7 @@
     const t = Math.max(0, (now - vStart) / 1000), dt = clamp(t - (vLive.last || t), 0, 0.1); vLive.last = t;
     const dpr = Math.min(devicePixelRatio || 1, 2), W = vDyn.width / dpr, H = vDyn.height / dpr;
     const ctx = vDyn.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    if (!usePhoto()) drawLive(ctx, W, H, vScene && vScene.rp, t, dt, vLive, false);
+    if (!usePhoto()) drawLive(ctx, W, H, vScene, t, dt, vLive, false);
     if (S.sound === 'rain') drawRain(ctx, W, H, t, false);
     vRaf = requestAnimationFrame(drawDyn);
   }
@@ -1871,7 +1972,7 @@
     const W = smallScene.W, H = smallScene.H, dpr = Math.min(devicePixelRatio || 1, 2);
     if (winLive.width !== Math.round(W * dpr)) { winLive.width = Math.round(W * dpr); winLive.height = Math.round(H * dpr); }
     const ctx = winLive.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    drawLive(ctx, W, H, smallScene.rp, t, dt, sLive, true);
+    drawLive(ctx, W, H, smallScene, t, dt, sLive, true);
   }
   sRaf = requestAnimationFrame(drawSmall);
   // ぼーっとタイム（3分）
@@ -1904,15 +2005,18 @@
   async function loadPhoto() {
     try { const rec = await kvGet('windowPhoto'); if (rec && rec.blob) { if (photoURL) URL.revokeObjectURL(photoURL); photoURL = URL.createObjectURL(rec.blob); } } catch (e) {}
   }
+  const VIEW_OPTS = [['mountain', '山と川'], ['sea', '海'], ['photo', '写真']];
+  let pendingPhotoRoom = null;
   function renderWinSetting() {
-    const mode = usePhoto() ? 'photo' : 'scene';
-    $('#winModeChips').innerHTML = [['scene', '山と川'], ['photo', 'じぶんの写真']].map(([k, l]) => `<button data-mode="${k}" class="${k === mode ? 'on' : ''}">${l}</button>`).join('');
+    $('#winModeChips').innerHTML = ROOM_DEFS.map((r) => `<div class="vrow"><span class="vl">${escapeHtml(roomName(r.id))}</span><div class="pchips">${
+      VIEW_OPTS.map(([k, l]) => `<button data-room="${r.id}" data-mode="${k}" class="${roomViewOf(r.id) === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>`).join('');
     $('#winPhotoBtn').textContent = photoURL ? '写真をえらびなおす' : '写真をえらぶ';
   }
   $('#winModeChips').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-mode]'); if (!b) return;
-    if (b.dataset.mode === 'photo' && !photoURL) { $('#winPhotoFile').click(); return; }
-    S.windowMode = b.dataset.mode; save(); smallKey = ''; refreshWindow(true); renderWinSetting();
+    if (b.dataset.mode === 'photo' && !photoURL) { pendingPhotoRoom = b.dataset.room; $('#winPhotoFile').click(); return; }
+    S.roomView = Object.assign({}, DEFAULT_VIEW, S.roomView || {}, { [b.dataset.room]: b.dataset.mode });
+    save(); smallKey = ''; refreshWindow(true); renderWinSetting();
   });
   $('#winPhotoBtn').addEventListener('click', () => $('#winPhotoFile').click());
   $('#winPhotoFile').addEventListener('change', async (e) => {
@@ -1924,7 +2028,7 @@
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
       const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.86));
       await kvPut({ id: 'windowPhoto', blob });
-      await loadPhoto(); S.windowMode = 'photo'; save(); refreshWindow(true); renderWinSetting(); toast('窓の景色をかえたよ');
+      await loadPhoto(); S.roomView = Object.assign({}, DEFAULT_VIEW, S.roomView || {}, { [pendingPhotoRoom || S.curRoom]: 'photo' }); pendingPhotoRoom = null; save(); refreshWindow(true); renderWinSetting(); toast('窓の景色をかえたよ');
     } catch (err) { toast('写真を読みこめなかった'); }
   });
 
@@ -2086,7 +2190,7 @@
       const data = JSON.parse(await f.text());
       if (data.schema !== SCHEMA || !data.pet) { toast('ひだまりのデータではないみたい'); return; }
       const p = data.pet;
-      if ((p.updatedAt || 0) > S.updatedAt) { if (p.persona) S.persona = p.persona; if (p.roomNames) S.roomNames = p.roomNames; S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; }
+      if ((p.updatedAt || 0) > S.updatedAt) { if (p.persona) S.persona = p.persona; if (p.roomNames) S.roomNames = p.roomNames; if (p.roomView) S.roomView = p.roomView; S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; }
       S.totalSec = Math.max(S.totalSec, p.totalSec || 0); // 時間は増えるだけ
       await save(); renderHud(); NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); toast('取り込んだよ');
     } catch (err) { toast('読み込めなかった'); }
@@ -2110,6 +2214,7 @@
     allPets[0].face(1); allPets[1].face(1); allPets[2].face(-1);
     allPets.forEach((p) => { if (S.petRoom[p.kind] !== S.curRoom) { p.away = true; p.mode = 'away'; p.cls('gone', true); } });
     refreshPets(); updateDoor(); renderTags();
+    if (!S.roomView) { S.roomView = Object.assign({}, DEFAULT_VIEW); if (S.windowMode === 'photo') Object.keys(S.roomView).forEach((k) => { S.roomView[k] = 'photo'; }); }
     await loadPhoto(); refreshWindow(true);
     window.addEventListener('resize', () => { smallKey = ''; refreshWindow(); });
     setTimeout(() => { const sp = speaker(); if (sp) { sp.happy(); sp.say(sp.kind === 'mochi' ? LINES.greet[phase()] : KIND_LINES[sp.kind].wow, 2800); } }, 700);

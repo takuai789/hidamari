@@ -167,12 +167,19 @@
   .pet.sit .bob { transform: scale(1.06, 0.93); transition: transform .5s; transform-origin: 50% 100%; }
   .pet.sleep .bob { animation: snooze 3.6s ease-in-out infinite; transform-origin: 50% 100%; }
   @keyframes snooze { 0%,100% { transform: scale(1.06,0.92); } 50% { transform: scale(1.09,0.89); } }
+  .pet.nope .bob { animation: nope .45s ease-in-out 2; transform-origin: 50% 100%; }
+  @keyframes nope { 0%,100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-4%) rotate(-5deg); } 75% { transform: translateX(4%) rotate(5deg); } }
   .pet.jump .bob { animation: jump .6s ease-out 1; }
   @keyframes jump { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-22%); } }
   .pet .tail { transform-box: fill-box; transform-origin: 15% 85%; }
   .pet.happy .tail, .pet.walk .tail { animation: wag .26s ease-in-out infinite alternate; }
   @keyframes wag { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
   .pet.speaking { z-index: 50 !important; }
+  .tag { position: absolute; left: 50%; top: 100%; margin-top: 3px; transform: translateX(-50%) scale(calc(1 / var(--s, 1))); transform-origin: 50% 0;
+    background: rgba(255,248,238,0.9); color: var(--ink); font-size: 11px; font-weight: 700; line-height: 1.5; letter-spacing: .5px;
+    padding: 1px 9px; border-radius: 10px; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 4px rgba(90,60,30,0.15); border: 1px solid rgba(232,145,107,0.35); }
+  .pet.shiba .tag { border-color: rgba(227,155,85,0.55); }
+  .pet.poodle .tag { border-color: rgba(196,135,85,0.5); }
   .zzz { position: absolute; right: -4%; top: -14%; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.9); opacity: 0; pointer-events: none; letter-spacing: 2px; }
   .pet.sleep .zzz { animation: zzz 3s ease-in-out infinite; }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0,6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(12px,-18px); } }
@@ -190,6 +197,78 @@
   .ripple { z-index: 8; width: 26px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.7); transform: translate(-50%, 50%); pointer-events: none; animation: ripple .7s ease-out forwards; }
   @keyframes ripple { to { transform: translate(-50%, 50%) scale(2.4); opacity: 0; } }
 
+
+  /* ===== 部屋の切りかえ ===== */
+  .room { transition: opacity .26s; }
+  .room.switching { opacity: 0; }
+  .roomNav { pointer-events: auto; position: absolute; left: 50%; top: calc(var(--safe-top) + 12px); transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px; background: rgba(255,248,238,0.82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-radius: 18px; padding: 2px 4px; box-shadow: 0 2px 10px rgba(90,60,30,0.12); }
+  .roomNav button { width: 30px; height: 30px; border: 0; background: none; color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer; font-family: inherit; }
+  .roomNav .dots { display: flex; gap: 6px; padding: 0 2px; }
+  .roomNav .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(90,70,54,0.22); }
+  .roomNav .dots i.on { background: var(--accent); }
+  .roomRow .pchips { margin-top: 6px; }
+  .roomRow .pchips button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .kakejiku, .andon, .chabudai, .bed, .tlamp { display: none; }
+
+  /* ===== 和室 ===== */
+  .room[data-theme="washitsu"] .wall { background: radial-gradient(ellipse at 30% 25%, rgba(255,255,255,0.4), transparent 60%), linear-gradient(#efe5cf, #e2d3b3); }
+  .room[data-theme="washitsu"] .baseboard { background: linear-gradient(#9c7b56, #86653f); }
+  .room[data-theme="washitsu"] .floor { background:
+      linear-gradient(rgba(70,60,20,0), rgba(70,60,20,0.2)),
+      linear-gradient(90deg, transparent 49.3%, #6e6238 49.3% 50.7%, transparent 50.7%),
+      linear-gradient(0deg, transparent 48%, #6e6238 48% 51%, transparent 51%),
+      repeating-linear-gradient(90deg, rgba(90,80,30,0.07) 0 2px, transparent 2px 6px), #cdc88e; }
+  .room[data-theme="washitsu"] .window, .room[data-theme="washitsu"] .sky::before, .room[data-theme="washitsu"] .sky::after, .room[data-theme="washitsu"] .window-sill { background: #8a6a4a; }
+  .room[data-theme="washitsu"] .curtain { border-radius: 0; box-shadow: 0 0 6px rgba(60,40,20,0.2); top: 0; bottom: 0;
+    background: linear-gradient(90deg, rgba(138,106,74,.9) 2px, transparent 2px) 0 0 / 33.4% 100%, linear-gradient(0deg, rgba(138,106,74,.9) 2px, transparent 2px) 0 0 / 100% 25%, #fbf6ea; }
+  .room[data-theme="washitsu"] .curtain.l { left: 0; } .room[data-theme="washitsu"] .curtain.r { right: 0; }
+  .room[data-theme="washitsu"] .closed .curtain { width: 50%; }
+  .room[data-theme="washitsu"] :is(.shelf, .clock, .chest, .rug, .lamp, .plant) { display: none; }
+  .room[data-theme="washitsu"] :is(.kakejiku, .andon, .chabudai) { display: block; }
+  .room[data-theme="washitsu"] .cushion { background: linear-gradient(#9b7bb0, #7f6196); border-radius: 22%; }
+  .room[data-theme="washitsu"] .door .frame { background: #8a6a4a; }
+  .room[data-theme="washitsu"] .door .leaf { background: radial-gradient(ellipse at 30% 80%, rgba(170,190,160,0.35), transparent 50%), linear-gradient(#f5eddb, #e8dbc0); }
+  .room[data-theme="washitsu"] .door .panel, .room[data-theme="washitsu"] .door .knob { display: none; }
+  .room[data-theme="washitsu"] .door .peek { top: 50%; left: 82%; width: 13%; background: #6d4f33; box-shadow: 0 0 0 2px #4d3822; }
+  .room[data-theme="washitsu"] .glow { background: radial-gradient(circle at 31% 83%, rgba(255,205,130,0.7), rgba(255,185,115,0.25) 22%, transparent 48%); }
+  .kakejiku { right: 11%; top: calc(var(--safe-top) + 12%); width: 16%; height: 25%; }
+  .kakejiku::before, .kakejiku::after { content: ''; position: absolute; left: -8%; right: -8%; height: 6px; border-radius: 3px; background: #5c4230; }
+  .kakejiku::before { top: 0; } .kakejiku::after { bottom: 0; }
+  .kakejiku .paper { position: absolute; inset: 5px 0; background: #fbf7ee; border-left: 5px solid #b9a27e; border-right: 5px solid #b9a27e; }
+  .kakejiku .enso { position: absolute; left: 50%; top: 38%; width: 62%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(-20deg); border-radius: 50%; border: 4px solid #3b3330; border-right-color: transparent; }
+  .kakejiku .seal { position: absolute; right: 18%; bottom: 12%; width: 7px; height: 7px; background: #c8483c; border-radius: 1px; }
+  .andon { left: 4%; bottom: 31%; width: 42px; height: 66px; }
+  .andon .box { position: absolute; left: 3px; right: 3px; top: 0; bottom: 8px; border-radius: 3px; background: linear-gradient(90deg, rgba(90,60,30,.5) 2px, transparent 2px) 0 0 / 50% 100%, linear-gradient(#fff6de, #ffe6b3); box-shadow: 0 0 0 2px #5c4230, 0 0 22px 6px rgba(255,210,140,0.45); }
+  .andon::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: #5c4230; border-radius: 2px; }
+  .chabudai { left: 30%; bottom: 31%; width: 30%; height: 9%; }
+  .chabudai .top { position: absolute; left: 0; right: 0; top: 0; height: 42%; border-radius: 50%; background: linear-gradient(#a5764c, #8c6039); box-shadow: 0 3px 0 #74502f; }
+  .chabudai .leg { position: absolute; top: 34%; bottom: 0; width: 6px; background: #74502f; border-radius: 2px; }
+  .chabudai .leg.l { left: 22%; } .chabudai .leg.r { right: 22%; }
+  .chabudai .cup { position: absolute; left: 58%; top: -22%; width: 12px; height: 11px; border-radius: 2px 2px 5px 5px; background: #6f8b6a; }
+
+  /* ===== しんしつ ===== */
+  .room[data-theme="bedroom"] .wall { background:
+      radial-gradient(circle at 12px 12px, rgba(255,255,255,0.8) 1.2px, transparent 1.6px) 0 0 / 34px 34px,
+      radial-gradient(circle at 29px 26px, rgba(255,240,200,0.7) 1px, transparent 1.4px) 0 0 / 34px 34px,
+      linear-gradient(#dfe3ee, #cdd4e4); }
+  .room[data-theme="bedroom"] .baseboard { background: linear-gradient(#b3bbcf, #a0a9c0); }
+  .room[data-theme="bedroom"] .floor { background: linear-gradient(rgba(60,50,70,0), rgba(60,50,70,0.22)),
+      repeating-linear-gradient(90deg, #c9b39c 0 18%, #b39c86 18% 18.5%, #c2ac95 18.5% 37%, #b39c86 37% 37.5%); }
+  .room[data-theme="bedroom"] .curtain { background: repeating-linear-gradient(90deg, #7c8bb3 0 10px, #7383ac 10px 20px); }
+  .room[data-theme="bedroom"] :is(.lamp, .cushion, .chest .mug, .chest .vase, .plant) { display: none; }
+  .room[data-theme="bedroom"] :is(.bed, .tlamp) { display: block; }
+  .room[data-theme="bedroom"] .chest { right: 25%; width: 16%; height: 10%; padding: 9% 12% 0; }
+  .room[data-theme="bedroom"] .rug { background: radial-gradient(ellipse at center, #c3cbe2 0 38%, #a9b4d2 39% 52%, #c3cbe2 53% 62%, #95a2c4 63% 100%); left: 30%; right: 5%; }
+  .room[data-theme="bedroom"] .door .leaf { background: linear-gradient(#f4f2ee, #e2dfd7); }
+  .room[data-theme="bedroom"] .glow { background: radial-gradient(circle at 74% 64%, rgba(255,205,130,0.7), rgba(255,185,115,0.25) 24%, transparent 50%); }
+  .bed { left: 1%; bottom: 29%; width: 46%; height: 17%; }
+  .tlamp { position: absolute; left: 34%; bottom: 100%; width: 30px; height: 30px; }
+  .tlamp::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 15px; background: linear-gradient(#fbe3bd, #f1c98f); clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); }
+  .tlamp i { position: absolute; left: 13px; top: 15px; width: 4px; height: 10px; background: #7a604b; }
+  .tlamp::after { content: ''; position: absolute; left: 7px; right: 7px; bottom: 0; height: 5px; border-radius: 3px; background: #7a604b; }
+
   /* ===== HUD ===== */
   .hud { position: absolute; left: 0; right: 0; top: 0; z-index: 40; display: flex; justify-content: space-between; align-items: flex-start;
     padding: calc(var(--safe-top) + 8px) 14px 0; pointer-events: none; }
@@ -201,7 +280,7 @@
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--ink); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(90,60,30,0.12); cursor: pointer; }
 
   /* ===== ドック ===== */
-  .dock { position: relative; z-index: 40; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  .dock { position: relative; z-index: 40; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px;
     padding: 10px 12px calc(var(--safe-bottom) + 10px); background: #FBF1E4; border-top: 1px solid rgba(160,120,80,0.14); transition: transform .5s, opacity .5s; }
   .dock button { border: 0; background: none; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; border-radius: 14px; cursor: pointer; }
   .dock button:active { background: rgba(232,145,107,0.12); }
@@ -209,6 +288,26 @@
   .dock .lb { font-size: 11.5px; font-weight: 500; white-space: nowrap; }
   .dock button.active .ic { background: var(--accent); color: #fff; }
   body.breathing .dock { opacity: 0.3; pointer-events: none; }
+  .dock .ic { width: 44px; height: 44px; }
+  .dock .lb { font-size: 11px; }
+
+  /* ===== おはなし ===== */
+  .talk { position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; background: #FBF1E4; border-radius: 22px 22px 0 0;
+    padding: 14px 16px calc(var(--safe-bottom) + 14px); box-shadow: 0 -6px 24px rgba(90,60,30,0.14);
+    transform: translateY(105%); transition: transform .38s cubic-bezier(.32,.72,0,1); }
+  body.talking .talk { transform: translateY(0); }
+  .talk .head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .talk .head .avatar { width: 38px; height: 35px; }
+  .talk .head b { flex: 1; font-size: 14px; font-weight: 700; }
+  .talk .close { width: 30px; height: 30px; border-radius: 50%; border: 0; background: #f0e2d1; color: var(--ink2); font-size: 16px; line-height: 1; cursor: pointer; }
+  .talk .text { font-size: 17px; line-height: 1.65; min-height: 2.2em; padding: 2px 2px 12px; }
+  .talk .choices { display: flex; flex-wrap: wrap; gap: 8px; min-height: 42px; }
+  .talk .choices button { border: 1.5px solid rgba(232,145,107,0.55); background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 500;
+    padding: 9px 16px; border-radius: 20px; cursor: pointer; animation: chipIn .3s ease-out both; }
+  .talk .choices button:nth-child(2) { animation-delay: .06s; } .talk .choices button:nth-child(3) { animation-delay: .12s; } .talk .choices button:nth-child(4) { animation-delay: .18s; }
+  .talk .choices button:active { background: #fdeee6; }
+  @keyframes chipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  body.talking .hud { opacity: 0.5; }
   body.breathing .hud { opacity: 0; pointer-events: none; }
 
   /* ===== 深呼吸 ===== */
@@ -236,6 +335,14 @@
   .row input { flex: 1; min-width: 0; text-align: right; border: 0; outline: none; font-family: inherit; font-size: 16px; color: var(--ink); background: none; -webkit-user-select: text; user-select: text; }
   .row .val { font-size: 14px; color: var(--ink2); }
   .row button.link { border: 0; background: none; color: var(--accent); font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; padding: 10px 0; width: 100%; text-align: left; }
+  .secLabel { font-size: 12px; color: var(--ink2); padding: 0 6px 6px; }
+  .prow { padding: 10px 0; }
+  .prow + .prow { border-top: 1px solid rgba(160,120,80,0.14); }
+  .prow .pl { font-size: 14px; font-weight: 500; margin-bottom: 7px; }
+  .pchips { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pchips button { border: 1.5px solid rgba(160,120,80,0.22); background: #fff; color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 6px 10px; border-radius: 16px; cursor: pointer; }
+  .pchips button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+  #sheet { max-height: 90%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .note { font-size: 12px; color: var(--ink2); line-height: 1.6; padding: 0 4px 12px; }
   #versionLabel { text-align: center; font-size: 12px; color: rgba(90,70,54,0.35); padding-top: 4px; }
   .toast { position: fixed; left: 50%; top: calc(var(--safe-top) + 64px); z-index: 200; transform: translate(-50%, -20px); opacity: 0;
@@ -286,11 +393,22 @@
       <div class="inside"></div>
       <div class="leaf"><div class="peek"></div><div class="panel a"></div><div class="panel b"></div><div class="knob"></div></div>
     </div>
-    <div class="chest"><div class="drawer"></div><div class="drawer"></div><div class="mug"></div><div class="vase"></div></div>
+    <div class="chest"><div class="drawer"></div><div class="drawer"></div><div class="mug"></div><div class="vase"></div><div class="tlamp"><i></i></div></div>
+    <div class="kakejiku"><div class="paper"><div class="enso"></div><div class="seal"></div></div></div>
+    <div class="chabudai"><div class="top"></div><div class="leg l"></div><div class="leg r"></div><div class="cup"></div></div>
+    <svg class="bed" viewBox="0 0 200 90" preserveAspectRatio="none">
+      <rect x="0" y="4" width="16" height="86" rx="6" fill="#b98a60"/><rect x="186" y="40" width="14" height="50" rx="5" fill="#b98a60"/>
+      <rect x="10" y="48" width="180" height="26" rx="6" fill="#fffaf2"/>
+      <path d="M58 40 H186 Q192 40 192 48 V74 H58 Q50 74 50 66 V48 Q50 40 58 40 Z" fill="#8fa3cf"/>
+      <path d="M58 40 H186 Q192 40 192 48 V52 H50 V48 Q50 40 58 40 Z" fill="#b6c4e2"/>
+      <ellipse cx="36" cy="44" rx="22" ry="10" fill="#ffffff" stroke="#e6ded2"/>
+      <rect x="12" y="74" width="8" height="14" fill="#9c7350"/><rect x="180" y="74" width="8" height="14" fill="#9c7350"/>
+    </svg>
     <div class="rug"></div>
     <div class="cushion"></div>
 
     <div class="lamp"><div class="shade"></div><div class="pole"></div><div class="base"></div></div>
+    <div class="andon"><div class="box"></div></div>
     <svg class="plant" viewBox="0 0 70 110">
       <path d="M35 82 C33 60 22 48 12 40" stroke="#6f8a55" stroke-width="2" fill="none"/>
       <path d="M36 82 C38 58 50 44 60 34" stroke="#6f8a55" stroke-width="2" fill="none"/>
@@ -317,6 +435,7 @@
 
   <div class="hud">
     <div class="chip"><div class="nm" id="petName">もち</div><div class="tm" id="together">いっしょに 0分</div></div>
+    <div class="roomNav"><button id="roomPrev" aria-label="まえの部屋">‹</button><span class="dots" id="roomDots"></span><button id="roomNext" aria-label="つぎの部屋">›</button></div>
     <button class="roundBtn" id="settingsBtn" aria-label="設定">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>
     </button>
@@ -326,6 +445,9 @@
     <button id="btnFood"><span class="ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></svg>
     </span><span class="lb">ごはん</span></button>
+    <button id="btnTalk"><span class="ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg>
+    </span><span class="lb">はなす</span></button>
     <button id="btnBreath"><span class="ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h6"/></svg>
     </span><span class="lb">深呼吸</span></button>
@@ -335,6 +457,11 @@
     <button id="btnSound"><span class="ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
     </span><span class="lb" id="soundLabel">おと</span></button>
+  </div>
+  <div class="talk" id="talk">
+    <div class="head"><div class="avatar" id="talkAvatar"></div><b id="talkName"></b><button class="close" id="talkClose" aria-label="とじる">×</button></div>
+    <div class="text" id="talkText"></div>
+    <div class="choices" id="talkChoices"></div>
   </div>
 </div>
 
@@ -348,20 +475,28 @@
     <div class="row"><label for="poodleInput">トイプードル</label><input id="poodleInput" maxlength="10" placeholder="ココ" enterkeyhint="done" /></div>
     <div class="row"><label>いっしょにいた時間</label><span class="val" id="totalVal">0分</span></div>
   </div>
+  <div class="secLabel">へやの名前</div>
+  <div class="field">
+    <div class="row"><label for="room0">1つめ</label><input id="room0" maxlength="10" placeholder="リビング" enterkeyhint="done" /></div>
+    <div class="row"><label for="room1">2つめ</label><input id="room1" maxlength="10" placeholder="和室" enterkeyhint="done" /></div>
+    <div class="row"><label for="room2">3つめ</label><input id="room2" maxlength="10" placeholder="しんしつ" enterkeyhint="done" /></div>
+  </div>
+  <div class="secLabel">せいかく</div>
+  <div class="field" id="personaField"></div>
   <div class="field">
     <div class="row"><button class="link" id="exportBtn">データを書き出す</button></div>
     <div class="row"><button class="link" id="importBtn">データを取り込む</button></div>
   </div>
-  <p class="note">部屋の空は、いまの時刻に合わせて変わります。床をタップすると、みんなそこまで歩いてきます。ドアをタップすると、おへやに出し入れできます。</p>
+  <p class="note">部屋の空は、いまの時刻に合わせて変わります。床をタップすると、みんなそこまで歩いてきます。左右にスワイプするか ‹ › で部屋を移動できます。ドアをタップすると、だれをどの部屋にいさせるか決められます。同じ部屋の子どうしは、ときどき遊んだりおしゃべりしたりします。ごはんは食べすぎると断られます（20分ごとにおなかがすきます）。</p>
   <div id="versionLabel"></div>
   <input type="file" id="importFile" accept="application/json,.json" hidden />
 </div>
 <div class="sheetBg" id="roomSheetBg"></div>
 <div class="sheet" id="roomSheet">
   <div class="grab"></div>
-  <h3>おへや</h3>
+  <h3>だれが どの部屋？</h3>
   <div class="field" id="roomList"></div>
-  <p class="note">おへやに入った子は、画面には出てきません。よぶと、ドアから出てきます。</p>
+  <p class="note">部屋をえらぶと、ドアから出ていきます。いま見ている部屋をえらぶと、ドアから入ってきます。</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -373,7 +508,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '1.6.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -391,7 +526,7 @@
   function kvPut(val) { return new Promise((res) => { try { const r = _db.transaction('kv', 'readwrite').objectStore('kv').put(val); r.onsuccess = () => res(); r.onerror = () => res(); } catch (e) { res(); } }); }
 
   // ---------- 状態 ----------
-  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', inRoom: { mochi: false, shiba: false, poodle: false }, totalSec: 0, sound: 'none', updatedAt: 0 };
+  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', curRoom: 'living', petRoom: { mochi: 'living', shiba: 'living', poodle: 'living' }, roomNames: {}, full: {}, persona: { mochi: 'ottori', shiba: 'cool', poodle: 'genki' }, totalSec: 0, sound: 'none', updatedAt: 0 };
   let lightOff = false;
   async function save() { S.updatedAt = Date.now(); await kvPut({ ...S }); }
 
@@ -530,7 +665,7 @@
       this.kind = kind; this.w = w; this.x = start[0]; this.y = start[1]; this.dir = 1; this.mode = 'idle'; this.token = 0;
       const el = document.createElement('div');
       el.className = 'pet ' + kind; el.style.setProperty('--w', w);
-      el.innerHTML = `<div class="pet-shadow"></div><div class="bob"><div class="breath"><div class="flip">${svg}</div></div></div><div class="zzz">z z</div><div class="bubble"></div>`;
+      el.innerHTML = `<div class="pet-shadow"></div><div class="bob"><div class="breath"><div class="flip">${svg}</div></div></div><div class="zzz">z z</div><div class="bubble"></div><div class="tag"></div>`;
       room.insertBefore(el, $('#shadeLayer'));
       this.el = el; this.bubble = el.querySelector('.bubble'); this.breathEl = el.querySelector('.breath');
       el.addEventListener('click', (e) => { e.stopPropagation(); this.onTap(); });
@@ -592,7 +727,11 @@
         }, i * 220);
       }
     }
-    line(type) { const L = KIND_LINES[this.kind]; return L[type] ? pick(L[type]) : randomLine(); }
+    line(type) {
+      const P = personaOf(this), L = KIND_LINES[this.kind];
+      if ((type === 'idle' || type === 'pet') && Math.random() < 0.55) return pick(P[type]);
+      return L[type] ? pick(L[type]) : randomLine();
+    }
     onTap() {
       if (this.mode === 'breath') return;
       if (this.mode === 'sleep') { this.say(KIND_LINES[this.kind].sleepy, 1800); return; }
@@ -612,12 +751,14 @@
     async wander(delay) {
       await sleep(delay);
       while (true) {
-        await sleep(rand(3500, 9000));
+        const P = personaOf(this);
+        await sleep(rand(...P.rest));
         if (this.mode !== 'idle' || document.hidden) continue;
-        const r = Math.random();
-        if (r < 0.55) { const [x, y] = this.freeSpot(); await this.moveTo(x, y, rand(4.5, 7) * (this.kind === 'poodle' ? 1.2 : 1)); }
-        else if (r < 0.72) this.cls('sit', true);
-        else if (r < 0.86) { this.cls('sit', false); this.face(this.x > 40 ? -1 : 1); }
+        const r = Math.random(), spd = rand(4.5, 7) * P.speed * (this.kind === 'poodle' ? 1.15 : 1);
+        if (P.follow && Math.random() < P.follow) { await this.moveTo(rand(38, 62), rand(FLOOR.yMin, FLOOR.yMin + 5), spd); if (this.mode === 'idle') { this.face(1); this.hop(); } }
+        else if (r < P.walk) { const [x, y] = this.freeSpot(); await this.moveTo(x, y, spd); }
+        else if (r < P.walk + P.sit) this.cls('sit', true);
+        else if (r < 1 - P.hop) { this.cls('sit', false); this.face(this.x > 40 ? -1 : 1); }
         else { this.cls('sit', false); this.hop(); }
         if (this.mode === 'idle' && Date.now() - lastSpoke > 20000 && Math.random() < 0.3) this.say(this.line('idle'));
       }
@@ -627,6 +768,7 @@
   // なでる：各Petのクリック / 床タップでみんな寄ってくる
   room.addEventListener('click', async (e) => {
     if (e.target.closest('.pet, button, .door')) return;
+    if (Date.now() - swipedAt < 400) return;
     const rm = room.getBoundingClientRect();
     const xp = ((e.clientX - rm.left) / rm.width) * 100;
     const yp = ((rm.bottom - e.clientY) / rm.height) * 100;
@@ -676,6 +818,8 @@
     food.style.zIndex = String(10 + Math.round(FLOOR.yMax - fy));
     food.style.fontSize = (28 * depthScale(fy)) + 'px';
     room.appendChild(food);
+    const full = getFull(p.kind);
+    if (full >= FULL_MAX) { await refuse(p, food, fx); return; }
     p.lookAt(fx); if (first) p.say(KIND_LINES[p.kind].wow, 1200);
     await sleep(700);
     const gap = 19 * p.w;
@@ -687,13 +831,47 @@
       food.style.transform = `translateX(-50%) scale(${1 - (i + 1) * 0.3})`;
     }
     food.remove(); p.cls('eat', false);
+    const n = addFull(p.kind);
     p.happy(); p.hearts(3);
-    p.say(p.line('eat'), 2000);
+    p.say(n >= FULL_MAX ? FULL_LINE[p.kind] : n === FULL_MAX - 1 ? 'ふぅ、おなかふくれてきた' : p.line('eat'), 2200);
+    p.mode = 'idle';
+  }
+  // 満腹度：1回で+1、20分ごとに1ずつもどる。FULL_MAXで「もういらない」
+  const FULL_MAX = 3, DIGEST_MS = 20 * 60 * 1000;
+  const FULL_LINE = { mochi: 'もうおなかいっぱい！', shiba: 'まんぷく。ふぅ', poodle: 'おなかパンパン〜' };
+  const NOPE_LINE = { mochi: ['もうはいらないよ〜', 'あとでね…', 'おなかいっぱいなの'], shiba: ['ぷいっ', 'いらない。ふんっ', '…あとで'], poodle: ['いらな〜い', 'もうむり〜', 'ダイエット中なの！'] };
+  function getFull(kind) {
+    S.full = S.full || {};
+    const f = S.full[kind] || { n: 0, t: Date.now() };
+    const steps = Math.floor((Date.now() - f.t) / DIGEST_MS);
+    if (steps > 0) { f.n = Math.max(0, f.n - steps); f.t += steps * DIGEST_MS; }
+    if (f.n === 0) f.t = Date.now();
+    S.full[kind] = f; return f.n;
+  }
+  function addFull(kind) { getFull(kind); S.full[kind].n = Math.min(FULL_MAX, S.full[kind].n + 1); save(); return S.full[kind].n; }
+  async function refuse(p, food, fx) {
+    p.lookAt(fx);
+    await sleep(700);
+    p.cls('nope', true); p.say(pick(NOPE_LINE[p.kind]), 2000);
+    await sleep(1000);
+    p.cls('nope', false); p.face(fx > p.x ? -1 : 1);
+    food.style.transition = 'opacity .8s, transform .8s'; food.style.opacity = '0';
+    food.style.transform = 'translateX(-50%) translateY(-30px) scale(.6)';
+    await sleep(800); food.remove();
     p.mode = 'idle';
   }
 
   // ---------- あかり ----------
-  const SLEEP_SPOTS = { mochi: [28, 15.5], shiba: [62, 10], poodle: [80, 19] };
+  // 寄り添って寝る：部屋にいる子だけで、となりどうしに詰めて並ぶ
+  const SLEEP_SLOTS = {
+    living:   [[27, 15], [43, 12.5], [59, 16.5]],
+    washitsu: [[27, 15], [43, 12.5], [59, 16.5]],
+    bedroom:  [[13, 34], [26, 34], [40, 30.5]],
+  };
+  const SLEEP_ORDER = ['mochi', 'shiba', 'poodle'];
+  const sleepIdx = (kind) => Math.max(0, SLEEP_ORDER.filter((k) => S.petRoom[k] === S.curRoom).indexOf(kind));
+  const sleepSpot = (kind) => SLEEP_SLOTS[curTheme()][sleepIdx(kind)];
+  const sleepFace = (p) => (sleepIdx(p.kind) === 0 ? 1 : -1);
   function updateLightBtn() {
     $('#btnLight').classList.toggle('active', lightOff);
     $('#lightLabel').textContent = lightOff ? 'おきる' : 'おやすみ';
@@ -705,10 +883,10 @@
       speaker()?.say(pets.length > 1 ? 'みんな、おやすみ…' : 'おやすみ…', 1800);
       pets.forEach(async (p) => {
         p.mode = 'sleep-going';
-        const [x, y] = SLEEP_SPOTS[p.kind];
+        const [x, y] = sleepSpot(p.kind);
         await p.moveTo(x, y, 6);
         if (!lightOff || p.away || p.mode !== 'sleep-going') return;
-        p.face(p.kind === 'shiba' ? -1 : 1); p.cls('sit', false); p.cls('sleep', true); p.mode = 'sleep';
+        p.face(sleepFace(p)); p.cls('sit', false); p.cls('sleep', true); p.mode = 'sleep';
       });
     } else {
       pets.forEach((p) => { p.token++; p.cls('walk', false); p.cls('sleep', false); p.mode = 'idle'; });
@@ -758,44 +936,54 @@
   }
   $('#breathEnd').addEventListener('click', (e) => { e.stopPropagation(); if (breathing) endBreath(false); });
 
-  // ---------- おへや（奥の部屋に出し入れ） ----------
+  // ---------- 部屋（複数）とドア ----------
   const DOOR = { x: 87.5, y: FLOOR.yMax, inY: 36 };
   const door = $('#door');
   const KIND_LABEL = { mochi: 'おもち', shiba: 'しば犬', poodle: 'トイプードル' };
   const NAME_KEY = { mochi: 'name', shiba: 'shibaName', poodle: 'poodleName' };
-  const BACK_LINE = { mochi: 'ただいま〜', shiba: 'わんっ！', poodle: 'きゃん！' };
-  const BYE_LINE = { mochi: 'ちょっとおへやにいるね', shiba: 'くぅん（またね）', poodle: 'またあとでね〜' };
-  let doorBusy = 0, doorT;
+  const BACK_LINE = { mochi: 'きたよ〜', shiba: 'わんっ！', poodle: 'きゃん！' };
+  const ROOM_DEFS = [
+    { id: 'living', theme: 'living', def: 'リビング' },
+    { id: 'washitsu', theme: 'washitsu', def: '和室' },
+    { id: 'bedroom', theme: 'bedroom', def: 'しんしつ' },
+  ];
+  const roomDef = (id) => ROOM_DEFS.find((r) => r.id === id) || ROOM_DEFS[0];
+  const roomName = (id) => (S.roomNames && S.roomNames[id]) || roomDef(id).def;
+  const curTheme = () => roomDef(S.curRoom).theme;
+  const petName = (p) => S[NAME_KEY[p.kind]] || '';
+  let doorBusy = 0, doorT, switching = false;
   function openDoor() { doorBusy++; clearTimeout(doorT); door.classList.add('open'); }
   function closeDoor(ms = 500) { doorT = setTimeout(() => { if (--doorBusy <= 0) { doorBusy = 0; door.classList.remove('open'); } }, ms); }
-  function updateDoor() {
-    const n = allPets.filter((p) => p.away).length;
-    door.classList.toggle('lit', n > 0);
-    renderHud();
-  }
-  async function sendToRoom(p) {
+  function updateDoor() { renderHud(); renderRoomNav(); }
+  const busyPets = () => allPets.some((p) => p.mode === 'leaving' || p.mode === 'coming');
+
+  async function walkOut(p, to) {
     if (p.away || p.mode === 'leaving' || p.mode === 'coming') return;
-    p.mode = 'leaving'; refreshPets(); pets = pets.filter((q) => q !== p);
+    p.mode = 'leaving'; p.leaveTo = to; refreshPets();
     p.token++; p.cls('sleep', false); p.cls('sit', false); p.cls('happy', false);
-    p.say(BYE_LINE[p.kind], 1600);
+    p.say(p.kind === 'shiba' ? `${roomName(to)}いってくる。わん` : `${roomName(to)}に いってくるね`, 1600);
     p.stopMove();
     await p.moveTo(DOOR.x, DOOR.y, 7);
+    if (p.mode !== 'leaving') return;
     openDoor(); p.face(1);
     await sleep(450);
-    p.hush();
-    p.cls('walk', true);
+    if (p.mode !== 'leaving') return;
+    p.hush(); p.cls('walk', true);
     p.el.style.transitionDuration = '0.9s';
     p.el.style.bottom = DOOR.inY + '%'; p.el.style.opacity = '0';
     p.el.style.setProperty('--s', (depthScale(DOOR.y) * 0.85).toFixed(3));
     await sleep(900);
+    if (p.mode !== 'leaving') return;
     p.cls('walk', false); p.cls('gone', true);
     p.away = true; p.mode = 'away';
-    S.inRoom[p.kind] = true; save(); updateDoor(); closeDoor(300);
+    S.petRoom[p.kind] = to; save(); updateDoor(); closeDoor(300);
   }
-  async function callFromRoom(p) {
+  async function walkIn(p) {
     if (!p.away) return;
+    S.petRoom[p.kind] = S.curRoom; save();
     openDoor();
     await sleep(500);
+    if (!p.away || S.petRoom[p.kind] !== S.curRoom) return;
     p.away = false; p.mode = 'coming';
     p.el.style.transitionDuration = '0s';
     p.el.style.left = DOOR.x + '%'; p.el.style.bottom = DOOR.inY + '%'; p.el.style.opacity = '0';
@@ -806,26 +994,90 @@
     p.el.style.opacity = '1';
     p.setPos(DOOR.x, DOOR.y, 0.9);
     await sleep(900);
+    if (p.mode !== 'coming') return;
     p.cls('walk', false);
-    S.inRoom[p.kind] = false; save(); updateDoor(); closeDoor(400);
-    const tx = rand(45, 70), ty = rand(FLOOR.yMin + 4, FLOOR.yMax - 4);
-    await p.moveTo(tx, ty, 7);
+    updateDoor(); closeDoor(400);
+    await p.moveTo(rand(45, 70), rand(FLOOR.yMin + 4, FLOOR.yMax - 4), 7);
+    if (p.mode !== 'coming') return;
     if (lightOff) {
       p.mode = 'sleep-going'; refreshPets();
-      const [x, y] = SLEEP_SPOTS[p.kind]; await p.moveTo(x, y, 6);
-      if (lightOff && p.mode === 'sleep-going') { p.cls('sleep', true); p.mode = 'sleep'; }
+      const [x, y] = sleepSpot(p.kind); await p.moveTo(x, y, 6);
+      if (lightOff && p.mode === 'sleep-going') { p.face(sleepFace(p)); p.cls('sleep', true); p.mode = 'sleep'; }
       return;
     }
     p.mode = 'idle'; refreshPets();
     p.hop(); p.happy(); p.hearts(2); p.say(BACK_LINE[p.kind], 2000);
   }
+  function movePet(p, to) {
+    const from = S.petRoom[p.kind];
+    if (from === to) return;
+    if (from === S.curRoom) walkOut(p, to);
+    else if (to === S.curRoom) walkIn(p);
+    else { S.petRoom[p.kind] = to; save(); updateDoor(); toast(`${petName(p)}は ${roomName(to)}へ いったよ`); }
+  }
+
+  // 表示している部屋をきりかえる
+  function applyRoom() {
+    room.dataset.theme = curTheme();
+    refreshPets();
+    allPets.forEach((p) => {
+      const here = S.petRoom[p.kind] === S.curRoom;
+      p.token++; p.hush();
+      ['walk', 'sit', 'sleep', 'happy', 'eat', 'chomp', 'nope'].forEach((c) => p.cls(c, false));
+      p.el.style.opacity = '1';
+      p.away = !here; p.cls('gone', !here);
+      p.mode = here ? 'idle' : 'away';
+    });
+    refreshPets();
+    pets.forEach((p) => {
+      if (lightOff) { const [x, y] = sleepSpot(p.kind); p.setPos(x, y, 0); p.face(sleepFace(p)); p.cls('sleep', true); p.mode = 'sleep'; }
+      else { const [x, y] = p.freeSpot(); p.setPos(x, y, 0); p.face(Math.random() < 0.5 ? -1 : 1); }
+    });
+    updateDoor(); applyTime();
+  }
+  async function switchRoom(delta) {
+    if (switching || breathing || talking || feeding) return;
+    switching = true;
+    // ドアへ向かっている子は、そのまま行き先の部屋へ
+    allPets.forEach((p) => { if (p.mode === 'leaving') S.petRoom[p.kind] = p.leaveTo; });
+    doorBusy = 0; clearTimeout(doorT); door.classList.remove('open');
+    const i = ROOM_DEFS.findIndex((r) => r.id === S.curRoom);
+    const next = ROOM_DEFS[(i + delta + ROOM_DEFS.length) % ROOM_DEFS.length].id;
+    room.classList.add('switching');
+    await sleep(260);
+    S.curRoom = next; save();
+    applyRoom();
+    room.classList.remove('switching');
+    toast(roomName(next));
+    switching = false;
+    setTimeout(() => { const sp = pets.find((p) => p.mode === 'idle'); if (sp) { sp.hop(); sp.say(pick(['いらっしゃい', 'ここ、いいでしょ', 'きてくれた〜'].concat(sp.kind === 'mochi' ? [] : [KIND_LINES[sp.kind].wow])), 1800); } }, 500);
+  }
+  function renderRoomNav() {
+    $('#roomDots').innerHTML = ROOM_DEFS.map((r) => {
+      const n = allPets.filter((p) => S.petRoom[p.kind] === r.id).length;
+      return `<i class="${r.id === S.curRoom ? 'on' : ''}" title="${escapeHtml(roomName(r.id))}">${n ? '' : ''}</i>`;
+    }).join('');
+  }
+  $('#roomPrev').addEventListener('click', (e) => { e.stopPropagation(); switchRoom(-1); });
+  $('#roomNext').addEventListener('click', (e) => { e.stopPropagation(); switchRoom(1); });
+  // 左右スワイプでも移動
+  let swipe = null, swipedAt = 0;
+  room.addEventListener('pointerdown', (e) => { swipe = { x: e.clientX, y: e.clientY }; });
+  room.addEventListener('pointerup', (e) => {
+    if (!swipe) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y; swipe = null;
+    if (Math.abs(dx) > 60 && Math.abs(dy) < 50) { swipedAt = Date.now(); switchRoom(dx < 0 ? 1 : -1); }
+  });
+
+  // ドアのシート：だれをどの部屋に
   function renderRoomSheet() {
     const svgs = { mochi: SVG_MOCHI, shiba: SVG_SHIBA, poodle: SVG_POODLE };
     $('#roomList').innerHTML = allPets.map((p, i) => `
       <div class="roomRow">
         <div class="avatar">${svgs[p.kind]}</div>
-        <div class="who"><b>${escapeHtml(S[NAME_KEY[p.kind]] || '')}</b><span>${KIND_LABEL[p.kind]} ・ ${p.away ? 'おへやにいるよ' : 'リビング'}</span></div>
-        <button data-i="${i}" class="${p.away ? 'call' : ''}">${p.away ? 'よぶ' : 'おへやへ'}</button>
+        <div class="who"><b>${escapeHtml(petName(p))}</b><span>いま：${escapeHtml(roomName(S.petRoom[p.kind]))}</span>
+          <div class="pchips">${ROOM_DEFS.map((r) => `<button data-i="${i}" data-room="${r.id}" class="${S.petRoom[p.kind] === r.id ? 'on' : ''}">${escapeHtml(roomName(r.id))}</button>`).join('')}</div>
+        </div>
       </div>`).join('');
   }
   function escapeHtml(t) { return String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -833,17 +1085,275 @@
   function closeRoomSheet() { $('#roomSheetBg').classList.remove('show'); $('#roomSheet').classList.remove('show'); }
   door.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (breathing) return;
+    if (breathing || talking || switching) return;
     openRoomSheet();
   });
   $('#roomSheetBg').addEventListener('click', closeRoomSheet);
   $('#roomList').addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-i]'); if (!b) return;
-    const p = allPets[+b.dataset.i];
+    const b = e.target.closest('button[data-room]'); if (!b) return;
+    const p = allPets[+b.dataset.i], to = b.dataset.room;
+    if (S.petRoom[p.kind] === to) return;
     if (feeding) { toast('ごはんのあとにしよう'); return; }
+    if (p.mode === 'leaving' || p.mode === 'coming') return;
     closeRoomSheet();
-    setTimeout(() => (p.away ? callFromRoom(p) : sendToRoom(p)), 350);
+    setTimeout(() => movePet(p, to), 350);
   });
+
+
+  // ---------- おはなし（選択肢でかえす会話） ----------
+  // ノード: { t: セリフ, a: [[返事, 次のノード], ...], act: 'breath'|'food'|'sleep'|'zoom' }
+  // a が無いノードは会話のおわり（「うん」で閉じる → act があれば実行）
+  const TALKS = [
+    { id: 'day', when: ['day', 'evening', 'dusk', 'night'], q: 'きょうはどんな一日だった？', a: [
+      ['いい日だった', { t: 'よかったね！ なにがよかったの？', a: [
+        ['ごはんがおいしかった', { t: 'おいしいごはんは正義だね。いいなぁ〜' }],
+        ['やりたいことができた', { t: 'すごい！ ちゃんと自分をほめてあげてね' }],
+        ['なんとなく', { t: 'なんとなくいい日、さいこうだね' }] ] }],
+      ['ふつうかな', { t: 'ふつうの日って、じつはいちばん大事かも', a: [
+        ['たしかに', { t: 'でしょ〜。ここでゆっくりしていってね' }],
+        ['そうかなぁ', { t: 'そうだよ。なにもない日も、ちゃんとえらいよ' }] ] }],
+      ['ちょっとつかれた', { t: 'おつかれさま。がんばったね', a: [
+        ['ちょっと休みたい', { t: 'うん、なにもしなくていいよ。ここにいるね' }],
+        ['深呼吸したい', { t: 'いっしょにやろ！', act: 'breath' }],
+        ['話を聞いてほしい', { t: 'うんうん。なんのこと？', a: [
+          ['しごとのこと', { t: 'そっか…。いまはしごとのこと、おいといていいよ' }],
+          ['人のこと', { t: 'そっか…。ぜんぶ言わなくても大丈夫。ここでは力をぬいてね' }],
+          ['なんとなく', { t: 'なんとなくしんどい日もあるよね。となりにいるね' }] ] }] ] }] ] },
+    { id: 'mood', q: 'いま、なにしたい気分？', a: [
+      ['ぼーっとしたい', { t: 'いいね。いっしょにぼーっとしよ' }],
+      ['なにか食べたい', { t: 'ごはんにする？', a: [
+        ['うん', { t: 'やったー！ もってくるね', act: 'food' }],
+        ['あとで', { t: 'りょうかい〜。おなかすいたら言ってね' }] ] }],
+      ['ねむい', { t: 'おやすみする？', a: [
+        ['うん', { t: 'じゃあ、あかりけすね', act: 'sleep' }],
+        ['もうちょっと起きてる', { t: 'じゃあ、ねむくなるまでここにいよ' }] ] }] ] },
+    { id: 'season', q: 'ねえねえ、すきな季節ってある？', a: [
+      ['春', { t: 'さくら、いいよね。ぽかぽかでねむくなっちゃう' }],
+      ['夏', { t: 'アイスとかき氷の季節だ〜！' }],
+      ['秋', { t: 'おいもがおいしい季節！ だいすき' }],
+      ['冬', { t: 'おふとんから出たくない季節だね。わかる〜' }] ] },
+    { id: 'water', q: 'そういえば、お水のんだ？', a: [
+      ['のんだよ', { t: 'えらい！ からだがよろこんでるね' }],
+      ['まだかも', { t: 'じゃあ、いっしょにひとくちのも。ごくごく' }] ] },
+    { id: 'tomorrow', when: ['dusk', 'night'], q: 'あしたのこと、気になってる？', a: [
+      ['ちょっと', { t: 'あしたのことは、あしたのじぶんにまかせよ' }],
+      ['ぜんぜん', { t: 'いいね、そのちょうし！' }] ] },
+    { id: 'sleep', when: ['dawn', 'day'], q: 'ゆうべは よく眠れた？', a: [
+      ['ぐっすり', { t: 'よかった〜。いい顔してるもん' }],
+      ['いまいち', { t: 'そっか。きょうはむりしないでいこうね', a: [
+        ['そうする', { t: 'うん。ときどきここで休憩してね' }],
+        ['ちょっと横になる', { t: 'いってらっしゃい。しずかにしてるね' }] ] }] ] },
+    { id: 'thanks', q: 'いつも来てくれて、ありがとね', a: [
+      ['こちらこそ', { t: 'えへへ。なんだかうれしいな' }],
+      ['また来るね', { t: 'うん！ いつでもまってるよ' }] ] },
+    // キャラごとの話題
+    { id: 'walk', kind: 'shiba', q: 'ねえ、おさんぽ行きたいな〜', a: [
+      ['行こう！', { t: 'やったー！ （へやをぐるぐる）', act: 'zoom' }],
+      ['また今度ね', { t: '…わかった。ここでまってる。ふんっ' }] ] },
+    { id: 'fluffy', kind: 'poodle', q: 'ねぇ、わたしの毛並み どう？', a: [
+      ['ふわふわ！', { t: 'でしょ〜！ まいにちお手入れしてるの' }],
+      ['かわいい', { t: 'えへへ〜。もっと言って〜' }],
+      ['もじゃもじゃ', { t: 'もじゃもじゃじゃないもん！ ふわふわだもん！' }] ] },
+    { id: 'what', kind: 'mochi', q: 'もちって、なんのなかまだと思う？', a: [
+      ['おもち', { t: 'おしい！ でもちょっとちがうかも' }],
+      ['だいふく', { t: 'なかにあんこは入ってないよ〜' }],
+      ['わからない', { t: 'じつは ぼくもわかんない。えへへ' }] ] },
+  ];
+  const OPENER = { mochi: '', shiba: 'わん！ ', poodle: 'きゃん♪ ' };
+  const talkEl = $('#talk');
+  let talking = null, lastTalk = [], typeT = null;
+
+  function pickTopic(p) {
+    const ph = phase();
+    let pool = TALKS.filter((t) => (!t.kind || t.kind === p.kind) && (!t.when || t.when.includes(ph)) && !lastTalk.includes(t.id));
+    if (!pool.length) pool = TALKS.filter((t) => !t.kind || t.kind === p.kind);
+    const own = pool.filter((t) => t.kind === p.kind);
+    const topic = own.length && Math.random() < 0.35 ? pick(own) : pick(pool);
+    lastTalk = [topic.id, ...lastTalk].slice(0, 4);
+    return topic;
+  }
+  function typeText(text, done) {
+    const el = $('#talkText'); clearInterval(typeT);
+    let i = 0; el.textContent = '';
+    typeT = setInterval(() => {
+      i++; el.textContent = text.slice(0, i);
+      if (i >= text.length) { clearInterval(typeT); done && done(); }
+    }, 38);
+  }
+  function showNode(node) {
+    const box = $('#talkChoices'); box.innerHTML = '';
+    typeText(node.t, () => {
+      const choices = node.a ? node.a : [['うん', null]];
+      box.innerHTML = choices.map(([label], i) => `<button data-i="${i}">${escapeHtml(label)}</button>`).join('');
+      box.querySelectorAll('button').forEach((b) => b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const next = choices[+b.dataset.i][1];
+        if (!next) { endTalk(node.act); return; }
+        talking.p.happy(1200);
+        if (Math.random() < 0.4) talking.p.hearts(2);
+        showNode(next);
+      }));
+    });
+  }
+  async function startTalk() {
+    if (lightOff) { toast('みんなぐっすり寝てるみたい'); return; }
+    if (breathing || feeding || talking) return;
+    const idle = pets.filter((p) => p.mode === 'idle');
+    if (!idle.length) { toast(pets.length ? 'いまはいそがしいみたい' : 'いまは だれもいないよ'); return; }
+    const p = pick(idle);
+    const topic = pickTopic(p);
+    talking = { p };
+    p.mode = 'talk'; p.hush(); p.stopMove(); p.cls('sit', false);
+    $('#talkName').textContent = S[NAME_KEY[p.kind]] || '';
+    $('#talkAvatar').innerHTML = { mochi: SVG_MOCHI, shiba: SVG_SHIBA, poodle: SVG_POODLE }[p.kind];
+    $('#talkText').textContent = ''; $('#talkChoices').innerHTML = '';
+    document.body.classList.add('talking');
+    p.moveTo(clamp(p.x, 30, 70), FLOOR.yMin + 3, 8).then(() => { if (talking && talking.p === p) { p.face(1); p.hop(); } });
+    await sleep(350);
+    const PP = personaOf(p);
+    showNode({ t: (PP.opener ? '' : OPENER[p.kind]) + (PP.opener || '') + topic.q, a: topic.a });
+  }
+  function endTalk(act) {
+    if (!talking) return;
+    const p = talking.p; talking = null;
+    clearInterval(typeT);
+    document.body.classList.remove('talking');
+    p.stopMove();
+    if (p.mode === 'talk') p.mode = 'idle';
+    p.happy();
+    setTimeout(async () => {
+      if (act === 'breath') $('#btnBreath').click();
+      else if (act === 'food') $('#btnFood').click();
+      else if (act === 'sleep') $('#btnLight').click();
+      else if (act === 'zoom' && p.mode === 'idle') {
+        p.mode = 'zoom';
+        for (const [x, y] of [[20, 12], [80, 14], [75, 27], [22, 26], [50, 16]]) { await p.moveTo(x, y, 22); if (p.mode !== 'zoom') return; }
+        p.mode = 'idle'; p.hop(); p.hearts(3); p.say('たのしかった〜！', 2000);
+      }
+    }, 450);
+  }
+  $('#btnTalk').addEventListener('click', startTalk);
+  $('#talkClose').addEventListener('click', (e) => { e.stopPropagation(); endTalk(); });
+
+
+  // ---------- せいかく ----------
+  const PERSONA = {
+    ottori: { label: 'おっとり', speed: 0.7, rest: [6000, 13000], walk: 0.4, sit: 0.35, hop: 0.03, opener: 'あのね〜、',
+      idle: ['のんびりいこ〜', 'ふわぁ…', 'ぽかぽか〜', 'ゆっくりでいいよ〜', 'ねむねむ…'], pet: ['ふふ〜', 'きもちいい〜', 'ほわ〜'], hello: 'のんびりいくね〜' },
+    genki: { label: 'げんき', speed: 1.5, rest: [1800, 4500], walk: 0.62, sit: 0.08, hop: 0.3, opener: 'ねえねえ！ ',
+      idle: ['あそぼ！', 'ねえねえ！', 'たのしいね！', 'いくよー！', 'わーい！'], pet: ['やったー！', 'もっともっと！', 'えへへっ！'], hello: 'げんきいっぱい！' },
+    amae: { label: 'あまえんぼう', speed: 1, rest: [3500, 8000], walk: 0.55, sit: 0.2, hop: 0.12, follow: 0.45, opener: 'ねぇ〜、',
+      idle: ['ねえ、こっち見て', 'そばにいて〜', 'かまって〜', 'すき〜'], pet: ['もっとなでて〜', 'はなれないで〜', 'しあわせ…'], hello: 'ずっといっしょね〜' },
+    cool: { label: 'クール', speed: 0.9, rest: [5000, 11000], walk: 0.45, sit: 0.35, hop: 0.02, opener: '',
+      idle: ['……', 'まあ、わるくない', 'ふん', 'ひまだな'], pet: ['……べつに', '（しっぽが ゆれてる）', 'まあ、いいけど'], hello: '……よろしく' },
+  };
+  const PERSONA_KEYS = Object.keys(PERSONA);
+  const DEFAULT_PERSONA = { mochi: 'ottori', shiba: 'cool', poodle: 'genki' };
+  const personaOf = (p) => PERSONA[(S.persona && S.persona[p.kind]) || DEFAULT_PERSONA[p.kind]];
+  function renderPersona() {
+    $('#personaField').innerHTML = allPets.map((p) => {
+      const cur = (S.persona && S.persona[p.kind]) || DEFAULT_PERSONA[p.kind];
+      return `<div class="prow"><div class="pl">${escapeHtml(S[NAME_KEY[p.kind]] || '')}</div><div class="pchips">${PERSONA_KEYS.map((k) =>
+        `<button data-kind="${p.kind}" data-k="${k}" class="${k === cur ? 'on' : ''}">${PERSONA[k].label}</button>`).join('')}</div></div>`;
+    }).join('');
+  }
+  $('#personaField').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-k]'); if (!b) return;
+    S.persona = Object.assign({}, DEFAULT_PERSONA, S.persona || {}, { [b.dataset.kind]: b.dataset.k });
+    save(); renderPersona();
+    const p = allPets.find((q) => q.kind === b.dataset.kind);
+    if (p && !p.away && p.mode !== 'sleep') { p.happy(); p.say(PERSONA[b.dataset.k].hello, 2000); }
+  });
+
+
+  // ---------- なかまどうし（おいかけっこ・すりすり・おしゃべり・寄り添い寝） ----------
+  const PAIR_TALKS = [
+    ['いいてんきだね', 'ね〜、ぽかぽか'], ['おなかすいたね', 'さっき食べたでしょ'], ['ねえ、なにしてるの？', 'ぼーっとしてる'],
+    ['ひまだね〜', 'ひまだね〜'], ['{b}、いっしょにいよ', 'うん、いいよ'], ['ねむくなってきた', 'ちょっとねよっか'],
+    ['あそぼ？', 'あとでね〜'], ['いいにおいがする', 'え、どこどこ？'], ['{b}って、ふわふわだね', 'えへへ'], ['ここ、すき？', 'だいすき'],
+  ];
+  const NIGHT_TALKS = [['夜だね', 'しずかだね'], ['星、みえるかな', 'きっとみえるよ'], ['あしたも いっしょにいようね', 'もちろん']];
+  const NUZZLE_LINE = { ottori: 'すりすり〜', genki: 'すりすりっ！', amae: 'すりすり…すき', cool: '……（すりすり）' };
+  const social = { busy: false };
+  function faceEach(a, b) { a.face(b.x > a.x ? 1 : -1); b.face(a.x > b.x ? 1 : -1); }
+  function heartBetween(a, b, n = 2) {
+    for (let i = 0; i < n; i++) setTimeout(() => {
+      const h = document.createElement('div'); h.className = 'heart'; h.textContent = '♥';
+      h.style.color = pick(['#f08a8a', '#f4a3a3', '#e8916b']);
+      h.style.left = ((a.x + b.x) / 2 + rand(-3, 3)) + '%';
+      h.style.bottom = (Math.max(a.y, b.y) + 14 * depthScale(Math.max(a.y, b.y))) + '%';
+      h.style.setProperty('--dx', rand(-14, 14) + 'px');
+      room.appendChild(h); setTimeout(() => h.remove(), 1700);
+    }, i * 260);
+  }
+  const stillSocial = (...ps) => ps.every((p) => p.mode === 'social' && !p.away);
+  function nextTo(a, b, gap) {
+    // 他の子とかぶらない側に並ぶ
+    const others = pets.filter((p) => p !== a && p !== b);
+    const room4 = (x) => (x < 11 || x > 89 ? -1 : Math.min(99, ...others.map((o) => Math.abs(o.x - x))));
+    const cands = [b.x - gap, b.x + gap].sort((m, n) => room4(n) - room4(m));
+    return [clamp(cands[0], 11, 89), clamp(b.y + rand(-1, 1), FLOOR.yMin, FLOOR.yMax)];
+  }
+  async function doChase(a, b) {
+    b.hop(); b.say(pick(['おいかけっこしよ！', 'つかまえてごらん〜', 'こっちこっち！']), 1600);
+    await sleep(900);
+    for (let i = 0; i < 3; i++) {
+      if (!stillSocial(a, b)) return;
+      const [tx, ty] = b.freeSpot();
+      const [cx, cy] = [clamp(tx + (tx > b.x ? -14 : 14), 11, 89), clamp(ty + rand(-2, 2), FLOOR.yMin, FLOOR.yMax)];
+      await Promise.all([b.moveTo(tx, ty, 15), sleep(250).then(() => a.moveTo(cx, cy, 13))]);
+    }
+    if (!stillSocial(a, b)) return;
+    const [x, y] = nextTo(a, b, 13 * a.w); await a.moveTo(x, y, 10);
+    if (!stillSocial(a, b)) return;
+    faceEach(a, b); a.happy(); b.happy(); heartBetween(a, b, 3);
+    a.say(pick(['つかまえた！', 'つーかまえた', 'はぁはぁ、たのしい！']), 1800);
+  }
+  async function doNuzzle(a, b) {
+    const [x, y] = nextTo(a, b, 15 * a.w);
+    await a.moveTo(x, y, 6);
+    if (!stillSocial(a, b)) return;
+    faceEach(a, b); b.cls('sit', true);
+    a.happy(2200); b.happy(2200); heartBetween(a, b, 3);
+    a.say(NUZZLE_LINE[(S.persona && S.persona[a.kind]) || DEFAULT_PERSONA[a.kind]] || 'すりすり', 2000);
+    await sleep(2200);
+  }
+  async function doChat(a, b) {
+    const [x, y] = nextTo(a, b, 24);
+    await a.moveTo(x, y, 6);
+    if (!stillSocial(a, b)) return;
+    faceEach(a, b);
+    const pool = phase() === 'night' || phase() === 'dusk' ? PAIR_TALKS.concat(NIGHT_TALKS) : PAIR_TALKS;
+    const [l1, l2] = pick(pool).map((t) => t.replace('{b}', petName(b)).replace('{a}', petName(a)));
+    a.say(l1, 2200); await sleep(2300);
+    if (!stillSocial(a, b)) return;
+    b.say(l2, 2200); b.happy(1200); await sleep(1600);
+    if (stillSocial(a, b) && Math.random() < 0.5) heartBetween(a, b, 1);
+  }
+  async function socialLoop() {
+    await sleep(12000);
+    while (true) {
+      await sleep(rand(14000, 26000));
+      if (document.hidden || lightOff || breathing || feeding || talking || switching || social.busy) continue;
+      const idle = pets.filter((p) => p.mode === 'idle');
+      if (idle.length < 2) continue;
+      const a = pick(idle), b = pick(idle.filter((p) => p !== a));
+      const act = pick([doChase, doNuzzle, doNuzzle, doChat, doChat]);
+      social.busy = true;
+      a.mode = 'social'; b.mode = 'social'; a.hush(); b.hush(); a.stopMove(); b.stopMove(); a.cls('sit', false); b.cls('sit', false);
+      try { await act(a, b); } catch (e) {}
+      [a, b].forEach((p) => { if (p.mode === 'social') { p.mode = 'idle'; p.cls('sit', false); } });
+      social.busy = false;
+    }
+  }
+  // 寄り添って寝ているとき、ときどき小さな♡
+  setInterval(() => {
+    if (!lightOff || document.hidden) return;
+    const sl = pets.filter((p) => p.mode === 'sleep');
+    if (sl.length < 2 || Math.random() < 0.4) return;
+    const a = pick(sl), b = sl.slice().sort((m, n) => Math.abs(m.x - a.x) - Math.abs(n.x - a.x)).find((p) => p !== a);
+    heartBetween(a, b, 1);
+  }, 9000);
 
   // ---------- おと（WebAudioで合成） ----------
   const SOUNDS = ['none', 'rain', 'fire', 'wave'];
@@ -926,15 +1436,19 @@
   }, { capture: true });
 
   // ---------- いっしょにいた時間（増えるだけ） ----------
+  function renderTags() {
+    const names = { mochi: S.name || 'もち', shiba: S.shibaName || 'こてつ', poodle: S.poodleName || 'ココ' };
+    (typeof allPets !== 'undefined' ? allPets : []).forEach((p) => { p.el.querySelector('.tag').textContent = names[p.kind]; });
+  }
   function fmtTime(sec) {
     const m = Math.floor(sec / 60); if (m < 60) return m + '分';
     const h = Math.floor(m / 60); return h + '時間' + (m % 60 ? (m % 60) + '分' : '');
   }
   function renderHud() {
-    const here = [['mochi', S.name || 'もち'], ['shiba', S.shibaName || 'こてつ'], ['poodle', S.poodleName || 'ココ']].filter(([k]) => !(S.inRoom && S.inRoom[k])).map(([, n]) => n);
-    $('#petName').textContent = here.length ? here.join('・') : 'しずかな部屋';
+    $('#petName').textContent = roomName(S.curRoom || 'living');
     $('#together').textContent = 'いっしょに ' + fmtTime(S.totalSec);
     $('#totalVal').textContent = fmtTime(S.totalSec);
+    renderTags();
   }
   let tick = 0;
   setInterval(() => {
@@ -950,16 +1464,20 @@
 
   // ---------- 設定シート ----------
   const NAME_FIELDS = [['#nameInput', 'name', 0], ['#shibaInput', 'shibaName', 1], ['#poodleInput', 'poodleName', 2]];
-  function openSheet() { NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
+  function openSheet() { NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); renderPersona(); ROOM_DEFS.forEach((r, i) => { $('#room' + i).value = roomName(r.id); }); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
   function closeSheet() {
     let changed = null;
     NAME_FIELDS.forEach(([sel, key, i]) => { const el = $(sel); el.blur(); const v = el.value.trim(); if (v && v !== S[key]) { S[key] = v; changed = allPets[i]; } });
     if (changed && changed.away) changed = null;
+    let roomChanged = false;
+    ROOM_DEFS.forEach((r, i) => { const el = $('#room' + i); el.blur(); const v = el.value.trim(); if (v && v !== roomName(r.id)) { S.roomNames = Object.assign({}, S.roomNames, { [r.id]: v }); roomChanged = true; } });
+    if (roomChanged) { save(); updateDoor(); }
     if (changed) { save(); renderHud(); setTimeout(() => { changed.happy(); changed.say(changed.kind === 'mochi' ? 'いいなまえ！' : KIND_LINES[changed.kind].wow, 2000); }, 350); }
     $('#sheetBg').classList.remove('show'); $('#sheet').classList.remove('show');
   }
   $('#settingsBtn').addEventListener('click', openSheet);
   $('#sheetBg').addEventListener('click', closeSheet);
+  ['#room0', '#room1', '#room2'].forEach((sel) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); }));
   NAME_FIELDS.forEach(([sel]) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); }));
 
   const SCHEMA = 'hidamari.v1';
@@ -977,7 +1495,7 @@
       const data = JSON.parse(await f.text());
       if (data.schema !== SCHEMA || !data.pet) { toast('ひだまりのデータではないみたい'); return; }
       const p = data.pet;
-      if ((p.updatedAt || 0) > S.updatedAt) { S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; }
+      if ((p.updatedAt || 0) > S.updatedAt) { if (p.persona) S.persona = p.persona; if (p.roomNames) S.roomNames = p.roomNames; S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; }
       S.totalSec = Math.max(S.totalSec, p.totalSec || 0); // 時間は増えるだけ
       await save(); renderHud(); NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); toast('取り込んだよ');
     } catch (err) { toast('読み込めなかった'); }
@@ -990,15 +1508,21 @@
     try { await openDB(); const saved = await kvGet('pet'); if (saved) Object.assign(S, saved); } catch (e) {}
     $('#versionLabel').textContent = 'v' + APP_VERSION;
     renderHud(); updateSoundBtn(); updateLightBtn(); applyTime();
-    S.inRoom = Object.assign({ mochi: false, shiba: false, poodle: false }, S.inRoom || {});
+    // 旧「おへや」(v1.2〜1.4) からの引っ越し：おへやにいた子は しんしつへ
+    if (S.inRoom && !S.petRoomMigrated) { Object.keys(S.inRoom).forEach((k) => { if (S.inRoom[k]) S.petRoom[k] = 'bedroom'; }); }
+    S.petRoomMigrated = true; delete S.inRoom;
+    S.petRoom = Object.assign({ mochi: 'living', shiba: 'living', poodle: 'living' }, S.petRoom || {});
+    if (!ROOM_DEFS.some((r) => r.id === S.curRoom)) S.curRoom = 'living';
+    room.dataset.theme = curTheme();
     mochi = new Pet('mochi', SVG_MOCHI, 1, [50, 17]);
     allPets = [mochi, new Pet('shiba', SVG_SHIBA, 1.0, [27, 24]), new Pet('poodle', SVG_POODLE, 0.84, [70, 13])];
     allPets[0].face(1); allPets[1].face(1); allPets[2].face(-1);
-    allPets.forEach((p) => { if (S.inRoom[p.kind]) { p.away = true; p.mode = 'away'; p.cls('gone', true); } });
-    refreshPets(); updateDoor();
+    allPets.forEach((p) => { if (S.petRoom[p.kind] !== S.curRoom) { p.away = true; p.mode = 'away'; p.cls('gone', true); } });
+    refreshPets(); updateDoor(); renderTags();
     setTimeout(() => { const sp = speaker(); if (sp) { sp.happy(); sp.say(sp.kind === 'mochi' ? LINES.greet[phase()] : KIND_LINES[sp.kind].wow, 2800); } }, 700);
     setTimeout(() => { pets.slice(1).forEach((p, i) => (i ? p.hop() : p.happy())); }, 1200);
     allPets.forEach((p, i) => p.wander(i * 1700));
+    socialLoop();
   })();
 
   function setupViewportTracking() {

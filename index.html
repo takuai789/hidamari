@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="ひだまり" />
+<meta name="theme-color" content="#EAD3B8" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23FFC98B'/%3E%3Cstop offset='1' stop-color='%23F08A7E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M32 14c14 0 22 12 22 24 0 10-9 14-22 14S10 48 10 38c0-12 8-24 22-24z' fill='%23FFFAF2'/%3E%3Cellipse cx='25' cy='36' rx='2.4' ry='3.2' fill='%233B2F2A'/%3E%3Cellipse cx='39' cy='36' rx='2.4' ry='3.2' fill='%233B2F2A'/%3E%3Cellipse cx='20' cy='42' rx='3.5' ry='2.2' fill='%23F4A3A3'/%3E%3Cellipse cx='44' cy='42' rx='3.5' ry='2.2' fill='%23F4A3A3'/%3E%3C/svg%3E" />
+<title>ひだまり</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #5A4636;
+    --ink2: rgba(90,70,54,0.62);
+    --accent: #E8916B;
+    --cream: #FFF8EE;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+  html, body { height: 100%; overflow: hidden; background: #FBF1E4; }
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+    color: var(--ink); font-size: 16px; -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+  }
+  #app { height: var(--app-height, 100%); display: flex; flex-direction: column; position: relative; }
+
+  /* ===== 部屋 ===== */
+  .room { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: manipulation; }
+  .room > * { position: absolute; }
+  .wall {
+    inset: 0 0 40% 0;
+    background:
+      radial-gradient(circle at 10px 10px, rgba(255,255,255,0.35) 1.4px, transparent 1.6px) 0 0 / 22px 22px,
+      linear-gradient(#F4E6D3, #EAD3B8);
+  }
+  .baseboard { left: 0; right: 0; bottom: 40%; height: 10px; background: linear-gradient(#d9bb98, #c9a57f); box-shadow: 0 2px 4px rgba(90,60,30,0.18); }
+  .floor {
+    left: 0; right: 0; bottom: 0; height: 40%;
+    background:
+      linear-gradient(rgba(80,50,20,0.0), rgba(80,50,20,0.22)),
+      repeating-linear-gradient(90deg, #CFA172 0 18%, #b98b5d 18% 18.5%, #C69868 18.5% 37%, #b98b5d 37% 37.5%);
+  }
+
+  /* 窓 */
+  .window { left: 8%; top: calc(var(--safe-top) + 10%); width: 48%; height: 28%; border-radius: 12px; background: #fdf6ec; padding: 8px; box-shadow: 0 6px 18px rgba(90,60,30,0.18), inset 0 0 0 1px rgba(160,120,80,0.2); }
+  .sky { position: relative; width: 100%; height: 100%; border-radius: 6px; overflow: hidden; background: var(--sky, linear-gradient(#7ec3ef, #cfeaf7)); transition: background 2s; }
+  .sky::before, .sky::after { content: ''; position: absolute; background: #fdf6ec; z-index: 5; }
+  .sky::before { left: 50%; top: 0; bottom: 0; width: 6px; transform: translateX(-50%); }
+  .sky::after { top: 50%; left: 0; right: 0; height: 6px; transform: translateY(-50%); }
+  .sun, .moon { position: absolute; border-radius: 50%; transition: opacity 2s, top 2s; }
+  .sun { width: 30px; height: 30px; right: 16%; top: var(--sunTop, 18%); background: radial-gradient(circle, #fff6c9 0 45%, #ffd978 70%); box-shadow: 0 0 24px 10px rgba(255,220,120,0.55); opacity: var(--sunOp, 1); }
+  .moon { width: 22px; height: 22px; left: 18%; top: 18%; background: #fff8dc; box-shadow: 0 0 18px 6px rgba(255,248,220,0.35); opacity: var(--moonOp, 0); }
+  .moon::after { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; left: 7px; top: -4px; background: var(--moonCut, #1a2247); }
+  .stars { inset: 0; position: absolute; opacity: var(--starOp, 0); transition: opacity 2s; }
+  .star { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .25 } 50% { opacity: 1 } }
+  .cloud { position: absolute; height: 12px; border-radius: 12px; background: rgba(255,255,255,0.85); opacity: var(--cloudOp, 1); transition: opacity 2s; animation: drift linear infinite; }
+  .cloud::before { content: ''; position: absolute; width: 55%; height: 180%; left: 18%; bottom: 20%; border-radius: 50%; background: inherit; }
+  @keyframes drift { from { transform: translateX(-120%); } to { transform: translateX(260%); } }
+  .rain { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s; background: rgba(90,100,120,0.25); }
+  .rain.on { opacity: 1; }
+  .drop { position: absolute; top: -20%; width: 1.2px; height: 14px; background: linear-gradient(transparent, rgba(255,255,255,0.8)); animation: fall linear infinite; }
+  @keyframes fall { to { transform: translateY(260%); } }
+  .curtain { position: absolute; top: -10px; bottom: -14px; width: 30%; z-index: 6;
+    background: repeating-linear-gradient(90deg, #e9a893 0 10px, #e19b85 10px 20px); box-shadow: 0 4px 10px rgba(90,40,30,0.2); transition: width 1.4s cubic-bezier(.4,0,.2,1); }
+  .curtain.l { left: -12px; border-radius: 0 0 40% 0; }
+  .curtain.r { right: -12px; border-radius: 0 0 0 40%; }
+  .closed .curtain { width: 58%; border-radius: 0; }
+  .window-sill { left: 5%; top: calc(var(--safe-top) + 10% + 28%); width: 54%; height: 9px; border-radius: 4px; background: #e2c7a4; box-shadow: 0 3px 6px rgba(90,60,30,0.2); }
+
+  /* 時計 */
+  .clock { right: 14%; top: calc(var(--safe-top) + 13%); width: 50px; height: 50px; border-radius: 50%; background: #fffaf2; border: 4px solid #c99d72; box-shadow: 0 4px 10px rgba(90,60,30,0.18); }
+  .clock .hand { position: absolute; left: 50%; bottom: 50%; transform-origin: 50% 100%; background: #6b5443; border-radius: 2px; }
+  .clock .h { width: 3px; height: 12px; margin-left: -1.5px; }
+  .clock .m { width: 2px; height: 17px; margin-left: -1px; }
+  .clock::after { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: var(--accent); }
+
+  /* 棚 */
+  .shelf { right: 8%; top: calc(var(--safe-top) + 30%); width: 30%; height: 60px; }
+  .shelf .plank { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; border-radius: 3px; background: #b88a5f; box-shadow: 0 4px 6px rgba(90,60,30,0.22); }
+  .book { position: absolute; bottom: 8px; border-radius: 2px 2px 0 0; }
+  .shelf .pot { position: absolute; right: 6%; bottom: 8px; width: 22px; height: 18px; background: #e7eadf; border-radius: 3px 3px 7px 7px; }
+  .shelf .sprig { position: absolute; right: 6%; bottom: 24px; width: 22px; height: 26px; }
+
+  /* 床の上のもの */
+  .chest { right: 6%; bottom: 37%; width: 36%; height: 11%; border-radius: 6px 6px 3px 3px; background: linear-gradient(#caa079, #b88c62); box-shadow: 0 5px 8px rgba(80,50,20,0.22); padding: 7% 6% 0; display: flex; flex-direction: column; gap: 8%; }
+  .chest .drawer { flex: 1; max-height: 34%; border-radius: 3px; background: rgba(255,255,255,0.12); position: relative; box-shadow: inset 0 0 0 1px rgba(90,60,30,0.15); }
+  .chest .drawer::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 3px; margin: -1.5px -6px; border-radius: 2px; background: #8b6a4c; }
+  .chest .mug { position: absolute; left: 16%; bottom: 100%; width: 16px; height: 15px; border-radius: 2px 2px 5px 5px; background: #f3efe6; }
+  .chest .mug::after { content: ''; position: absolute; right: -6px; top: 3px; width: 6px; height: 7px; border: 2px solid #f3efe6; border-left: 0; border-radius: 0 5px 5px 0; }
+  .chest .vase { position: absolute; right: 18%; bottom: 100%; width: 14px; height: 24px; border-radius: 7px 7px 5px 5px; background: #8fa7b8; }
+  .chest .vase::before { content: ''; position: absolute; left: 3px; bottom: 100%; width: 1.5px; height: 16px; background: #7f9a62; transform: rotate(-8deg); }
+  .chest .vase::after { content: ''; position: absolute; left: -2px; bottom: calc(100% + 13px); width: 9px; height: 9px; border-radius: 50%; background: #f2b8a0; }
+  .rug { left: 7%; right: 7%; bottom: 7%; height: 19%; border-radius: 50%;
+    background: radial-gradient(ellipse at center, #f5dcc4 0 38%, #eec3a7 39% 52%, #f5dcc4 53% 62%, #e7b394 63% 100%);
+    box-shadow: 0 3px 8px rgba(80,50,20,0.18); }
+  .cushion { left: 15%; bottom: 15%; width: 25%; height: 7%; border-radius: 45%; background: linear-gradient(#b9c8a8, #9fb28e); box-shadow: 0 4px 6px rgba(60,70,40,0.25); z-index: 2; }
+  .cushion::after { content: ''; position: absolute; left: 48%; top: 38%; width: 5px; height: 5px; border-radius: 50%; background: #7f9170; }
+  .lamp { left: 3%; bottom: 31%; width: 60px; height: 33%; z-index: 3; pointer-events: none; }
+  .lamp .shade { position: absolute; top: 0; left: 5px; width: 50px; height: 34px; background: linear-gradient(#fbe3bd, #f1c98f); clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); }
+  .lamp .pole { position: absolute; top: 34px; bottom: 5px; left: 29px; width: 3px; background: #7a604b; }
+  .lamp .base { position: absolute; bottom: 0; left: 16px; width: 29px; height: 6px; border-radius: 3px; background: #7a604b; }
+  .glow { left: -30%; bottom: 20%; width: 130%; height: 90%; pointer-events: none; z-index: 21;
+    background: radial-gradient(circle at 34% 50%, rgba(255,205,130,0.7), rgba(255,185,115,0.25) 32%, transparent 62%);
+    mix-blend-mode: screen; opacity: 0; transition: opacity 1.4s; z-index: 61; }
+  .glow.on { opacity: 1; }
+  .plant { right: 2%; bottom: 25%; width: 70px; height: 110px; z-index: 3; pointer-events: none; }
+
+  /* 明るさ */
+  .shadeLayer { inset: 0; pointer-events: none; z-index: 60; background: var(--shadeColor, #fff); mix-blend-mode: multiply; transition: background 1.6s; }
+
+  /* ===== ペット ===== */
+  .pet { left: 50%; bottom: 18%; width: min(30vw, 128px); aspect-ratio: 120 / 110;
+    transform: translateX(-50%) scale(var(--s, 1)); transform-origin: 50% 100%;
+    transition-property: left, bottom, transform; transition-timing-function: linear; z-index: 10; }
+  .pet-shadow { position: absolute; left: 15%; right: 15%; bottom: -3%; height: 12%; border-radius: 50%; background: rgba(70,40,20,0.22); }
+  .pet .bob { position: absolute; inset: 0; }
+  .pet .breath { position: absolute; inset: 0; transform-origin: 50% 95%; transition: transform 4s ease-in-out; }
+  .pet .flip { position: absolute; inset: 0; transform: scaleX(var(--dir, 1)); transition: transform .35s; }
+  .pet svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .pet .eyes { transform: translateX(calc(var(--look, 0) * 1px)); transition: transform .4s; }
+  .pet .eyes-open { transform-origin: 60px 60px; animation: blink 5.5s infinite; }
+  @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96.5% { transform: scaleY(0.1); } }
+  .pet .eyes-happy, .pet .eyes-sleep, .pet .mouth-open { display: none; }
+  .pet.happy .eyes-open, .pet.sleep .eyes-open { display: none; }
+  .pet.happy .eyes-happy { display: inline; }
+  .pet.sleep .eyes-sleep { display: inline; }
+  .pet.eat .mouth, .pet.eat .mouth-open { display: none; }
+  .pet.eat.chomp .mouth-open { display: inline; }
+  .pet.walk .bob { animation: hop .55s ease-in-out infinite; }
+  @keyframes hop { 0%,100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-7%) scaleY(1.02); } }
+  .pet.happy .bob { animation: squish .5s ease-in-out 3; }
+  @keyframes squish { 0%,100% { transform: scale(1,1); } 40% { transform: scale(1.1,0.9); } 70% { transform: scale(0.96,1.05); } }
+  .pet.sit .bob { transform: scale(1.06, 0.93); transition: transform .5s; transform-origin: 50% 100%; }
+  .pet.sleep .bob { animation: snooze 3.6s ease-in-out infinite; transform-origin: 50% 100%; }
+  @keyframes snooze { 0%,100% { transform: scale(1.06,0.92); } 50% { transform: scale(1.09,0.89); } }
+  .pet.jump .bob { animation: jump .6s ease-out 1; }
+  @keyframes jump { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-22%); } }
+  .zzz { position: absolute; right: -4%; top: -14%; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.9); opacity: 0; pointer-events: none; letter-spacing: 2px; }
+  .pet.sleep .zzz { animation: zzz 3s ease-in-out infinite; }
+  @keyframes zzz { 0% { opacity: 0; transform: translate(0,6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(12px,-18px); } }
+  .bubble { position: absolute; left: 50%; bottom: 104%; transform: translateX(-50%) scale(calc(1 / var(--s, 1))) translateY(6px); transform-origin: 50% 100%;
+    background: var(--cream); color: var(--ink); font-size: 13.5px; font-weight: 500; line-height: 1.5; white-space: nowrap;
+    padding: 7px 13px; border-radius: 16px; box-shadow: 0 4px 14px rgba(90,60,30,0.18); opacity: 0; pointer-events: none; transition: opacity .4s, transform .4s; z-index: 30; }
+  .bubble::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+  .bubble.show { opacity: 1; transform: translateX(-50%) scale(calc(1 / var(--s, 1))) translateY(0); }
+
+  .food { z-index: 9; font-size: 30px; line-height: 1; transform: translateX(-50%); transition: transform .35s; pointer-events: none; }
+  .food.dropIn { animation: foodDrop .55s cubic-bezier(.3,1.5,.6,1); }
+  @keyframes foodDrop { from { transform: translate(-50%, -120px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+  .heart { z-index: 25; font-size: 18px; pointer-events: none; animation: rise 1.6s ease-out forwards; }
+  @keyframes rise { from { opacity: 0; transform: translate(-50%, 0) scale(.6); } 20% { opacity: 1; } to { opacity: 0; transform: translate(calc(-50% + var(--dx, 0px)), -70px) scale(1.1); } }
+  .ripple { z-index: 8; width: 26px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.7); transform: translate(-50%, 50%); pointer-events: none; animation: ripple .7s ease-out forwards; }
+  @keyframes ripple { to { transform: translate(-50%, 50%) scale(2.4); opacity: 0; } }
+
+  /* ===== HUD ===== */
+  .hud { position: absolute; left: 0; right: 0; top: 0; z-index: 40; display: flex; justify-content: space-between; align-items: flex-start;
+    padding: calc(var(--safe-top) + 8px) 14px 0; pointer-events: none; }
+  .chip { pointer-events: auto; background: rgba(255,248,238,0.82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-radius: 16px; padding: 7px 13px; box-shadow: 0 2px 10px rgba(90,60,30,0.12); }
+  .chip .nm { font-size: 14px; font-weight: 700; }
+  .chip .tm { font-size: 11px; color: var(--ink2); margin-top: 1px; }
+  .roundBtn { pointer-events: auto; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,248,238,0.82);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--ink); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(90,60,30,0.12); cursor: pointer; }
+
+  /* ===== ドック ===== */
+  .dock { position: relative; z-index: 40; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    padding: 10px 12px calc(var(--safe-bottom) + 10px); background: #FBF1E4; border-top: 1px solid rgba(160,120,80,0.14); transition: transform .5s, opacity .5s; }
+  .dock button { border: 0; background: none; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; border-radius: 14px; cursor: pointer; }
+  .dock button:active { background: rgba(232,145,107,0.12); }
+  .dock .ic { width: 46px; height: 46px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(90,60,30,0.10); transition: background .3s, color .3s; }
+  .dock .lb { font-size: 11.5px; font-weight: 500; white-space: nowrap; }
+  .dock button.active .ic { background: var(--accent); color: #fff; }
+  body.breathing .dock { opacity: 0.3; pointer-events: none; }
+  body.breathing .hud { opacity: 0; pointer-events: none; }
+
+  /* ===== 深呼吸 ===== */
+  .breathUI { position: absolute; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; pointer-events: none; opacity: 0; transition: opacity .8s; }
+  body.breathing .breathUI { opacity: 1; }
+  .breathUI .word { position: absolute; top: 45%; font-size: 26px; font-weight: 500; color: var(--ink); letter-spacing: 8px; text-shadow: 0 1px 10px rgba(255,248,238,0.9); transition: opacity .6s; }
+  .breathUI .count { position: absolute; top: calc(45% + 44px); font-size: 13px; color: var(--ink2); letter-spacing: 2px; }
+  .breathUI .end { pointer-events: auto; position: absolute; bottom: calc(var(--safe-bottom) + 26px); border: 0; background: rgba(255,248,238,0.85); color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 500; padding: 11px 26px; border-radius: 22px; cursor: pointer; }
+  .halo { position: absolute; left: 50%; bottom: 23%; width: 60vw; height: 60vw; max-width: 300px; max-height: 300px; border-radius: 50%; transform: translate(-50%, 30%) scale(.55);
+    background: radial-gradient(circle, rgba(255,240,215,0.45), rgba(255,240,215,0) 68%); transition: transform 4s ease-in-out; z-index: 9; opacity: 0; pointer-events: none; }
+  body.breathing .halo { opacity: 1; }
+
+  /* ===== シート / トースト ===== */
+  .sheetBg { position: fixed; inset: 0; z-index: 100; background: rgba(40,25,20,0.35); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .sheetBg.show { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 101; background: #FBF1E4; border-radius: 22px 22px 0 0; padding: 10px 18px calc(var(--safe-bottom) + 18px);
+    transform: translateY(105%); transition: transform .38s cubic-bezier(.32,.72,0,1); }
+  .sheet.show { transform: translateY(0); }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: rgba(90,70,54,0.2); margin: 0 auto 14px; }
+  .sheet h3 { font-size: 17px; text-align: center; margin-bottom: 16px; }
+  .field { background: #fff; border-radius: 14px; padding: 4px 14px; margin-bottom: 14px; }
+  .row { display: flex; align-items: center; justify-content: space-between; min-height: 48px; gap: 12px; }
+  .row + .row { border-top: 1px solid rgba(160,120,80,0.14); }
+  .row label { font-size: 15px; }
+  .row input { flex: 1; min-width: 0; text-align: right; border: 0; outline: none; font-family: inherit; font-size: 16px; color: var(--ink); background: none; -webkit-user-select: text; user-select: text; }
+  .row .val { font-size: 14px; color: var(--ink2); }
+  .row button.link { border: 0; background: none; color: var(--accent); font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; padding: 10px 0; width: 100%; text-align: left; }
+  .note { font-size: 12px; color: var(--ink2); line-height: 1.6; padding: 0 4px 12px; }
+  #versionLabel { text-align: center; font-size: 12px; color: rgba(90,70,54,0.35); padding-top: 4px; }
+  .toast { position: fixed; left: 50%; top: calc(var(--safe-top) + 64px); z-index: 200; transform: translate(-50%, -20px); opacity: 0;
+    background: rgba(90,70,54,0.92); color: #fff; font-size: 13.5px; padding: 9px 16px; border-radius: 18px; transition: opacity .3s, transform .3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  #updateBanner { position: fixed; left: 12px; right: 12px; bottom: calc(var(--safe-bottom) + 16px); z-index: 1000; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent); color: #fff; border: 0; border-radius: 14px; padding: 14px 18px; font-family: inherit; font-size: 14px; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(232,145,107,0.45); cursor: pointer; transform: translateY(140%); transition: transform 0.35s cubic-bezier(.32,.72,0,1); }
+  #updateBanner.show { transform: translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="room" id="room">
+    <div class="wall"></div>
+    <div class="baseboard"></div>
+    <div class="floor"></div>
+
+    <div class="window" id="window">
+      <div class="sky" id="sky">
+        <div class="stars" id="stars"></div>
+        <div class="sun"></div>
+        <div class="moon"></div>
+        <div class="cloud" style="top:22%; width:34px; animation-duration:70s; animation-delay:-20s;"></div>
+        <div class="cloud" style="top:62%; width:26px; animation-duration:95s; animation-delay:-60s;"></div>
+        <div class="rain" id="rain"></div>
+        <div class="curtain l"></div>
+        <div class="curtain r"></div>
+      </div>
+    </div>
+    <div class="window-sill"></div>
+
+    <div class="clock"><div class="hand h" id="hh"></div><div class="hand m" id="mh"></div></div>
+
+    <div class="shelf">
+      <div class="book" style="left:4%; width:9px; height:34px; background:#d98b73;"></div>
+      <div class="book" style="left:15%; width:8px; height:40px; background:#8fa7b8;"></div>
+      <div class="book" style="left:25%; width:10px; height:31px; background:#e6c26f;"></div>
+      <div class="book" style="left:37%; width:8px; height:36px; background:#9fb28e; transform:rotate(12deg); transform-origin:bottom left;"></div>
+      <svg class="sprig" viewBox="0 0 22 26"><path d="M11 26V10" stroke="#7f9a62" stroke-width="1.6"/><ellipse cx="6" cy="12" rx="5" ry="3" fill="#94b173" transform="rotate(-30 6 12)"/><ellipse cx="16" cy="9" rx="5" ry="3" fill="#86a566" transform="rotate(30 16 9)"/><ellipse cx="10" cy="4" rx="4" ry="2.6" fill="#a2bf80" transform="rotate(-60 10 4)"/></svg>
+      <div class="pot"></div>
+      <div class="plank"></div>
+    </div>
+
+    <div class="chest"><div class="drawer"></div><div class="drawer"></div><div class="mug"></div><div class="vase"></div></div>
+    <div class="rug"></div>
+    <div class="cushion"></div>
+
+    <div class="lamp"><div class="shade"></div><div class="pole"></div><div class="base"></div></div>
+    <svg class="plant" viewBox="0 0 70 110">
+      <path d="M35 82 C33 60 22 48 12 40" stroke="#6f8a55" stroke-width="2" fill="none"/>
+      <path d="M36 82 C38 58 50 44 60 34" stroke="#6f8a55" stroke-width="2" fill="none"/>
+      <path d="M35 82 C35 58 34 36 32 16" stroke="#6f8a55" stroke-width="2" fill="none"/>
+      <ellipse cx="12" cy="38" rx="13" ry="8" fill="#8cac6c" transform="rotate(-25 12 38)"/>
+      <ellipse cx="59" cy="32" rx="13" ry="8" fill="#7d9e5f" transform="rotate(30 59 32)"/>
+      <ellipse cx="31" cy="15" rx="9" ry="14" fill="#96b676" transform="rotate(-8 31 15)"/>
+      <ellipse cx="22" cy="60" rx="11" ry="6" fill="#86a566" transform="rotate(-10 22 60)"/>
+      <ellipse cx="50" cy="56" rx="11" ry="6" fill="#94b173" transform="rotate(15 50 56)"/>
+      <path d="M20 80 H50 L46 108 H24 Z" fill="#d7c1a3"/><rect x="18" y="77" width="34" height="6" rx="2" fill="#c9ae8b"/>
+    </svg>
+
+    <div class="halo" id="halo"></div>
+
+    <div class="pet" id="pet">
+      <div class="pet-shadow"></div>
+      <div class="bob"><div class="breath" id="petBreath"><div class="flip">
+        <svg viewBox="0 0 120 110">
+          <defs>
+            <radialGradient id="bodyG" cx="40%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#fff6ea"/><stop offset="1" stop-color="#f6e4cf"/>
+            </radialGradient>
+          </defs>
+          <path d="M60 10 C60 4 64 0 70 0 C70 6 66 10 60 10 Z" fill="#9fc27f"/>
+          <path d="M60 10 C60 5 56 2 51 3 C52 8 56 10 60 10 Z" fill="#b3d192"/>
+          <path d="M60 10 V16" stroke="#8aad6a" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="40" cy="103" rx="11" ry="5" fill="#f1dcc3"/>
+          <ellipse cx="80" cy="103" rx="11" ry="5" fill="#f1dcc3"/>
+          <path d="M60 14 C93 14 112 42 112 70 C112 94 90 104 60 104 C30 104 8 94 8 70 C8 42 27 14 60 14 Z" fill="url(#bodyG)" stroke="#ecd9c2" stroke-width="1.5"/>
+          <ellipse cx="34" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/>
+          <ellipse cx="86" cy="74" rx="8" ry="5" fill="#f4a3a3" opacity="0.55"/>
+          <g class="eyes">
+            <g class="eyes-open"><ellipse cx="44" cy="62" rx="4.2" ry="5.6" fill="#3b2f2a"/><ellipse cx="76" cy="62" rx="4.2" ry="5.6" fill="#3b2f2a"/>
+              <circle cx="45.5" cy="60" r="1.4" fill="#fff"/><circle cx="77.5" cy="60" r="1.4" fill="#fff"/></g>
+            <g class="eyes-happy" fill="none" stroke="#3b2f2a" stroke-width="3" stroke-linecap="round"><path d="M38 64 Q44 56 50 64"/><path d="M70 64 Q76 56 82 64"/></g>
+            <g class="eyes-sleep" fill="none" stroke="#3b2f2a" stroke-width="2.6" stroke-linecap="round"><path d="M38 62 Q44 67 50 62"/><path d="M70 62 Q76 67 82 62"/></g>
+            <path class="mouth" d="M55 72 Q57.5 75.5 60 72 Q62.5 75.5 65 72" fill="none" stroke="#3b2f2a" stroke-width="2" stroke-linecap="round"/>
+            <ellipse class="mouth-open" cx="60" cy="74" rx="4" ry="3.6" fill="#b85c5c"/>
+          </g>
+        </svg>
+      </div></div></div>
+      <div class="zzz">z z</div>
+      <div class="bubble" id="bubble"></div>
+    </div>
+
+    <div class="shadeLayer" id="shadeLayer"></div>
+    <div class="glow" id="glow"></div>
+
+    <div class="breathUI">
+      <div class="word" id="breathWord">すって</div>
+      <div class="count" id="breathCount">1 / 5</div>
+      <button class="end" id="breathEnd">おわる</button>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="chip"><div class="nm" id="petName">もち</div><div class="tm" id="together">いっしょに 0分</div></div>
+    <button class="roundBtn" id="settingsBtn" aria-label="設定">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>
+    </button>
+  </div>
+
+  <div class="dock">
+    <button id="btnFood"><span class="ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></svg>
+    </span><span class="lb">ごはん</span></button>
+    <button id="btnBreath"><span class="ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h6"/></svg>
+    </span><span class="lb">深呼吸</span></button>
+    <button id="btnLight"><span class="ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
+    </span><span class="lb" id="lightLabel">おやすみ</span></button>
+    <button id="btnSound"><span class="ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+    </span><span class="lb" id="soundLabel">おと</span></button>
+  </div>
+</div>
+
+<div class="sheetBg" id="sheetBg"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <h3>せってい</h3>
+  <div class="field">
+    <div class="row"><label for="nameInput">なまえ</label><input id="nameInput" maxlength="10" placeholder="もち" enterkeyhint="done" /></div>
+    <div class="row"><label>いっしょにいた時間</label><span class="val" id="totalVal">0分</span></div>
+  </div>
+  <div class="field">
+    <div class="row"><button class="link" id="exportBtn">データを書き出す</button></div>
+    <div class="row"><button class="link" id="importBtn">データを取り込む</button></div>
+  </div>
+  <p class="note">部屋の空は、いまの時刻に合わせて変わります。床をタップすると、そこまで歩いてきます。</p>
+  <div id="versionLabel"></div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ---------- バージョン ----------
+  const APP_VERSION = '1.0.0';
+
+  // ---------- IndexedDB（DB名・キーは変えない） ----------
+  const DB_NAME = 'hidamari-db';
+  const DB_VERSION = 1;
+  let _db = null;
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv', { keyPath: 'id' }); };
+      req.onsuccess = () => { _db = req.result; resolve(_db); };
+      req.onerror = () => reject(req.error);
+    });
+  }
+  function kvGet(id) { return new Promise((res) => { try { const r = _db.transaction('kv').objectStore('kv').get(id); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } }); }
+  function kvPut(val) { return new Promise((res) => { try { const r = _db.transaction('kv', 'readwrite').objectStore('kv').put(val); r.onsuccess = () => res(); r.onerror = () => res(); } catch (e) { res(); } }); }
+
+  // ---------- 状態 ----------
+  const S = { id: 'pet', name: 'もち', totalSec: 0, sound: 'none', updatedAt: 0 };
+  let lightOff = false;
+  async function save() { S.updatedAt = Date.now(); await kvPut({ ...S }); }
+
+  // ---------- トースト ----------
+  let toastT;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
+
+  // ---------- 空・時刻 ----------
+  function buildSky() {
+    const st = $('#stars');
+    for (let i = 0; i < 22; i++) {
+      const s = document.createElement('div'); s.className = 'star';
+      s.style.left = rand(3, 97) + '%'; s.style.top = rand(3, 90) + '%';
+      s.style.animationDelay = rand(0, 3) + 's';
+      st.appendChild(s);
+    }
+    const rain = $('#rain');
+    for (let i = 0; i < 26; i++) {
+      const d = document.createElement('div'); d.className = 'drop';
+      d.style.left = rand(0, 100) + '%';
+      d.style.animationDuration = rand(0.55, 0.9) + 's';
+      d.style.animationDelay = rand(0, 1) + 's';
+      rain.appendChild(d);
+    }
+  }
+  function phase() {
+    const d = new Date(); const h = d.getHours() + d.getMinutes() / 60;
+    if (h >= 4.5 && h < 6.5) return 'dawn';
+    if (h >= 6.5 && h < 16) return 'day';
+    if (h >= 16 && h < 18) return 'evening';
+    if (h >= 18 && h < 19.5) return 'dusk';
+    return 'night';
+  }
+  const SKY = {
+    dawn:    { sky: 'linear-gradient(#5a6aa0, #f6b89a)', sun: 0.8, sunTop: '62%', moon: 0, star: 0.2, cloud: 0.7, cut: '#5a6aa0', shade: '#ffe9dc', lamp: false },
+    day:     { sky: 'linear-gradient(#7ec3ef, #d4eef8)', sun: 1, sunTop: '18%', moon: 0, star: 0, cloud: 1, cut: '#7ec3ef', shade: '#ffffff', lamp: false },
+    evening: { sky: 'linear-gradient(#f7b877, #f59c8a)', sun: 1, sunTop: '50%', moon: 0, star: 0, cloud: 0.8, cut: '#f7b877', shade: '#ffe4cf', lamp: false },
+    dusk:    { sky: 'linear-gradient(#5b4f8f, #ee8b7a)', sun: 0, sunTop: '80%', moon: 0.6, star: 0.4, cloud: 0.4, cut: '#5b4f8f', shade: '#d9bfd6', lamp: true },
+    night:   { sky: 'linear-gradient(#141b3c, #2b3563)', sun: 0, sunTop: '90%', moon: 1, star: 1, cloud: 0.15, cut: '#141b3c', shade: '#bba6c4', lamp: true },
+  };
+  function applyTime() {
+    const p = SKY[phase()]; const sky = $('#sky');
+    const rainy = S.sound === 'rain';
+    sky.style.setProperty('--sky', rainy ? (phase() === 'night' ? 'linear-gradient(#1c2238, #333a52)' : 'linear-gradient(#8e9aab, #c3cad3)') : p.sky);
+    sky.style.setProperty('--sunOp', rainy ? 0 : p.sun);
+    sky.style.setProperty('--sunTop', p.sunTop);
+    sky.style.setProperty('--moonOp', rainy ? 0 : p.moon);
+    sky.style.setProperty('--moonCut', p.cut);
+    sky.style.setProperty('--starOp', rainy ? 0 : p.star);
+    sky.style.setProperty('--cloudOp', p.cloud);
+    $('#rain').classList.toggle('on', rainy);
+    $('#window').classList.toggle('closed', lightOff);
+    $('#shadeLayer').style.setProperty('--shadeColor', lightOff ? '#4b4c78' : p.shade);
+    $('#glow').classList.toggle('on', !lightOff && p.lamp);
+    // 時計
+    const d = new Date();
+    $('#hh').style.transform = `rotate(${(d.getHours() % 12) * 30 + d.getMinutes() * 0.5}deg)`;
+    $('#mh').style.transform = `rotate(${d.getMinutes() * 6}deg)`;
+  }
+
+  // ---------- ことば ----------
+  const LINES = {
+    dawn: ['はやおきだね', 'まだねむいね…', '空がすこし明るいよ'],
+    day: ['ひなたぼっこしよ', 'ちょっと休憩しよっか', 'ここ、あったかいよ', 'お茶でものむ？'],
+    evening: ['きょうもおつかれさま', '夕焼けきれいだね', 'がんばったね'],
+    dusk: ['もうすぐ夜だね', 'あかりがついたよ', 'きょうもおつかれさま'],
+    night: ['そろそろ休もうか', '夜はしずかでいいね', '今日のことはもうおしまい', 'ゆっくり眠れますように'],
+    any: ['ここにいるよ', '深呼吸しよっか', 'きてくれてうれしい', 'ぼーっとしよ', 'なにもしなくていいよ', 'ゆっくりでいいよ', 'ふわぁ…'],
+    pet: ['えへへ', 'もっと〜', 'くすぐったい', 'ふふっ', 'すき', 'きもちいい…'],
+    greet: { dawn: 'おはよう、はやいね', day: 'おかえり', evening: 'おかえり、おつかれさま', dusk: 'おかえり', night: 'おかえり。夜だね' },
+  };
+  let bubbleT, lastSpoke = 0;
+  function say(text, ms = 3200) {
+    const b = $('#bubble'); b.textContent = text; b.classList.add('show');
+    lastSpoke = Date.now(); clearTimeout(bubbleT);
+    bubbleT = setTimeout(() => b.classList.remove('show'), ms);
+  }
+  function randomLine() { return Math.random() < 0.55 ? pick(LINES[phase()]) : pick(LINES.any); }
+
+  // ---------- ペット ----------
+  const petEl = $('#pet');
+  const P = { x: 50, y: 18, dir: 1, mode: 'idle', token: 0 };
+  const FLOOR = { xMin: 16, xMax: 84, yMin: 9, yMax: 29 };
+  function depthScale(y) { return 1.14 - ((y - FLOOR.yMin) / (FLOOR.yMax - FLOOR.yMin)) * 0.3; }
+  function setPos(x, y, dur) {
+    petEl.style.transitionDuration = dur + 's';
+    petEl.style.left = x + '%'; petEl.style.bottom = y + '%';
+    petEl.style.setProperty('--s', depthScale(y).toFixed(3));
+    petEl.style.zIndex = String(10 + Math.round((FLOOR.yMax - y)));
+    P.x = x; P.y = y;
+  }
+  function face(dir) { P.dir = dir; petEl.style.setProperty('--dir', dir); petEl.style.setProperty('--look', 0); }
+  function lookAt(x) { face(x < P.x ? -1 : 1); }
+  function cls(name, on) { petEl.classList.toggle(name, on); }
+  async function moveTo(x, y, speed = 6) {
+    const tok = ++P.token;
+    const dist = Math.hypot(x - P.x, (y - P.y) * 1.6);
+    if (dist < 0.8) return tok === P.token;
+    if (Math.abs(x - P.x) > 1) face(x < P.x ? -1 : 1);
+    const dur = Math.max(0.6, dist / speed);
+    cls('sit', false); cls('walk', true);
+    setPos(x, y, dur);
+    await sleep(dur * 1000);
+    if (tok !== P.token) return false;
+    cls('walk', false);
+    return true;
+  }
+  function stopMove() {
+    P.token++;
+    const r = petEl.getBoundingClientRect(), room = $('#room').getBoundingClientRect();
+    const x = ((r.left + r.width / 2 - room.left) / room.width) * 100;
+    const y = ((room.bottom - r.bottom) / room.height) * 100;
+    setPos(clamp(x, FLOOR.xMin, FLOOR.xMax), clamp(y, FLOOR.yMin, FLOOR.yMax), 0);
+    cls('walk', false);
+  }
+  function hearts(n = 3) {
+    const room = $('#room');
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => {
+        const h = document.createElement('div'); h.className = 'heart'; h.textContent = pick(['♡', '♥', '♡']);
+        h.style.color = pick(['#f08a8a', '#f4a3a3', '#e8916b']);
+        h.style.left = (P.x + rand(-6, 6)) + '%';
+        h.style.bottom = (P.y + 13 * depthScale(P.y)) + '%';
+        h.style.setProperty('--dx', rand(-24, 24) + 'px');
+        room.appendChild(h); setTimeout(() => h.remove(), 1700);
+      }, i * 220);
+    }
+  }
+  let happyT;
+  function beHappy(ms = 1600) {
+    cls('happy', false); void petEl.offsetWidth; cls('happy', true);
+    clearTimeout(happyT); happyT = setTimeout(() => cls('happy', false), ms);
+  }
+
+  // なでる
+  petEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (P.mode === 'breath') return;
+    if (P.mode === 'sleep') { say('むにゃ…', 1800); return; }
+    if (P.mode === 'idle') { stopMove(); cls('sit', false); }
+    beHappy(); hearts(3);
+    say(pick(LINES.pet), 1800);
+  });
+
+  // 床タップでそこへ歩く
+  $('#room').addEventListener('click', async (e) => {
+    if (e.target.closest('.pet, button')) return;
+    const room = $('#room').getBoundingClientRect();
+    const xp = ((e.clientX - room.left) / room.width) * 100;
+    const yp = ((room.bottom - e.clientY) / room.height) * 100;
+    if (P.mode !== 'idle') return;
+    if (yp > 40) { lookAt(xp); petEl.style.setProperty('--look', 0); return; }
+    const r = document.createElement('div'); r.className = 'ripple';
+    r.style.left = xp + '%'; r.style.bottom = yp + '%';
+    $('#room').appendChild(r); setTimeout(() => r.remove(), 750);
+    const ok = await moveTo(clamp(xp, FLOOR.xMin, FLOOR.xMax), clamp(yp - 2, FLOOR.yMin, FLOOR.yMax), 9);
+    if (ok && P.mode === 'idle' && Math.random() < 0.4) { cls('jump', true); setTimeout(() => cls('jump', false), 650); }
+  });
+
+  // ぶらぶら
+  async function wander() {
+    while (true) {
+      await sleep(rand(3500, 8500));
+      if (P.mode !== 'idle' || document.hidden) continue;
+      const r = Math.random();
+      if (r < 0.55) {
+        cls('sit', false);
+        await moveTo(rand(FLOOR.xMin, FLOOR.xMax), rand(FLOOR.yMin, FLOOR.yMax), rand(4.5, 7));
+      } else if (r < 0.72) {
+        cls('sit', true);
+      } else if (r < 0.86) {
+        cls('sit', false); face(P.x > 40 ? -1 : 1); // 窓のほうを見る
+      } else {
+        cls('sit', false); cls('jump', true); setTimeout(() => cls('jump', false), 650);
+      }
+      if (P.mode === 'idle' && Date.now() - lastSpoke > 25000 && Math.random() < 0.35) say(randomLine());
+    }
+  }
+
+  // ---------- ごはん ----------
+  const FOODS = ['🍙', '🍓', '🍡', '🍵', '🍪', '🍑', '🍠', '🥛'];
+  let foodIdx = Math.floor(Math.random() * FOODS.length);
+  $('#btnFood').addEventListener('click', async () => {
+    if (P.mode === 'sleep') { toast('ぐっすり寝てるみたい'); return; }
+    if (P.mode !== 'idle') return;
+    P.mode = 'eat'; stopMove(); cls('sit', false);
+    const food = document.createElement('div'); food.className = 'food dropIn';
+    food.textContent = FOODS[foodIdx]; foodIdx = (foodIdx + 1) % FOODS.length;
+    const side = P.x > 50 ? -1 : 1;
+    const fx = clamp(P.x + side * rand(26, 34), 12, 88);
+    const fy = clamp(P.y + rand(-3, 3), FLOOR.yMin, FLOOR.yMax);
+    food.style.left = fx + '%'; food.style.bottom = fy + '%';
+    food.style.zIndex = String(10 + Math.round(FLOOR.yMax - fy));
+    food.style.fontSize = (30 * depthScale(fy)) + 'px';
+    $('#room').appendChild(food);
+    lookAt(fx); say('わぁ！', 1200);
+    await sleep(700);
+    await moveTo(fx + (fx > P.x ? -20 : 20), fy + 0.3, 8);
+    lookAt(fx);
+    cls('eat', true);
+    for (let i = 0; i < 3; i++) {
+      cls('chomp', true); await sleep(380); cls('chomp', false); await sleep(380);
+      food.style.transform = `translateX(-50%) scale(${1 - (i + 1) * 0.3})`;
+    }
+    food.remove(); cls('eat', false);
+    beHappy(); hearts(4);
+    say(pick(['おいしい！', 'ごちそうさま', 'しあわせ〜', 'おなかいっぱい']), 2200);
+    P.mode = 'idle';
+  });
+
+  // ---------- あかり ----------
+  function updateLightBtn() {
+    $('#btnLight').classList.toggle('active', lightOff);
+    $('#lightLabel').textContent = lightOff ? 'おきる' : 'おやすみ';
+  }
+  $('#btnLight').addEventListener('click', async () => {
+    if (P.mode === 'breath' || P.mode === 'eat') return;
+    lightOff = !lightOff; updateLightBtn(); applyTime();
+    if (lightOff) {
+      P.mode = 'sleep-going'; say('おやすみ…', 1600);
+      await moveTo(28, 15.5, 6);
+      if (!lightOff) return;
+      face(1); cls('sit', false); cls('sleep', true); P.mode = 'sleep';
+    } else {
+      P.token++; cls('walk', false); cls('sleep', false); P.mode = 'idle';
+      setTimeout(() => say(phase() === 'night' ? 'まだ夜だよ…' : 'ふわぁ、おはよ', 2200), 300);
+    }
+  });
+
+  // ---------- 深呼吸 ----------
+  let breathRun = 0;
+  $('#btnBreath').addEventListener('click', async () => {
+    if (P.mode === 'sleep') { toast('起こしてからにしよう'); return; }
+    if (P.mode !== 'idle') return;
+    P.mode = 'breath'; const run = ++breathRun;
+    $('#bubble').classList.remove('show');
+    cls('sit', false);
+    document.body.classList.add('breathing');
+    $('#breathWord').textContent = 'いっしょに'; $('#breathCount').textContent = '';
+    await moveTo(50, 17, 8); face(1);
+    const br = $('#petBreath'), halo = $('#halo'), word = $('#breathWord'), cnt = $('#breathCount');
+    await sleep(1200);
+    const CYCLES = 5;
+    for (let i = 1; i <= CYCLES && run === breathRun; i++) {
+      cnt.textContent = i + ' / ' + CYCLES;
+      word.textContent = 'すって';
+      br.style.transitionDuration = '4s'; halo.style.transitionDuration = '4s';
+      br.style.transform = 'scale(1.28)'; halo.style.transform = 'translate(-50%, 30%) scale(1)';
+      await sleep(4000); if (run !== breathRun) break;
+      word.textContent = 'とめて';
+      await sleep(2000); if (run !== breathRun) break;
+      word.textContent = 'はいて';
+      br.style.transitionDuration = '6s'; halo.style.transitionDuration = '6s';
+      br.style.transform = 'scale(1)'; halo.style.transform = 'translate(-50%, 30%) scale(.55)';
+      await sleep(6000);
+    }
+    if (run === breathRun) endBreath(true);
+  });
+  function endBreath(done) {
+    breathRun++;
+    const br = $('#petBreath'), halo = $('#halo');
+    br.style.transitionDuration = '1s'; br.style.transform = 'scale(1)';
+    halo.style.transitionDuration = '1s'; halo.style.transform = 'translate(-50%, 30%) scale(.55)';
+    document.body.classList.remove('breathing');
+    P.mode = 'idle';
+    beHappy(); if (done) hearts(3);
+    setTimeout(() => say(done ? 'すっきりしたね' : 'またやろうね', 2400), 400);
+  }
+  $('#breathEnd').addEventListener('click', (e) => { e.stopPropagation(); if (P.mode === 'breath') endBreath(false); });
+
+  // ---------- おと（WebAudioで合成） ----------
+  const SOUNDS = ['none', 'rain', 'fire', 'wave'];
+  const SOUND_NAME = { none: 'おと', rain: '雨', fire: '焚き火', wave: '波' };
+  let AC = null, master = null, current = null;
+  function ensureAudio() {
+    if (!AC) {
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  }
+  function noiseBuffer(kind) {
+    const len = AC.sampleRate * 4, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0, last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+      else { b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.969 * b2 + w * 0.153852; b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898; d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926; }
+    }
+    return buf;
+  }
+  function loopSrc(buf) { const s = AC.createBufferSource(); s.buffer = buf; s.loop = true; return s; }
+  function startSound(kind) {
+    const out = AC.createGain(); out.connect(master);
+    const nodes = []; let timer = null;
+    if (kind === 'rain') {
+      const s = loopSrc(noiseBuffer('pink')); const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 350;
+      const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; const g = AC.createGain(); g.gain.value = 0.9;
+      s.connect(hp).connect(lp).connect(g).connect(out); s.start(); nodes.push(s);
+      const s2 = loopSrc(noiseBuffer('brown')); const g2 = AC.createGain(); g2.gain.value = 0.35; s2.connect(g2).connect(out); s2.start(); nodes.push(s2);
+    } else if (kind === 'fire') {
+      const s = loopSrc(noiseBuffer('brown')); const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+      const g = AC.createGain(); g.gain.value = 0.9; s.connect(lp).connect(g).connect(out); s.start(); nodes.push(s);
+      const crackBuf = noiseBuffer('white');
+      const crackle = () => {
+        const n = Math.random() < 0.3 ? 3 : 1;
+        for (let k = 0; k < n; k++) {
+          const t = AC.currentTime + k * rand(0.02, 0.07);
+          const c = AC.createBufferSource(); c.buffer = crackBuf;
+          const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = rand(1500, 4200); bp.Q.value = 1.2;
+          const eg = AC.createGain(); eg.gain.setValueAtTime(0, t); eg.gain.linearRampToValueAtTime(rand(0.25, 0.8), t + 0.002); eg.gain.exponentialRampToValueAtTime(0.001, t + rand(0.015, 0.06));
+          c.connect(bp).connect(eg).connect(out); c.start(t, rand(0, 3), 0.1);
+        }
+        timer = setTimeout(crackle, rand(60, 520));
+      };
+      crackle();
+    } else if (kind === 'wave') {
+      const s = loopSrc(noiseBuffer('pink')); const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+      const wg = AC.createGain(); wg.gain.value = 0.55;
+      const lfo = AC.createOscillator(); lfo.frequency.value = 0.09; const lg = AC.createGain(); lg.gain.value = 0.45;
+      lfo.connect(lg).connect(wg.gain); lfo.start(); nodes.push(lfo);
+      s.connect(lp).connect(wg).connect(out); s.start(); nodes.push(s);
+    }
+    return { out, stop() { clearTimeout(timer); const t = AC.currentTime; out.gain.setTargetAtTime(0, t, 0.4); setTimeout(() => { nodes.forEach((n) => { try { n.stop(); } catch (e) {} }); out.disconnect(); }, 1800); } };
+  }
+  function playSound(kind) {
+    ensureAudio();
+    if (current) { current.stop(); current = null; }
+    const t = AC.currentTime;
+    if (kind === 'none') { master.gain.setTargetAtTime(0, t, 0.4); return; }
+    current = startSound(kind);
+    master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.setTargetAtTime(0.5, t, 0.8);
+  }
+  function updateSoundBtn() {
+    $('#soundLabel').textContent = S.sound === 'none' ? 'おと' : SOUND_NAME[S.sound];
+    $('#btnSound').classList.toggle('active', S.sound !== 'none');
+  }
+  $('#btnSound').addEventListener('click', () => {
+    S.sound = SOUNDS[(SOUNDS.indexOf(S.sound) + 1) % SOUNDS.length];
+    playSound(S.sound); updateSoundBtn(); applyTime(); save();
+    toast(S.sound === 'none' ? 'しずかにしたよ' : SOUND_NAME[S.sound] + 'の音');
+  });
+  // 前回の音は、最初のタップで再開（自動再生はブラウザ制約でできないため）
+  let resumed = false;
+  document.addEventListener('pointerdown', (e) => {
+    if (resumed) return; resumed = true;
+    if (S.sound !== 'none' && !e.target.closest('#btnSound')) playSound(S.sound);
+  }, { capture: true });
+
+  // ---------- いっしょにいた時間（増えるだけ） ----------
+  function fmtTime(sec) {
+    const m = Math.floor(sec / 60); if (m < 60) return m + '分';
+    const h = Math.floor(m / 60); return h + '時間' + (m % 60 ? (m % 60) + '分' : '');
+  }
+  function renderHud() {
+    $('#petName').textContent = S.name || 'もち';
+    $('#together').textContent = 'いっしょに ' + fmtTime(S.totalSec);
+    $('#totalVal').textContent = fmtTime(S.totalSec);
+  }
+  let tick = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    S.totalSec++; tick++;
+    if (tick % 30 === 0) { renderHud(); applyTime(); }
+    if (tick % 20 === 0) save();
+  }, 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { save(); if (AC) AC.suspend(); }
+    else { applyTime(); if (AC && S.sound !== 'none') AC.resume(); }
+  });
+
+  // ---------- 設定シート ----------
+  function openSheet() { $('#nameInput').value = S.name; renderHud(); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
+  function closeSheet() {
+    $('#nameInput').blur();
+    const v = $('#nameInput').value.trim();
+    if (v && v !== S.name) { S.name = v; save(); renderHud(); setTimeout(() => say('いいなまえ！', 2000), 350); }
+    $('#sheetBg').classList.remove('show'); $('#sheet').classList.remove('show');
+  }
+  $('#settingsBtn').addEventListener('click', openSheet);
+  $('#sheetBg').addEventListener('click', closeSheet);
+  $('#nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); });
+
+  const SCHEMA = 'hidamari.v1';
+  $('#exportBtn').addEventListener('click', () => {
+    const data = { schema: SCHEMA, exportedAt: new Date().toISOString(), pet: { ...S } };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = 'hidamari-sync.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast('書き出したよ');
+  });
+  $('#importBtn').addEventListener('click', () => $('#importFile').click());
+  $('#importFile').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (data.schema !== SCHEMA || !data.pet) { toast('ひだまりのデータではないみたい'); return; }
+      const p = data.pet;
+      if ((p.updatedAt || 0) > S.updatedAt) { S.name = p.name || S.name; }
+      S.totalSec = Math.max(S.totalSec, p.totalSec || 0); // 時間は増えるだけ
+      await save(); renderHud(); $('#nameInput').value = S.name; toast('取り込んだよ');
+    } catch (err) { toast('読み込めなかった'); }
+  });
+
+  // ---------- 起動 ----------
+  (async function init() {
+    setupViewportTracking();
+    buildSky();
+    try { await openDB(); const saved = await kvGet('pet'); if (saved) Object.assign(S, saved); } catch (e) {}
+    $('#versionLabel').textContent = 'v' + APP_VERSION;
+    renderHud(); updateSoundBtn(); updateLightBtn(); applyTime();
+    setPos(50, 18, 0); face(1);
+    setTimeout(() => { beHappy(); say(LINES.greet[phase()], 2800); }, 700);
+    wander();
+  })();
+
+  function setupViewportTracking() {
+    const vv = window.visualViewport; if (!vv) return;
+    const apply = () => document.documentElement.style.setProperty('--app-height', vv.height + 'px');
+    vv.addEventListener('resize', apply); apply();
+  }
+
+  // ---------- Service Worker + 自動アップデート ----------
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', async () => {
+      try {
+        const res = await fetch(new URL('sw.js', location.href).href, { method: 'HEAD' });
+        if (!res.ok) return;
+        const reg = await navigator.serviceWorker.register('sw.js');
+        if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner(reg.waiting);
+        reg.addEventListener('updatefound', () => {
+          const sw = reg.installing; if (!sw) return;
+          sw.addEventListener('statechange', () => { if (sw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner(sw); });
+        });
+        reg.update();
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => { if (refreshing) return; refreshing = true; location.reload(); });
+      } catch (e) {}
+    });
+  }
+  function showUpdateBanner(waitingSW) {
+    if (document.getElementById('updateBanner')) return;
+    const b = document.createElement('button'); b.id = 'updateBanner';
+    b.innerHTML = '<span>新しいバージョンがあります — タップで更新</span>';
+    b.addEventListener('click', () => { b.disabled = true; b.querySelector('span').textContent = '更新中…'; waitingSW.postMessage('SKIP_WAITING'); });
+    document.body.appendChild(b); requestAnimationFrame(() => b.classList.add('show'));
+  }
+</script>
+</body>
+</html>

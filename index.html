@@ -321,6 +321,21 @@
   @keyframes bottoFade { 0%, 60% { opacity: 1; } 100% { opacity: 0.35; } }
   body.botto .bottoBarWrap { opacity: 1; }
 
+
+  /* ===== 音量 ===== */
+  .volRow { gap: 10px; }
+  .volRow .vmin, .volRow .vmax, .volPop span { font-size: 15px; opacity: .75; }
+  input[type=range] { -webkit-appearance: none; appearance: none; flex: 1; height: 28px; background: transparent; }
+  input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--accent) var(--v, 40%), #ead9c5 var(--v, 40%)); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -9px; border-radius: 50%; background: #fff; box-shadow: 0 1px 5px rgba(90,60,30,0.3); border: 0; }
+  input[type=range]::-moz-range-track { height: 6px; border-radius: 3px; background: #ead9c5; }
+  input[type=range]::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--accent); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 0; box-shadow: 0 1px 5px rgba(90,60,30,0.3); }
+  .volPop { position: fixed; right: 12px; bottom: calc(var(--safe-bottom) + 96px); z-index: 60; width: 230px; display: flex; align-items: center; gap: 8px;
+    background: rgba(255,248,238,0.96); border-radius: 18px; padding: 6px 14px; box-shadow: 0 6px 20px rgba(90,60,30,0.18);
+    opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .25s, transform .25s; }
+  .volPop.show { opacity: 1; transform: none; pointer-events: auto; }
+
   /* ===== HUD ===== */
   .hud { position: absolute; left: 0; right: 0; top: 0; z-index: 40; display: flex; justify-content: space-between; align-items: flex-start;
     padding: calc(var(--safe-top) + 8px) 14px 0; pointer-events: none; }
@@ -527,6 +542,8 @@
     <div class="row"><label for="poodleInput">トイプードル</label><input id="poodleInput" maxlength="10" placeholder="ココ" enterkeyhint="done" /></div>
     <div class="row"><label>いっしょにいた時間</label><span class="val" id="totalVal">0分</span></div>
   </div>
+  <div class="secLabel">おとの大きさ</div>
+  <div class="field"><div class="row volRow"><span class="vmin">🔈</span><input type="range" id="volSlider" min="0" max="100" step="1" /><span class="vmax">🔊</span></div></div>
   <div class="secLabel">窓の景色</div>
   <div class="field"><div class="prow"><div class="pchips" id="winModeChips"></div>
     <button class="link small" id="winPhotoBtn">写真をえらぶ</button>
@@ -582,6 +599,7 @@
   <button class="bottoPeek" id="bottoPeek">おわる</button>
   <div class="sill"></div>
 </div>
+<div class="volPop" id="volPop"><span>🔈</span><input type="range" id="volPopSlider" min="0" max="100" step="1" /><span>🔊</span></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -592,7 +610,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '1.7.0';
+  const APP_VERSION = '1.8.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -610,7 +628,7 @@
   function kvPut(val) { return new Promise((res) => { try { const r = _db.transaction('kv', 'readwrite').objectStore('kv').put(val); r.onsuccess = () => res(); r.onerror = () => res(); } catch (e) { res(); } }); }
 
   // ---------- 状態 ----------
-  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', curRoom: 'living', petRoom: { mochi: 'living', shiba: 'living', poodle: 'living' }, roomNames: {}, full: {}, persona: { mochi: 'ottori', shiba: 'cool', poodle: 'genki' }, windowMode: 'scene', totalSec: 0, sound: 'none', updatedAt: 0 };
+  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', curRoom: 'living', petRoom: { mochi: 'living', shiba: 'living', poodle: 'living' }, roomNames: {}, full: {}, persona: { mochi: 'ottori', shiba: 'cool', poodle: 'genki' }, windowMode: 'scene', volume: 0.45, totalSec: 0, sound: 'none', updatedAt: 0 };
   let lightOff = false;
   async function save() { S.updatedAt = Date.now(); await kvPut({ ...S }); }
 
@@ -1685,7 +1703,7 @@
   const winImg = document.createElement('img'); winImg.className = 'winPhoto'; winImg.alt = '';
   const winTint = document.createElement('div'); winTint.className = 'winTint';
   $('#sky').prepend(winTint); $('#sky').prepend(winImg); $('#sky').prepend(winCanvas);
-  let smallKey = '', photoURL = null;
+  let smallKey = '', photoURL = null, smallScene = null;
   const PHOTO_TINT = { dawn: 'rgba(255,170,140,0.18)', day: 'rgba(0,0,0,0)', evening: 'rgba(255,140,70,0.22)', dusk: 'rgba(80,50,120,0.4)', night: 'rgba(8,14,45,0.6)' };
   function usePhoto() { return S.windowMode === 'photo' && photoURL; }
   function refreshWindow(force) {
@@ -1696,7 +1714,7 @@
     const key = sceneKey() + Math.round(r.width) + 'x' + Math.round(r.height);
     if (!force && key === smallKey) return;
     if (r.width < 10) return;
-    smallKey = key; renderScene(winCanvas, r.width, r.height, true);
+    smallKey = key; smallScene = renderScene(winCanvas, r.width, r.height, false);
   }
 
   // ---------- 窓の外をながめる ----------
@@ -1724,7 +1742,7 @@
     vCanvas.style.display = photo ? 'none' : 'block';
     if (!photo) vScene = renderScene(vCanvas, W, H, false);
     vDyn.width = Math.round(W * Math.min(devicePixelRatio || 1, 2)); vDyn.height = Math.round(H * Math.min(devicePixelRatio || 1, 2));
-    vStart = performance.now(); cancelAnimationFrame(vRaf); vRaf = requestAnimationFrame(drawDyn);
+    vStart = performance.now(); vLive.last = 0; cancelAnimationFrame(vRaf); vRaf = requestAnimationFrame(drawDyn);
     const rain = S.sound === 'rain';
     viewSpeaker(rain ? 'あめ、しずかだね' : pick(VIEW_LINES[phase()]));
     if (botto) setTimeout(startBotto, 700);
@@ -1735,71 +1753,127 @@
     setTimeout(() => cancelAnimationFrame(vRaf), 400);
     const sp = speaker(); if (sp && sp.mode === 'idle') setTimeout(() => { sp.hop(); sp.say('いい景色だったね', 1800); }, 500);
   }
-  // 動くもの：雲・霧・川のきらめき・鳥・草・ほたる・雨
-  const flock = { x: -1, y: 0, next: 4000 };
+  // 動くもの：雲・霧・川の流れ・鳥・草・ほたる・流れ星・雨（大きな景色と部屋の窓で共通）
+  function newLiveState() { return { birds: [], nextBird: 2 + Math.random() * 3, star: null, nextStar: 8 + Math.random() * 10, last: 0 }; }
+  function spawnFlock(st, W, H, small) {
+    const n = Math.random() < 0.25 ? 1 : 3 + Math.floor(Math.random() * 3);
+    const dir = Math.random() < 0.5 ? 1 : -1, far = Math.random() < 0.5;
+    const baseY = H * (0.12 + Math.random() * 0.22), size = (far ? 0.55 : 1) * (small ? 0.6 : 1);
+    const speed = (far ? 14 : 26) * (small ? 0.55 : 1) * (0.8 + Math.random() * 0.4);
+    for (let i = 0; i < n; i++) {
+      st.birds.push({ x: dir > 0 ? -20 - i * 16 * size : W + 20 + i * 16 * size, y: baseY + (i % 2 ? 1 : -1) * Math.ceil(i / 2) * 7 * size + (i ? 4 : 0),
+        dir, speed, size, phase: Math.random() * 6, wob: Math.random() * 6 });
+    }
+  }
+  function drawLive(ctx, W, H, rp, t, dt, st, small) {
+    const ph = phase(), night = ph === 'night' || ph === 'dusk', rain = S.sound === 'rain';
+    // 雲（ゆっくり流れる。手前ほど速い）
+    drawClouds(ctx, W, H, t * W * 0.018, sceneKey());
+    // 霧
+    for (let k = 0; k < 2; k++) {
+      const y = H * (k ? 0.6 : 0.52), x = ((t * W * (0.02 + k * 0.012) + k * W * 0.6) % (W * 1.8)) - W * 0.4;
+      const mg = ctx.createRadialGradient(x, y, 0, x, y, W * 0.55);
+      mg.addColorStop(0, `rgba(255,255,255,${night ? 0.07 : 0.2})`); mg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.save(); ctx.translate(x, y); ctx.scale(1, 0.16); ctx.translate(-x, -y); ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(x, y, W * 0.55, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    // 川の流れ：流れにそって下る波すじ＋岸ぞいの白い泡
+    if (rp) {
+      ctx.save(); riverPath(ctx, rp); ctx.clip();
+      const n = small ? 34 : 70, L = rp.length - 1;
+      for (let i = 0; i < n; i++) {
+        const sp = 0.07 + (i % 7) * 0.012;
+        const u = ((((i * 0.6180339) % 1 + t * sp) % 1) + 1) % 1;
+        const f = Math.pow(u, 0.8) * L, i0 = Math.floor(f), a = rp[i0], b = rp[Math.min(i0 + 1, L)], k = f - i0;
+        const x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k, w = a.w + (b.w - a.w) * k;
+        const lane = ((i * 0.37) % 1 - 0.5) * 0.85, off = lane * w, len = w * (0.12 + ((i * 7) % 5) * 0.03);
+        const fade = Math.sin(u * Math.PI);
+        const al = (night ? 0.28 : 0.75) * fade;
+        ctx.strokeStyle = night ? `rgba(255,245,215,${al})` : `rgba(255,255,255,${al})`;
+        ctx.lineWidth = (small ? 0.6 : 1) * (0.8 + u * 2.2);
+        ctx.beginPath(); ctx.moveTo(x + off - len / 2, y); ctx.quadraticCurveTo(x + off, y - 1.5 - u * 2, x + off + len / 2, y); ctx.stroke();
+      }
+      // 岸の泡
+      for (let side = -1; side <= 1; side += 2) {
+        ctx.strokeStyle = `rgba(255,255,255,${night ? 0.12 : 0.45})`; ctx.lineWidth = small ? 0.8 : 1.4;
+        ctx.setLineDash([3 + (small ? 0 : 3), 7]); ctx.lineDashOffset = -t * (small ? 14 : 30) * side * side;
+        ctx.beginPath();
+        rp.forEach((p, j) => { const x = p.x + side * (p.w / 2 - 2 - p.w * 0.03); j ? ctx.lineTo(x, p.y) : ctx.moveTo(x, p.y); });
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      ctx.restore();
+    }
+    // 鳥
+    if (!night && !rain) {
+      st.nextBird -= dt;
+      if (st.nextBird <= 0 && st.birds.length === 0) { spawnFlock(st, W, H, small); st.nextBird = 6 + Math.random() * 9; }
+      ctx.lineCap = 'round';
+      st.birds = st.birds.filter((bd) => {
+        bd.x += bd.dir * bd.speed * dt;
+        const y = bd.y + Math.sin(t * 0.9 + bd.wob) * 4 * bd.size;
+        const fl = Math.sin(t * 9 + bd.phase), s = 7 * bd.size;
+        ctx.strokeStyle = `rgba(35,35,45,${bd.size < 0.7 ? 0.55 : 0.8})`; ctx.lineWidth = Math.max(1, 1.6 * bd.size);
+        ctx.beginPath(); ctx.moveTo(bd.x - s, y - fl * s * 0.5); ctx.quadraticCurveTo(bd.x - s * 0.35, y - s * 0.3, bd.x, y); ctx.quadraticCurveTo(bd.x + s * 0.35, y - s * 0.3, bd.x + s, y - fl * s * 0.5); ctx.stroke();
+        return bd.dir > 0 ? bd.x < W + 40 : bd.x > -40;
+      });
+    } else st.birds = [];
+    // 夜：ほたると流れ星
+    if (ph === 'night' && !rain) {
+      const nF = small ? 7 : 14;
+      for (let i = 0; i < nF; i++) {
+        const x = W * (0.15 + ((i * 53) % 70) / 100) + Math.sin(t * 0.6 + i) * W * 0.045, y = H * (0.7 + ((i * 29) % 25) / 100) + Math.cos(t * 0.8 + i * 2) * H * 0.012;
+        const al = 0.5 + 0.5 * Math.sin(t * 2.2 + i * 1.7), r = small ? 4 : 8;
+        const fg = ctx.createRadialGradient(x, y, 0, x, y, r); fg.addColorStop(0, `rgba(230,255,150,${0.9 * al})`); fg.addColorStop(1, 'rgba(230,255,150,0)');
+        ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      st.nextStar -= dt;
+      if (!st.star && st.nextStar <= 0) { st.star = { x: W * (0.3 + Math.random() * 0.6), y: H * (0.05 + Math.random() * 0.2), life: 0 }; st.nextStar = 14 + Math.random() * 20; }
+      if (st.star) {
+        const s2 = st.star; s2.life += dt; const k = s2.life / 0.9, len = W * 0.18;
+        const x = s2.x - k * W * 0.3, y = s2.y + k * W * 0.12;
+        const gr = ctx.createLinearGradient(x, y, x + len, y - len * 0.4); gr.addColorStop(0, `rgba(255,255,240,${0.9 * (1 - k)})`); gr.addColorStop(1, 'rgba(255,255,240,0)');
+        ctx.strokeStyle = gr; ctx.lineWidth = small ? 1 : 1.6; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + len, y - len * 0.4); ctx.stroke();
+        if (k >= 1) st.star = null;
+      }
+    }
+    // 手前の草
+    const gcol = { dawn: '#4a6a3a', day: '#3f6b35', evening: '#55602f', dusk: '#2e3a30', night: '#121e18' }[ph];
+    ctx.strokeStyle = gcol; ctx.lineCap = 'round';
+    const nG = small ? 40 : 90;
+    for (let i = 0; i < nG; i++) {
+      const x = (i / nG) * W + ((i * 13) % 7), h = H * (0.05 + ((i * 31) % 10) / 160), sway = Math.sin(t * 1.4 + i * 0.5) * (small ? 2.5 : 6);
+      ctx.lineWidth = (small ? 0.8 : 1.6) + (i % 3) * 0.5; ctx.beginPath(); ctx.moveTo(x, H); ctx.quadraticCurveTo(x + sway * 0.4, H - h * 0.5, x + sway, H - h); ctx.stroke();
+    }
+  }
+  function drawRain(ctx, W, H, t, small) {
+    ctx.strokeStyle = 'rgba(230,236,245,0.45)'; ctx.lineWidth = small ? 0.7 : 1;
+    const n = small ? 40 : 110, len = small ? 8 : 16;
+    for (let i = 0; i < n; i++) { const x = ((i * 71) % W + t * 40) % W, y = ((i * 131) % H + t * (small ? 300 : 620) * (0.8 + (i % 5) * 0.1)) % H; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - len * 0.2, y + len); ctx.stroke(); }
+  }
+  // 大きな景色
+  const vLive = newLiveState();
   function drawDyn(now) {
-    const t = (now - vStart) / 1000;
+    const t = Math.max(0, (now - vStart) / 1000), dt = clamp(t - (vLive.last || t), 0, 0.1); vLive.last = t;
     const dpr = Math.min(devicePixelRatio || 1, 2), W = vDyn.width / dpr, H = vDyn.height / dpr;
     const ctx = vDyn.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    const ph = phase(), night = ph === 'night' || ph === 'dusk', rain = S.sound === 'rain', photo = usePhoto();
-    if (!photo) {
-      drawClouds(ctx, W, H, t * W * 0.006, sceneKey());
-      // 霧
-      for (let k = 0; k < 2; k++) {
-        const y = H * (k ? 0.6 : 0.52), x = ((t * (8 + k * 5) + k * W * 0.6) % (W * 1.8)) - W * 0.4;
-        const mg = ctx.createRadialGradient(x, y, 0, x, y, W * 0.55);
-        mg.addColorStop(0, `rgba(255,255,255,${night ? 0.06 : 0.16})`); mg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.save(); ctx.translate(x, y); ctx.scale(1, 0.18); ctx.translate(-x, -y); ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(x, y, W * 0.55, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-      }
-      // 川のきらめき
-      if (vScene) {
-        ctx.save(); riverPath(ctx, vScene.rp); ctx.clip();
-        const rp = vScene.rp, n = 46;
-        for (let i = 0; i < n; i++) {
-          const u = ((i / n) + t * 0.035 * (0.6 + (i % 5) * 0.12)) % 1, f = u * (rp.length - 1), a = rp[Math.floor(f)], b = rp[Math.min(Math.floor(f) + 1, rp.length - 1)], k = f - Math.floor(f);
-          const x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k, w = a.w + (b.w - a.w) * k;
-          const off = (((i * 97) % 100) / 100 - 0.5) * w * 0.8, len = w * (0.08 + ((i * 37) % 10) / 60);
-          const al = (night ? 0.18 : 0.5) * Math.sin(u * Math.PI) * (0.5 + 0.5 * Math.sin(t * 2 + i));
-          ctx.strokeStyle = night ? `rgba(255,245,210,${al})` : `rgba(255,255,255,${al})`; ctx.lineWidth = 1 + u * 1.5;
-          ctx.beginPath(); ctx.moveTo(x + off - len / 2, y); ctx.lineTo(x + off + len / 2, y); ctx.stroke();
-        }
-        ctx.restore();
-      }
-      // 鳥
-      if (!night && !rain) {
-        if (flock.x < 0 && now - vStart > flock.next) { flock.x = -30; flock.y = H * (0.18 + Math.random() * 0.15); }
-        if (flock.x >= -30) {
-          flock.x += 0.9;
-          ctx.strokeStyle = 'rgba(40,40,50,0.7)'; ctx.lineWidth = 1.4;
-          [[0, 0], [14, 6], [-12, 8]].forEach(([dx, dy], i) => { const fl = Math.sin(t * 8 + i) * 3, x = flock.x + dx, y = flock.y + dy;
-            ctx.beginPath(); ctx.moveTo(x - 6, y - fl); ctx.quadraticCurveTo(x - 2, y - 2, x, y); ctx.quadraticCurveTo(x + 2, y - 2, x + 6, y - fl); ctx.stroke(); });
-          if (flock.x > W + 40) { flock.x = -1; flock.next = now - vStart + 15000 + Math.random() * 20000; }
-        }
-      }
-      // ほたる
-      if (ph === 'night' && !rain) {
-        for (let i = 0; i < 14; i++) {
-          const x = W * (0.15 + ((i * 53) % 70) / 100) + Math.sin(t * 0.6 + i) * 18, y = H * (0.7 + ((i * 29) % 25) / 100) + Math.cos(t * 0.8 + i * 2) * 10;
-          const al = 0.5 + 0.5 * Math.sin(t * 2.2 + i * 1.7);
-          const fg = ctx.createRadialGradient(x, y, 0, x, y, 8); fg.addColorStop(0, `rgba(230,255,150,${0.9 * al})`); fg.addColorStop(1, 'rgba(230,255,150,0)');
-          ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-      // 手前の草
-      const gcol = { dawn: '#4a6a3a', day: '#3f6b35', evening: '#55602f', dusk: '#2e3a30', night: '#121e18' }[ph];
-      ctx.strokeStyle = gcol; ctx.lineCap = 'round';
-      for (let i = 0; i < 90; i++) {
-        const x = (i / 90) * W + ((i * 13) % 7), h = H * (0.05 + ((i * 31) % 10) / 160), sway = Math.sin(t * 1.2 + i * 0.5) * 5;
-        ctx.lineWidth = 1.6 + (i % 3) * 0.6; ctx.beginPath(); ctx.moveTo(x, H); ctx.quadraticCurveTo(x + sway * 0.4, H - h * 0.5, x + sway, H - h); ctx.stroke();
-      }
-    }
-    // 雨
-    if (rain) {
-      ctx.strokeStyle = 'rgba(230,236,245,0.45)'; ctx.lineWidth = 1;
-      for (let i = 0; i < 110; i++) { const x = ((i * 71) % W + t * 40) % W, y = ((i * 131) % H + t * 620 * (0.8 + (i % 5) * 0.1)) % H; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 16); ctx.stroke(); }
-    }
+    if (!usePhoto()) drawLive(ctx, W, H, vScene && vScene.rp, t, dt, vLive, false);
+    if (S.sound === 'rain') drawRain(ctx, W, H, t, false);
     vRaf = requestAnimationFrame(drawDyn);
   }
+  // 部屋の窓（こちらも動く。軽くするため約24fps）
+  const winLive = document.createElement('canvas'); winLive.className = 'winScene winLive';
+  winCanvas.after(winLive);
+  const sLive = newLiveState(); let sRaf = 0, sPrev = 0, sT0 = performance.now();
+  function drawSmall(now) {
+    sRaf = requestAnimationFrame(drawSmall);
+    if (document.hidden || view.classList.contains('show') || usePhoto() || !smallScene) return;
+    if (now - sPrev < 40) return;
+    const t = Math.max(0, (now - sT0) / 1000), dt = Math.min(0.2, (now - (sPrev || now)) / 1000); sPrev = now;
+    const W = smallScene.W, H = smallScene.H, dpr = Math.min(devicePixelRatio || 1, 2);
+    if (winLive.width !== Math.round(W * dpr)) { winLive.width = Math.round(W * dpr); winLive.height = Math.round(H * dpr); }
+    const ctx = winLive.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    drawLive(ctx, W, H, smallScene.rp, t, dt, sLive, true);
+  }
+  sRaf = requestAnimationFrame(drawSmall);
   // ぼーっとタイム（3分）
   function startBotto() {
     if (!view.classList.contains('show')) openWindowView(false);
@@ -1916,7 +1990,7 @@
     const t = AC.currentTime;
     if (kind === 'none') { master.gain.setTargetAtTime(0, t, 0.4); return; }
     current = startSound(kind);
-    master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.setTargetAtTime(0.5, t, 0.8);
+    master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.setTargetAtTime(volGain(), t, 0.8);
   }
   function updateSoundBtn() {
     $('#soundLabel').textContent = S.sound === 'none' ? 'おと' : SOUND_NAME[S.sound];
@@ -1926,7 +2000,25 @@
     S.sound = SOUNDS[(SOUNDS.indexOf(S.sound) + 1) % SOUNDS.length];
     playSound(S.sound); updateSoundBtn(); applyTime(); save();
     toast(S.sound === 'none' ? 'しずかにしたよ' : SOUND_NAME[S.sound] + 'の音');
+    if (S.sound !== 'none') showVolPop(); else $('#volPop').classList.remove('show');
   });
+
+  // ---------- 音量 ----------
+  const volGain = () => 0.6 * Math.pow(clamp(S.volume ?? 0.45, 0, 1), 1.4);
+  function setVolume(v, persist) {
+    S.volume = clamp(v, 0, 1);
+    if (AC && master && S.sound !== 'none') { const t = AC.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.setTargetAtTime(volGain(), t, 0.08); }
+    ['#volSlider', '#volPopSlider'].forEach((sel) => { const el = $(sel); if (+el.value !== Math.round(S.volume * 100)) el.value = Math.round(S.volume * 100); el.style.setProperty('--v', Math.round(S.volume * 100) + '%'); });
+    if (persist) save();
+  }
+  ['#volSlider', '#volPopSlider'].forEach((sel) => {
+    $(sel).addEventListener('input', (e) => { setVolume(e.target.value / 100, false); if (sel === '#volPopSlider') showVolPop(); });
+    $(sel).addEventListener('change', (e) => setVolume(e.target.value / 100, true));
+  });
+  let volPopT;
+  function showVolPop() { $('#volPop').classList.add('show'); clearTimeout(volPopT); volPopT = setTimeout(() => $('#volPop').classList.remove('show'), 3500); }
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest('#volPop, #btnSound')) $('#volPop').classList.remove('show'); });
+
   // 前回の音は、最初のタップで再開（自動再生はブラウザ制約でできないため）
   let resumed = false;
   document.addEventListener('pointerdown', (e) => {
@@ -2006,7 +2098,7 @@
     buildSky();
     try { await openDB(); const saved = await kvGet('pet'); if (saved) Object.assign(S, saved); } catch (e) {}
     $('#versionLabel').textContent = 'v' + APP_VERSION;
-    renderHud(); updateSoundBtn(); updateLightBtn(); applyTime();
+    renderHud(); updateSoundBtn(); updateLightBtn(); applyTime(); setVolume(S.volume ?? 0.45, false);
     // 旧「おへや」(v1.2〜1.4) からの引っ越し：おへやにいた子は しんしつへ
     if (S.inRoom && !S.petRoomMigrated) { Object.keys(S.inRoom).forEach((k) => { if (S.inRoom[k]) S.petRoom[k] = 'bedroom'; }); }
     S.petRoomMigrated = true; delete S.inRoom;

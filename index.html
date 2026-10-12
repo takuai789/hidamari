@@ -181,6 +181,8 @@
   .pet.shiba .tag { border-color: rgba(227,155,85,0.55); }
   .pet.poodle .tag { border-color: rgba(196,135,85,0.5); }
   .pet.cat .tag { border-color: rgba(233,163,90,0.55); }
+  .pet.penguin .tag { border-color: rgba(47,58,82,0.45); }
+  .pet.pig .tag { border-color: rgba(70,61,65,0.45); }
   .zzz { position: absolute; right: -4%; top: -14%; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.9); opacity: 0; pointer-events: none; letter-spacing: 2px; }
   .pet.sleep .zzz { animation: zzz 3s ease-in-out infinite; }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0,6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(12px,-18px); } }
@@ -608,6 +610,8 @@
   .pet.shiba .costume { left: 37%; top: -6%; width: 26%; height: 26%; }
   .pet.poodle .costume { left: 36%; top: -16%; width: 30%; height: 30%; }
   .pet.cat .costume { left: 36%; top: -10%; width: 28%; height: 28%; }
+  .pet.penguin .costume { left: 33%; top: -22%; width: 34%; height: 34%; }
+  .pet.pig .costume { left: 36%; top: -6%; width: 28%; height: 28%; }
   .trickCard { text-align: center; }
   .trickCard .avs { display: flex; justify-content: center; gap: 4px; margin: 4px 0 8px; }
   .trickCard .avs div { width: 52px; height: 48px; } .trickCard .avs svg { width: 100%; height: 100%; }
@@ -1085,6 +1089,8 @@
       <div class="row"><label for="shibaInput">しば犬</label><input id="shibaInput" maxlength="10" placeholder="こてつ" enterkeyhint="done" /></div>
       <div class="row"><label for="poodleInput">トイプードル</label><input id="poodleInput" maxlength="10" placeholder="ココ" enterkeyhint="done" /></div>
       <div class="row"><label for="catInput">ねこ</label><input id="catInput" maxlength="10" placeholder="みけ" enterkeyhint="done" /></div>
+      <div class="row"><label for="penguinInput">ペンギン</label><input id="penguinInput" maxlength="10" placeholder="ぺんちゃん" enterkeyhint="done" /></div>
+      <div class="row"><label for="pigInput">黒ぶた</label><input id="pigInput" maxlength="10" placeholder="ぶーちゃん" enterkeyhint="done" /></div>
     </div>
     <div class="secLabel">せいかく</div>
     <div class="field" id="personaField"></div>
@@ -1254,7 +1260,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.9.0';
+  const APP_VERSION = '2.10.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -1272,7 +1278,7 @@
   function kvPut(val) { return new Promise((res) => { try { const r = _db.transaction('kv', 'readwrite').objectStore('kv').put(val); r.onsuccess = () => res(); r.onerror = () => res(); } catch (e) { res(); } }); }
 
   // ---------- 状態 ----------
-  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', catName: 'みけ', curRoom: 'living', petRoom: { mochi: 'living', shiba: 'living', poodle: 'living', cat: 'den' }, roomNames: {}, full: {}, persona: { mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae' }, windowMode: 'scene', volume: 0.45, totalSec: 0, sound: 'none', updatedAt: 0 };
+  const S = { id: 'pet', name: 'もち', shibaName: 'こてつ', poodleName: 'ココ', catName: 'みけ', penguinName: 'ぺんちゃん', pigName: 'ぶーちゃん', curRoom: 'living', petRoom: { mochi: 'living', shiba: 'living', poodle: 'living', cat: 'den', penguin: 'washitsu', pig: 'bedroom' }, roomNames: {}, full: {}, persona: { mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae', penguin: 'genki', pig: 'ottori' }, windowMode: 'scene', volume: 0.45, totalSec: 0, sound: 'none', updatedAt: 0 };
   let lightOff = false;
   async function save() { S.updatedAt = Date.now(); S.lastSeen = Date.now(); await kvPut({ ...S }); }
 
@@ -1357,6 +1363,8 @@
     shiba:  { idle: ['わん', 'くんくん…', 'ふんっ', 'ひなた、すき', 'しっぽ ふりふり'], pet: ['わふっ', 'くぅ〜ん', 'もっとなでて', 'そこそこ'], eat: ['うまっ', 'わんっ！', 'ごちそうさま'], wow: 'わんっ！', sleepy: 'すぴー…' },
     poodle: { idle: ['きゃん！', 'ふわふわでしょ', 'あそぼ〜', 'くるくる〜', 'ねむねむ'], pet: ['くぅん', 'えへへ', 'ぷるぷる', 'すき〜'], eat: ['おいしい〜', 'きゃん！', 'もっと〜'], wow: 'きゃん！', sleepy: 'くー…' },
     cat:    { idle: ['にゃー', 'ごろごろ…', 'ふみふみ', 'あったかいにゃ', '…（じーっ）'], pet: ['ごろごろ…', 'にゃ〜ん', 'もっと〜', 'そこ、きもちいい'], eat: ['おいしいにゃ', 'にゃっ！', 'ごちそうさま'], wow: 'にゃっ！', sleepy: 'すぅ…' },
+    penguin: { idle: ['ぺん！', 'よちよち…', 'つめたいの すき', 'ぱたぱた', '…（ぺたぺた）', 'およぎたいぺん'], pet: ['ぺん〜', 'くすぐったいぺん', 'もっと〜', 'えへへ'], eat: ['おさかな さいこう！', 'ぺんっ！', 'ごちそうさまぺん'], wow: 'ぺんっ！', sleepy: 'くー…' },
+    pig:    { idle: ['ぶー', 'ぶひっ', 'ごろごろ〜', 'どろあそび したいな', 'くんくん（はなで）', 'おなか すいたぶー'], pet: ['ぶひ〜', 'きもちいい〜', 'もっと〜', 'ぶふふ'], eat: ['うまうま！', 'ぶひっ！', 'まだ たべられる'], wow: 'ぶひっ！', sleepy: 'ぐー…' },
   };
   let lastSpoke = 0;
   function randomLine() { const r = Math.random(); return r < 0.2 ? pick(SEASON_LINES[season()]) : r < 0.6 ? pick(LINES[phase()]) : pick(LINES.any); }
@@ -1423,7 +1431,31 @@
     <ellipse cx="33" cy="66" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.55"/><ellipse cx="87" cy="66" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.55"/>
     <g stroke="#b9aea3" stroke-width="1" stroke-linecap="round"><path d="M38 63 L20 60"/><path d="M38 67 L20 68"/><path d="M82 63 L100 60"/><path d="M82 67 L100 68"/></g>
     <g class="eyes">${EYES(47, 73, 53)}<path d="M57 60.5 L63 60.5 L60 63.5 Z" fill="#e58f8f"/>${MOUTH(65)}</g></svg>`;
-  const SVGS = { mochi: SVG_MOCHI, shiba: SVG_SHIBA, poodle: SVG_POODLE, cat: SVG_CAT };
+
+  // ペンギン（ぺんちゃん）
+  const PN = '#2f3a52', PNE = '#243048';
+  const SVG_PENGUIN = `<svg viewBox="0 0 120 110">
+    <ellipse cx="45" cy="104" rx="11" ry="5" fill="#f2a33a"/><ellipse cx="75" cy="104" rx="11" ry="5" fill="#f2a33a"/>
+    <g class="tail"><path d="M24 58 C11 68 10 86 17 93 C24 85 29 74 31 62 Z" fill="${PN}" stroke="${PNE}" stroke-width="1.2"/></g>
+    <path d="M96 58 C109 68 110 86 103 93 C96 85 91 74 89 62 Z" fill="${PN}" stroke="${PNE}" stroke-width="1.2"/>
+    <path d="M60 8 C88 8 99 36 99 64 C99 92 84 104 60 104 C36 104 21 92 21 64 C21 36 32 8 60 8 Z" fill="${PN}" stroke="${PNE}" stroke-width="1.5"/>
+    <path d="M60 34 C80 34 87 54 87 72 C87 92 75 100 60 100 C45 100 33 92 33 72 C33 54 40 34 60 34 Z" fill="#fbfaf6"/>
+    <ellipse cx="48" cy="50" rx="13" ry="13" fill="#fbfaf6"/><ellipse cx="72" cy="50" rx="13" ry="13" fill="#fbfaf6"/>
+    <ellipse cx="38" cy="64" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.6"/><ellipse cx="82" cy="64" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.6"/>
+    <g class="eyes">${EYES(48, 72, 51)}<path d="M53 59 Q60 56 67 59 L60 67 Z" fill="#f2a33a"/>${MOUTH(70)}</g></svg>`;
+  // 黒ぶた（ぶーちゃん）
+  const PG = '#463d41', PGE = '#342d30';
+  const SVG_PIG = `<svg viewBox="0 0 120 110">
+    <g class="tail"><path d="M90 84 q13 -3 11 -12 q-2 -7 -8 -3 q-4 4 2 7" stroke="${PG}" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+    <ellipse cx="60" cy="85" rx="34" ry="20" fill="${PG}" stroke="${PGE}" stroke-width="1.5"/>
+    <ellipse cx="44" cy="103" rx="9" ry="5" fill="#efe6dc" stroke="#d9cdbf" stroke-width="1"/><ellipse cx="76" cy="103" rx="9" ry="5" fill="#efe6dc" stroke="#d9cdbf" stroke-width="1"/>
+    <path d="M26 42 Q12 22 24 12 Q40 10 52 30 Z" fill="${PG}" stroke="${PGE}" stroke-width="1.4" stroke-linejoin="round"/><path d="M30 33 Q22 22 28 18 Q38 18 44 29 Z" fill="#c98f93"/>
+    <path d="M94 42 Q108 22 96 12 Q80 10 68 30 Z" fill="${PG}" stroke="${PGE}" stroke-width="1.4" stroke-linejoin="round"/><path d="M90 33 Q98 22 92 18 Q82 18 76 29 Z" fill="#c98f93"/>
+    <ellipse cx="60" cy="55" rx="38" ry="31" fill="${PG}" stroke="${PGE}" stroke-width="1.5"/>
+    <circle cx="46" cy="51" r="8" fill="#f3ece4"/><circle cx="74" cy="51" r="8" fill="#f3ece4"/>
+    <ellipse cx="34" cy="68" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.75"/><ellipse cx="86" cy="68" rx="6" ry="3.8" fill="#f4a3a3" opacity="0.75"/>
+    <g class="eyes">${EYES(46, 74, 52)}<ellipse cx="60" cy="68" rx="13" ry="9" fill="#e2acae" stroke="#c98f93" stroke-width="1.2"/><ellipse cx="55" cy="68" rx="2.6" ry="3.4" fill="#8a5a5c"/><ellipse cx="65" cy="68" rx="2.6" ry="3.4" fill="#8a5a5c"/><path class="mouth" d="M55 80 Q60 83 65 80" fill="none" stroke="#f3ece4" stroke-width="2" stroke-linecap="round"/><ellipse class="mouth-open" cx="60" cy="81" rx="4" ry="3.4" fill="#b85c5c"/></g></svg>`;
+  const SVGS = { mochi: SVG_MOCHI, shiba: SVG_SHIBA, poodle: SVG_POODLE, cat: SVG_CAT, penguin: SVG_PENGUIN, pig: SVG_PIG };
 
   // ---------- なかまたち ----------
   const room = $('#room');
@@ -1587,8 +1619,8 @@
   });
 
   // ---------- ごはん ----------
-  const FOODS = { mochi: ['🍙', '🍓', '🍡', '🍵', '🍑', '🍠'], shiba: ['🦴', '🍖', '🍠'], poodle: ['🍪', '🧁', '🍓'], cat: ['🐟', '🍤', '🥛'] };
-  const foodIdx = { mochi: 0, shiba: 0, poodle: 0, cat: 0 };
+  const FOODS = { mochi: ['🍙', '🍓', '🍡', '🍵', '🍑', '🍠'], shiba: ['🦴', '🍖', '🍠'], poodle: ['🍪', '🧁', '🍓'], penguin: ['🐟', '🦐', '🦑'], pig: ['🍠', '🍎', '🌽', '🥕'], cat: ['🐟', '🍤', '🥛'] };
+  const foodIdx = { mochi: 0, shiba: 0, poodle: 0, cat: 0, penguin: 0, pig: 0 };
   let feeding = false, foodXs = [];
   $('#btnFood').addEventListener('click', async () => {
     if (lightOff) { toast('みんなぐっすり寝てるみたい'); return; }
@@ -1639,8 +1671,8 @@
   }
   // 満腹度：1回で+1、20分ごとに1ずつもどる。FULL_MAXで「もういらない」
   const FULL_MAX = 3, DIGEST_MS = 20 * 60 * 1000;
-  const FULL_LINE = { mochi: 'もうおなかいっぱい！', shiba: 'まんぷく。ふぅ', poodle: 'おなかパンパン〜', cat: 'おなかいっぱいにゃ' };
-  const NOPE_LINE = { mochi: ['もうはいらないよ〜', 'あとでね…', 'おなかいっぱいなの'], shiba: ['ぷいっ', 'いらない。ふんっ', '…あとで'], poodle: ['いらな〜い', 'もうむり〜', 'ダイエット中なの！'] , cat: ['ぷいっ', 'いらないにゃ', '…（そっぽ）'] };
+  const FULL_LINE = { mochi: 'もうおなかいっぱい！', shiba: 'まんぷく。ふぅ', poodle: 'おなかパンパン〜', cat: 'おなかいっぱいにゃ', penguin: 'おなか まんまるぺん', pig: 'ぶふー、まんぷく' };
+  const NOPE_LINE = { mochi: ['もうはいらないよ〜', 'あとでね…', 'おなかいっぱいなの'], shiba: ['ぷいっ', 'いらない。ふんっ', '…あとで'], poodle: ['いらな〜い', 'もうむり〜', 'ダイエット中なの！'] , cat: ['ぷいっ', 'いらないにゃ', '…（そっぽ）'], penguin: ['もう はいらないぺん', 'あとで たべる〜'], pig: ['…さすがに もう むり', 'ぶひ…あとで'] };
   function getFull(kind) {
     S.full = S.full || {};
     const f = S.full[kind] || { n: 0, t: Date.now() };
@@ -1665,12 +1697,12 @@
   // ---------- あかり ----------
   // 寄り添って寝る：部屋にいる子だけで、となりどうしに詰めて並ぶ
   const SLEEP_SLOTS = {
-    living:   [[27, 15], [43, 12.5], [59, 16.5], [73, 12]],
-    washitsu: [[27, 15], [43, 12.5], [59, 16.5], [73, 12]],
-    bedroom:  [[13, 34], [26, 34], [40, 30.5], [56, 12]],
-    den:      [[24, 14], [41, 10], [58, 15], [76, 19.5]],
+    living:   [[27, 15], [43, 12.5], [59, 16.5], [73, 12], [36, 22], [66, 23]],
+    washitsu: [[27, 15], [43, 12.5], [59, 16.5], [73, 12], [36, 22], [66, 23]],
+    bedroom:  [[13, 34], [26, 34], [40, 30.5], [56, 12], [70, 18], [82, 13]],
+    den:      [[24, 14], [41, 10], [58, 15], [76, 19.5], [33, 22], [64, 24]],
   };
-  const SLEEP_ORDER = ['mochi', 'shiba', 'poodle', 'cat'];
+  const SLEEP_ORDER = ['mochi', 'shiba', 'poodle', 'cat', 'penguin', 'pig'];
   const sleepIdx = (kind) => Math.max(0, SLEEP_ORDER.filter((k) => S.petRoom[k] === S.curRoom).indexOf(kind));
   const sleepSpot = (kind) => SLEEP_SLOTS[curTheme()][sleepIdx(kind)];
   const sleepFace = (p) => (sleepIdx(p.kind) === 0 ? 1 : -1);
@@ -1699,7 +1731,7 @@
   });
 
   // ---------- 深呼吸（みんなで） ----------
-  const BREATH_SPOTS = { mochi: [50, 17], shiba: [22, 22], poodle: [78, 22], cat: [64, 10.5] };
+  const BREATH_SPOTS = { mochi: [50, 17], shiba: [22, 22], poodle: [78, 22], cat: [64, 10.5], penguin: [34, 10.5], pig: [82, 12] };
   let breathRun = 0, breathing = false;
   function setBreath(scale, sec) {
     pets.forEach((p) => { p.breathEl.style.transitionDuration = sec + 's'; p.breathEl.style.transform = `scale(${scale})`; });
@@ -1746,9 +1778,9 @@
   // ---------- 部屋（複数）とドア ----------
   const DOOR = { x: 87.5, y: FLOOR.yMax, inY: 36 };
   const door = $('#door');
-  const KIND_LABEL = { mochi: 'おもち', shiba: 'しば犬', poodle: 'トイプードル', cat: 'ねこ' };
-  const NAME_KEY = { mochi: 'name', shiba: 'shibaName', poodle: 'poodleName', cat: 'catName' };
-  const BACK_LINE = { mochi: 'きたよ〜', shiba: 'わんっ！', poodle: 'きゃん！', cat: 'にゃーん' };
+  const KIND_LABEL = { mochi: 'おもち', shiba: 'しば犬', poodle: 'トイプードル', cat: 'ねこ', penguin: 'ペンギン', pig: '黒ぶた' };
+  const NAME_KEY = { mochi: 'name', shiba: 'shibaName', poodle: 'poodleName', cat: 'catName', penguin: 'penguinName', pig: 'pigName' };
+  const BACK_LINE = { mochi: 'きたよ〜', shiba: 'わんっ！', poodle: 'きゃん！', cat: 'にゃーん', penguin: 'ぺんっ！', pig: 'ぶひっ！' };
   const ROOM_DEFS = [
     { id: 'living', theme: 'living', def: 'リビング' },
     { id: 'washitsu', theme: 'washitsu', def: '和室' },
@@ -1983,7 +2015,7 @@
       ['だいふく', { t: 'なかにあんこは入ってないよ〜' }],
       ['わからない', { t: 'じつは ぼくもわかんない。えへへ' }] ] },
   ];
-  const OPENER = { mochi: '', shiba: 'わん！ ', poodle: 'きゃん♪ ', cat: 'にゃ。 ' };
+  const OPENER = { mochi: '', shiba: 'わん！ ', poodle: 'きゃん♪ ', cat: 'にゃ。 ', penguin: 'ぺん！ ', pig: 'ぶひ。 ' };
   const talkEl = $('#talk');
   let talking = null, lastTalk = [], typeT = null;
 
@@ -2075,7 +2107,7 @@
       idle: ['……', 'まあ、わるくない', 'ふん', 'ひまだな'], pet: ['……べつに', '（しっぽが ゆれてる）', 'まあ、いいけど'], hello: '……よろしく' },
   };
   const PERSONA_KEYS = Object.keys(PERSONA);
-  const DEFAULT_PERSONA = { mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae' };
+  const DEFAULT_PERSONA = { mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae', penguin: 'genki', pig: 'ottori' };
   // 気分によって、ふるまいの性格が一時的に変わる（例：はしゃぎ中→げんき、ねむい→おっとり、すねてる→クール）
   const personaOf = (p) => { const m = (typeof MOODS !== 'undefined') && MOODS[moodOf(p)]; return PERSONA[(m && m.persona) || (S.persona && S.persona[p.kind]) || DEFAULT_PERSONA[p.kind]]; };
   function renderPersona() {
@@ -2806,6 +2838,7 @@
   }
   const dance = { claps: 0, hits: 0, lastLine: 0 };
   function danceSpots(n) {
+    if (n > 4) return Array.from({ length: n }, (_, i) => [18 + i * (64 / (n - 1)), i % 2 ? 14 : 21]);
     const xs = n === 2 ? [36, 64] : n === 3 ? [27, 50, 73] : [20, 40, 60, 80];
     const ys = n === 2 ? [17, 17] : n === 3 ? [20, 14, 20] : [21, 15, 15, 21];
     return xs.map((x, i) => [x, ys[i]]);
@@ -3270,7 +3303,7 @@
 
   // ---------- いっしょにいた時間（増えるだけ） ----------
   function renderTags() {
-    const names = { mochi: S.name || 'もち', shiba: S.shibaName || 'こてつ', poodle: S.poodleName || 'ココ', cat: S.catName || 'みけ' };
+    const names = { mochi: S.name || 'もち', shiba: S.shibaName || 'こてつ', poodle: S.poodleName || 'ココ', cat: S.catName || 'みけ', penguin: S.penguinName || 'ぺんちゃん', pig: S.pigName || 'ぶーちゃん' };
     (typeof allPets !== 'undefined' ? allPets : []).forEach((p) => { const m = MOODS[moodOf(p)]; p.el.querySelector('.tag').textContent = names[p.kind] + (m.icon ? ' ' + m.icon : ''); });
   }
   function fmtTime(sec) {
@@ -3300,7 +3333,7 @@
   });
 
   // ---------- 設定シート ----------
-  const NAME_FIELDS = [['#nameInput', 'name', 0], ['#shibaInput', 'shibaName', 1], ['#poodleInput', 'poodleName', 2], ['#catInput', 'catName', 3]];
+  const NAME_FIELDS = [['#nameInput', 'name', 0], ['#shibaInput', 'shibaName', 1], ['#poodleInput', 'poodleName', 2], ['#catInput', 'catName', 3], ['#penguinInput', 'penguinName', 4], ['#pigInput', 'pigName', 5]];
   function openSheet() { NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); renderPersona(); renderWinSetting(); renderSeasonWeather(); if (typeof renderEventChips === 'function') renderEventChips(); ROOM_DEFS.forEach((r, i) => { $('#room' + i).value = roomName(r.id); }); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
   function closeSheet() {
     let changed = null;
@@ -3332,7 +3365,7 @@
       const data = JSON.parse(await f.text());
       if (data.schema !== SCHEMA || !data.pet) { toast('ひだまりのデータではないみたい'); return; }
       const p = data.pet;
-      if ((p.updatedAt || 0) > S.updatedAt) { if (p.persona) S.persona = p.persona; if (p.roomNames) S.roomNames = p.roomNames; if (p.roomView) S.roomView = p.roomView; S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; S.catName = p.catName || S.catName; }
+      if ((p.updatedAt || 0) > S.updatedAt) { if (p.persona) S.persona = p.persona; if (p.roomNames) S.roomNames = p.roomNames; if (p.roomView) S.roomView = p.roomView; S.name = p.name || S.name; S.shibaName = p.shibaName || S.shibaName; S.poodleName = p.poodleName || S.poodleName; S.catName = p.catName || S.catName; S.penguinName = p.penguinName || S.penguinName; S.pigName = p.pigName || S.pigName; }
       S.totalSec = Math.max(S.totalSec, p.totalSec || 0); // 時間は増えるだけ
       await save(); renderHud(); NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); toast('取り込んだよ');
     } catch (err) { toast('読み込めなかった'); }
@@ -3420,7 +3453,7 @@
   // ===================================================================
   const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
   const fmtDate = (ts) => { const d = new Date(ts); return `${d.getMonth() + 1}月${d.getDate()}日`; };
-  const nameOfKind = (k) => S[NAME_KEY[k]] || { mochi: 'もち', shiba: 'こてつ', poodle: 'ココ', cat: 'みけ' }[k];
+  const nameOfKind = (k) => S[NAME_KEY[k]] || { mochi: 'もち', shiba: 'こてつ', poodle: 'ココ', cat: 'みけ', penguin: 'ぺんちゃん', pig: 'ぶーちゃん' }[k];
 
   // ---------- きょうの出来事（きょうのひだまり用） ----------
   const BOND_EV = { feed: 2, bath: 3, toilet: 1, work: 3 };
@@ -3466,7 +3499,7 @@
   const DREAMS = {
     any: ['ふかふかの くもの上…', 'そらを とんでる…', '{f}と かけっこ…', 'おにぎりの山…', 'ひなたで ごろごろ…', 'おおきな ケーキ…'],
     mochi: ['ぼく…おもちに なってる…？', 'つきで おもちつき…'], shiba: ['ほねが いっぱい…', 'さんぽ…むにゃ…'],
-    poodle: ['リボン…かわいい…', 'ふわふわ…もっと ふわふわ…'], cat: ['さかなの うみ…', 'はこ…ちょうどいい…'],
+    poodle: ['リボン…かわいい…', 'ふわふわ…もっと ふわふわ…'], cat: ['さかなの うみ…', 'はこ…ちょうどいい…'], penguin: ['こおりの うえで すべってる…', 'おさかなの パーティ…'], pig: ['どろんこ おふろ…', 'トリュフ みつけた…'],
   };
   function dreamOf(p) {
     const ev = (S.today && S.today.d === todayStr()) ? S.today.ev : [];
@@ -3514,7 +3547,7 @@
       b.style.left = (tx + rand(-6, 6)) + '%'; b.style.bottom = (ty + rand(4, 8)) + '%'; b.style.zIndex = tub.style.zIndex;
       b.style.setProperty('--sz', rand(6, 13) + 'px'); room.appendChild(b); setTimeout(() => b.remove(), 2200);
     }, 280);
-    p.say(pick(['ぽかぽか〜', 'あったまる〜', 'あわあわ〜']), 2200); p.happy(2200);
+    p.say(p.kind === 'penguin' ? pick(['みず だいすきぺん！', 'すいすい〜']) : p.kind === 'pig' ? pick(['どろんこより すき…かも', 'ぶひ〜 ぽかぽか']) : pick(['ぽかぽか〜', 'あったまる〜', 'あわあわ〜']), 2200); p.happy(2200);
     await sleep(2600); if (out()) return quit(); p.say(pick(['きもちいい〜', 'ふぅ〜…']), 2000);
     await sleep(2800); if (out()) return quit();
     clearInterval(bubbleT);
@@ -3972,7 +4005,7 @@
     popAlert(first);
     await sleep(1300);
     // みんなで取り囲んで、ほえる
-    const BARK = { mochi: ['でていって〜！', 'ぷんぷん！'], shiba: ['わんわんわん！', 'ウ〜、わんっ！'], poodle: ['きゃんきゃん！', 'でてってよ〜！'], cat: ['シャーッ！', 'フーッ！'] };
+    const BARK = { mochi: ['でていって〜！', 'ぷんぷん！'], shiba: ['わんわんわん！', 'ウ〜、わんっ！'], poodle: ['きゃんきゃん！', 'でてってよ〜！'], cat: ['シャーッ！', 'フーッ！'], penguin: ['ぺんぺんっ！', 'あっちいけ〜！'], pig: ['ぶーぶー！', 'ぶひーっ！'] };
     await Promise.all(team.map((p, i) => { const side = i % 2 ? 1 : -1, off = 15 + Math.floor(i / 2) * 11; return p.moveTo(clamp(a.x + side * off, 12, 88), clamp(a.y + rand(-4, 3), FLOOR.yMin, FLOOR.yMax), 14); }));
     if (stale()) return; if (guestAbort()) return removeGuest(true);
     team.forEach((p) => { p.lookAt(a.x); p.cls('angry', true); });
@@ -4030,7 +4063,7 @@
   // ---------- トイレ ----------
   // ごはんの数分後に自分で行く。長押しメニューからも。ついたてが立つので見た目はかわいいまま、失敗もしない
   const TOILET = { x: 11, y: 6.5 };
-  const TOILET_GO = { mochi: ['ちょっと トイレ〜', 'トイレ いってくるね'], shiba: ['トイレ！', 'ちょっと しつれい'], poodle: ['トイレ〜', 'ちょっとまってて〜'], cat: ['トイレにゃ', '…（すたすた）'] };
+  const TOILET_GO = { mochi: ['ちょっと トイレ〜', 'トイレ いってくるね'], shiba: ['トイレ！', 'ちょっと しつれい'], poodle: ['トイレ〜', 'ちょっとまってて〜'], cat: ['トイレにゃ', '…（すたすた）'], penguin: ['ちょっと トイレぺん', '（よちよち）'], pig: ['トイレ〜', 'ちょっと いってくるぶー'] };
   function scheduleToilet(p) { S.toiletDue = Object.assign({}, S.toiletDue, { [p.kind]: Date.now() + rand(2, 5) * 60000 }); save(); }
   async function goToilet(p, byUser) {
     if (lightOff || p.mode === 'sleep') { if (byUser) toast('ぐっすり寝てるみたい'); return; }
@@ -4172,9 +4205,9 @@
   const H_JII = humanSVG({ hair: '#f0eee8', top: '#7a8a6a', bottom: '#5a5048', face: '<path d="M48 82 q12 10 24 0" stroke="#f0eee8" stroke-width="5" fill="none"/>' });
   const GREET = { dawn: 'おはようございます！', day: 'こんにちは！', evening: 'こんにちは〜', dusk: 'こんばんは！', night: 'こんばんは！' };
   const WREACT = {
-    human: { mochi: ['こんにちは〜', 'えへへ'], shiba: ['わんっ！', '（しっぽ ふりふり）'], poodle: ['きゃん！', 'なでて〜'], cat: ['にゃ〜', '…（ちらっ）'] },
-    dog: { mochi: ['わんちゃん、こんにちは〜'], shiba: ['くんくん…', 'わふっ（なかよし）'], poodle: ['きゃん！ あそぼ！'], cat: ['…シャーッ'] },
-    pet: { mochi: ['うれしい〜'], shiba: ['くぅ〜ん'], poodle: ['えへへ〜'], cat: ['ごろごろ…'] },
+    human: { mochi: ['こんにちは〜', 'えへへ'], shiba: ['わんっ！', '（しっぽ ふりふり）'], poodle: ['きゃん！', 'なでて〜'], cat: ['にゃ〜', '…（ちらっ）'], penguin: ['ぺん！ こんにちは', '（ぱたぱた）'], pig: ['ぶひっ！', 'なでて〜'] },
+    dog: { mochi: ['わんちゃん、こんにちは〜'], shiba: ['くんくん…', 'わふっ（なかよし）'], poodle: ['きゃん！ あそぼ！'], cat: ['…シャーッ'], penguin: ['わんちゃんだ ぺん'], pig: ['ぶひ？ なかよく しよ'] },
+    pet: { mochi: ['うれしい〜'], shiba: ['くぅ〜ん'], poodle: ['えへへ〜'], cat: ['ごろごろ…'], penguin: ['ぺん〜'], pig: ['ぶふふ'] },
   };
   const W_ITEMS = { spring: [['🌸', 'さくらの花びら'], ['🌼', 'たんぽぽ']], summer: [['🍃', 'きれいな はっぱ'], ['🐚', 'ちいさな貝がら']], autumn: [['🌰', 'どんぐり'], ['🍁', 'まっかな もみじ']], winter: [['🌲', 'まつぼっくり'], ['🧤', 'ちいさな てぶくろ（とどけたよ）']] };
   const W_FLOWER = { spring: ['🌷', 'チューリップ'], summer: ['🌻', 'ひまわり'], autumn: ['💐', 'コスモス'], winter: ['🌼', 'スイートピー'] };
@@ -4202,7 +4235,7 @@
         c.say(c.e[1], 'わんっ！', 1300); c.heartBetween(c.e[1], c.lead); await c.wait(1600); c.say(c.e[0], 'なかよくしてくれて ありがとね', 1800); await c.wait(1500); } },
     { id: 'golden', icon: '🦮', name: 'ゴールデンの だいちゃん', who: 'both', when: 'day', actors: [{ svg: H_ONE, w: 1.0 }, { svg: DOG_GOLDEN(), w: 1.15, dx: -0.85, tag: 'だいちゃん' }],
       async run(c) { c.say(c.e[1], 'わふっ', 1300); await c.wait(1000);
-        const lines = { mochi: 'もふもふだ〜', shiba: '…（ぴしっ）', poodle: 'おおきい…！', cat: '…でかいにゃ' };
+        const lines = { mochi: 'もふもふだ〜', shiba: '…（ぴしっ）', poodle: 'おおきい…！', cat: '…でかいにゃ', penguin: 'おおきい ぺん…', pig: 'なかま？…ちがうか' };
         c.walkers.forEach((w, i) => setTimeout(() => c.sayW(w, lines[w.kind], 1600), i * 700)); await c.wait(1900);
         c.say(c.e[0], 'だいちゃん、やさしいから だいじょうぶだよ', 2300); await c.wait(2200); c.heartBetween(c.e[1], c.lead); c.walkers.forEach((w) => w.happy()); await c.wait(1500); } },
     { id: 'whitedog', icon: '🐩', name: 'しろい こいぬ', who: 'animal', when: 'day', actors: [{ svg: DOG_WHITE(), w: 0.7, tag: 'マロン' }],
@@ -4288,7 +4321,7 @@
       h.style.setProperty('--dx', rand(-14, 14) + 'px'); host.appendChild(h); setTimeout(() => h.remove(), 1700);
     }, i * 260);
   }
-  const KIND_SCALE = { mochi: 1, shiba: 1, poodle: 0.95, cat: 0.9 };
+  const KIND_SCALE = { mochi: 1, shiba: 1, poodle: 0.95, cat: 0.9, penguin: 0.88, pig: 0.95 };
   const walk = { run: 0, raf: 0, moving: false, scroll: 0, last: 0, startAt: 0, ents: [], walkers: [], met: [], gifts: [], plan: [], nextAt: 0, busy: false, paused: false, done: false, birdsT: 0, timer: 0 };
   function wBuild() {
     const se = season(), ph = phase(), rainy = isRaining(), dark = isDark();
@@ -4498,9 +4531,9 @@
 
   // ---------- バイト（本当の時間だけ出かけて、おきゅうりょうを もらってくる） ----------
   const JOBS = [
-    { id: 'bakery', icon: '🥐', name: 'パンやさん', place: 'コウさんの パンやで おてつだい', kinds: ['mochi', 'shiba', 'poodle', 'cat'], rate: 1,
+    { id: 'bakery', icon: '🥐', name: 'パンやさん', place: 'コウさんの パンやで おてつだい', kinds: ['mochi', 'shiba', 'poodle', 'cat', 'penguin', 'pig'], rate: 1,
       ev: ['パンの においで おなかが なりそうだった', 'お店の前で「いらっしゃいませ〜」って いったよ', 'コウさんに やきたてを ひとくち もらった', 'メロンパンが いちばん うれてた'], gift: ['🍞', 'パンのみみ'] },
-    { id: 'flower', icon: '💐', name: 'お花やさん', place: 'お花やさんで 店番', kinds: ['mochi', 'shiba', 'poodle', 'cat'], rate: 1,
+    { id: 'flower', icon: '💐', name: 'お花やさん', place: 'お花やさんで 店番', kinds: ['mochi', 'shiba', 'poodle', 'cat', 'penguin', 'pig'], rate: 1,
       ev: ['お花に おみずを あげたよ', 'ちょうちょが お店に まよいこんできた', 'お客さんに「かわいい店員さん」って いわれた', '花たばの リボンを えらんだよ'], gift: ['🌸', 'あまった お花'] },
     { id: 'cafe', icon: '☕', name: 'カフェの かんばん', place: 'まちかどの カフェで おもてなし', kinds: ['mochi', 'poodle', 'cat'], rate: 1.1,
       ev: ['お客さんの ひざの上で ひとやすみ…これも しごと', 'ラテアートを じーっと 見てた', '「また会いにくるね」って いわれた', 'まどべの 席で かんばんを したよ'], gift: ['🍪', 'おまけの クッキー'] },
@@ -4514,6 +4547,12 @@
       ev: ['こうえんを 3しゅう パトロール', 'まいごの ボールを みつけて とどけた', 'ベンチの おじいさんに「えらいのう」って いわれた', 'あやしい人は いなかった。へいわ'], gift: ['🎖️', 'パトロールの バッジ'] },
     { id: 'salon', icon: '✂️', name: 'サロンの モデル', place: 'トリミングサロンで モデル', kinds: ['poodle'], rate: 1.2,
       ev: ['もっと もふもふに してもらった', 'ポーズを きめて しゃしんを とってもらった', 'ドライヤーの 風が きもちよかった', 'ほかの わんちゃんと なかよくなった'], gift: ['🎀', 'リボン'] },
+    { id: 'aquarium', icon: '🐧', name: 'すいぞくかんの ショー', place: 'すいぞくかんで ペンギンショー', kinds: ['penguin'], rate: 1.25,
+      ev: ['よちよち あるいたら 大はくしゅ', 'すべりだいで ぴゅーっと すべった', 'こどもたちに てを ふった（ひれで）', 'ごほうびの おさかな、おいしかった'], gift: ['🐟', 'ごほうびの おさかな'] },
+    { id: 'truffle', icon: '🍄', name: 'もりの トリュフさがし', place: 'もりで トリュフさがし', kinds: ['pig'], rate: 1.25,
+      ev: ['はなで くんくん…みつけた！', 'どろんこに なっちゃった', 'きのこやさんに「めいけんならぬ めいぶた」って いわれた', 'どんぐりも いっぱい おちてた'], gift: ['🍄', 'ちいさな トリュフ'] },
+    { id: 'farm', icon: '🥕', name: 'はたけの おてつだい', place: 'はたけで やさいの しゅうかく', kinds: ['pig', 'mochi'], rate: 1.1,
+      ev: ['にんじんを ぬいたよ', 'おいもが いっぱい とれた', 'つちの においが すき', 'のうかの おじさんと おひるごはん'], gift: ['🥕', 'まがった にんじん'] },
     { id: 'maneki', icon: '🏮', name: 'しょうてんがいの まねきねこ', place: 'しょうてんがいで まねきねこ', kinds: ['cat'], rate: 1.2,
       ev: ['手を あげて「いらっしゃい」を くりかえした', 'お客さんが いっぱい きた（ねこの おかげ）', 'しょうてんがいの 人に なでてもらった', 'ひなたで ちょっと うとうとした'], gift: ['🪙', 'えんぎの いい 5円玉'] },
   ];
@@ -4699,7 +4738,7 @@
     { id: 'frame', icon: '🖼️', name: 'みんなの しゃしんたて', desc: 'たからものに。たなに かざられる', price: 150, act: 'item' },
     { id: 'cake', icon: '🎂', name: 'ホールケーキ', desc: 'みんなで おいわい。はしゃぎ気分に', price: 300, act: 'party' },
   ];
-  const SNACK = { mochi: '🍰', shiba: '🥩', poodle: '🧁', cat: '🐟' };
+  const SNACK = { mochi: '🍰', shiba: '🥩', poodle: '🧁', cat: '🐟', penguin: '🍣', pig: '🍩' };
   function openShop() { renderShop(); $('#shopBg').classList.add('show'); $('#shopSheet').classList.add('show'); }
   function closeShop() { $('#shopBg').classList.remove('show'); $('#shopSheet').classList.remove('show'); }
   const FURN_DESC = { sit: 'すわって くつろぐ', nap: 'おひるねする', climb: 'ねこが のぼる', play: 'いぬたちが あそぶ', watch: 'じーっと ながめる', warm: 'みんなで ぬくぬく', deco: 'おへやの かざり' };
@@ -4788,7 +4827,7 @@
       <rect x="100" y="250" width="200" height="18" rx="4" fill="#d6463c"/><rect x="88" y="236" width="224" height="14" rx="5" fill="#3d3030"/><rect x="118" y="292" width="164" height="10" fill="#d6463c"/><rect x="122" y="262" width="16" height="200" fill="#d6463c"/><rect x="262" y="262" width="16" height="200" fill="#d6463c"/>
       <rect x="30" y="400" width="26" height="60" fill="#a9a294"/><rect x="24" y="392" width="38" height="12" fill="#8f897c"/><rect x="344" y="400" width="26" height="60" fill="#a9a294"/><rect x="338" y="392" width="38" height="12" fill="#8f897c"/>`, ['#9fd4ef', '#eef7fb']),
   };
-  const EAT = { mochi: '🍙', shiba: '🍖', poodle: '🍰', cat: '🐟' };
+  const EAT = { mochi: '🍙', shiba: '🍖', poodle: '🍰', cat: '🐟', penguin: '🐟', pig: '🍠' };
   const FORTUNE = [['大吉', 'いいこと たくさん。いまのままで だいじょうぶ'], ['中吉', 'ゆっくり いけば、ちゃんと つく'], ['小吉', 'ちいさな しあわせが ちかくに あるよ'], ['吉', 'つかれたら、やすんで いいんだよ'], ['末吉', 'あとから じわじわ よくなる']];
   const DESTS = [
     { id: 'umi', icon: '🌊', name: 'うみの町', desc: 'すなはま・いちば・ゆうひの とうだい', cost: 120,
@@ -4796,7 +4835,7 @@
       spots: [
         { name: 'すなはま', bg: 'beach', sound: 'wave', props: [['⛱️', 72, 26, 54], ['🦀', 86, 8, 28, 'bob'], ['🐚', 14, 6, 22]], intro: 'すなはまに ついた！ しおかぜが きもちいい', lines: ['うみだ〜！', 'しょっぱい においがする', 'すな、あったかい'],
           acts: [['なみうちぎわで あそぶ', async (t) => { t.narr('なみうちぎわへ かけていく…'); t.each((w, i) => { if (w.kind === 'cat') { t.say(w, 'ぬれるのは いや…', 1800); return; } t.move(w, 18 + i * 22, 30); }); await t.wait(1800);
-            t.each((w) => { if (w.kind !== 'cat') { w.jump(); t.fx(w, '💦'); } }); t.say(t.lead.kind === 'cat' ? t.ws[1] || t.lead : t.lead, 'つめた〜い！', 1600); await t.wait(1600); t.each((w) => { if (w.kind !== 'cat') { w.jump(); t.fx(w, '💦'); } }); await t.wait(1200); t.home(); await t.wait(1700); t.hearts(); t.narr('たのしかったね'); }],
+            t.each((w) => { if (w.kind !== 'cat') { w.jump(); t.fx(w, '💦'); } }); { const pg = t.ws.find((w) => w.kind === 'penguin'); t.say(pg || (t.lead.kind === 'cat' ? t.ws[1] || t.lead : t.lead), pg ? 'うみ！ ふるさとぺん！' : 'つめた〜い！', 1600); } await t.wait(1600); t.each((w) => { if (w.kind !== 'cat') { w.jump(); t.fx(w, '💦'); } }); await t.wait(1200); t.home(); await t.wait(1700); t.hearts(); t.narr('たのしかったね'); }],
             ['かいがらを さがす', async (t) => { const w = t.ws.find((x) => x.kind === 'shiba') || t.lead; t.say(w, 'くんくん… あった！', 1600); await t.wait(1200); t.gift('🐚', 'さくら貝'); w.jump(); t.narr('ピンクの きれいな さくら貝を みつけた'); await t.wait(1200); }]] },
         { name: 'うみの いちば', bg: 'town', colors: ['#3d6a9a', '#c8483c', '#e9b64a', '#3d6a9a'], props: [['🐟', 20, 37, 30], ['🦑', 44, 38, 28], ['🦀', 70, 37, 28], ['🏮', 90, 52, 30, 'bob']], intro: 'にぎやかな いちばに ついた。いい においが する', lines: ['おさかな いっぱい！', 'いい におい〜', 'おなか すいてきた'],
           acts: [['たべあるき', async (t) => { t.narr('やきたての おやつを たべあるき'); await t.eatAll(); t.narr('おなかも こころも いっぱい'); }],
@@ -4917,7 +4956,7 @@
   }
   function tWalkers(spots) {
     const stage = tripView.querySelector('.tStage');
-    const n = trip.pets.length, W = Math.min(window.innerWidth * 0.26, 110) * (n >= 4 ? 0.82 : 1);
+    const n = trip.pets.length, W = Math.min(window.innerWidth * 0.26, 110) * (n >= 6 ? 0.68 : n >= 5 ? 0.74 : n >= 4 ? 0.82 : 1);
     trip.ws = trip.pets.map((p, i) => { const w = makeWalker(p, i, n, W); w.home = spots[i]; w.el.style.left = spots[i][0] + '%'; w.el.style.bottom = spots[i][1] + '%'; w.el.style.zIndex = 20 + i; stage.appendChild(w.el); return w; });
   }
   const rowSpots = (n, y = 13, x0 = 22, x1 = 78) => Array.from({ length: n }, (_, i) => [n === 1 ? 50 : x0 + i * ((x1 - x0) / (n - 1)), y + (i % 2) * 3]);
@@ -5239,6 +5278,8 @@
     mochi: `<svg viewBox="0 0 60 60"><path d="M30 2 L46 44 H14 Z" fill="#6a4a9a"/><path d="M30 2 Q36 0 40 8" stroke="#6a4a9a" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="15" y="34" width="30" height="7" fill="#f0a040"/><ellipse cx="30" cy="46" rx="28" ry="7" fill="#5a3a8a"/><circle cx="24" cy="22" r="2.4" fill="#ffe27a"/></svg>`,
     shiba: `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="38" rx="26" ry="20" fill="#f08a2a"/><path d="M12 30 Q30 22 48 30" stroke="#d9741a" stroke-width="2" fill="none"/><path d="M30 18 v26" stroke="#d9741a" stroke-width="2"/><rect x="27" y="10" width="6" height="10" rx="2" fill="#6a8a3a"/><path d="M20 36 l4 -4 l4 4Z M32 36 l4 -4 l4 4Z" fill="#4a2a10"/><path d="M22 44 q8 6 16 0" stroke="#4a2a10" stroke-width="2.5" fill="none"/></svg>`,
     poodle: `<svg viewBox="0 0 60 60"><path d="M30 6 L44 42 H16 Z" fill="#2b2430"/><rect x="17" y="32" width="26" height="6" fill="#c48ae0"/><ellipse cx="30" cy="44" rx="25" ry="6" fill="#1f1a24"/><path d="M38 14 l3 -3 l1 4 l4 1 l-3 3 l1 4 l-4 -2 l-3 3 l-1 -4 l-4 -1Z" fill="#ffe27a" transform="scale(.6) translate(30 10)"/></svg>`,
+    penguin: `<svg viewBox="0 0 60 60"><path d="M30 4 L45 42 H15 Z" fill="#e8564a"/><rect x="16" y="32" width="28" height="6" fill="#fff"/><ellipse cx="30" cy="44" rx="26" ry="6" fill="#c8483c"/><circle cx="30" cy="4" r="5" fill="#fff"/></svg>`,
+    pig: `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="40" rx="24" ry="18" fill="#f08a2a"/><path d="M14 34 Q30 26 46 34" stroke="#d9741a" stroke-width="2" fill="none"/><rect x="27" y="14" width="6" height="10" rx="2" fill="#6a8a3a"/><path d="M21 38 l4 -4 l4 4Z M31 38 l4 -4 l4 4Z" fill="#4a2a10"/><path d="M23 46 q7 5 14 0" stroke="#4a2a10" stroke-width="2.5" fill="none"/></svg>`,
     cat: `<svg viewBox="0 0 60 60"><path d="M30 4 L45 42 H15 Z" fill="#2b2430"/><rect x="16" y="32" width="28" height="6" fill="#f0a040"/><ellipse cx="30" cy="44" rx="26" ry="6" fill="#1f1a24"/><circle cx="34" cy="20" r="3" fill="#ffe27a"/></svg>`,
   };
   function addCostumes() { allPets.forEach((p) => { if (p.el.querySelector('.costume')) return; const c = document.createElement('div'); c.className = 'costume'; c.innerHTML = COSTUME[p.kind] || ''; p.el.querySelector('.flip').appendChild(c); }); }
@@ -5397,13 +5438,13 @@
     // 旧「おへや」(v1.2〜1.4) からの引っ越し：おへやにいた子は しんしつへ
     if (S.inRoom && !S.petRoomMigrated) { Object.keys(S.inRoom).forEach((k) => { if (S.inRoom[k]) S.petRoom[k] = 'bedroom'; }); }
     S.petRoomMigrated = true; delete S.inRoom;
-    S.petRoom = Object.assign({ mochi: 'living', shiba: 'living', poodle: 'living', cat: 'den' }, S.petRoom || {});
-    S.persona = Object.assign({ mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae' }, S.persona || {});
+    S.petRoom = Object.assign({ mochi: 'living', shiba: 'living', poodle: 'living', cat: 'den', penguin: 'washitsu', pig: 'bedroom' }, S.petRoom || {});
+    S.persona = Object.assign({ mochi: 'ottori', shiba: 'cool', poodle: 'genki', cat: 'amae', penguin: 'genki', pig: 'ottori' }, S.persona || {});
     if (!ROOM_DEFS.some((r) => r.id === S.curRoom)) S.curRoom = 'living';
     room.dataset.theme = curTheme();
     mochi = new Pet('mochi', SVG_MOCHI, 1, [50, 17]);
-    allPets = [mochi, new Pet('shiba', SVG_SHIBA, 1.0, [27, 24]), new Pet('poodle', SVG_POODLE, 0.84, [70, 13]), new Pet('cat', SVG_CAT, 0.9, [40, 12])];
-    allPets[0].face(1); allPets[1].face(1); allPets[2].face(-1); allPets[3].face(1);
+    allPets = [mochi, new Pet('shiba', SVG_SHIBA, 1.0, [27, 24]), new Pet('poodle', SVG_POODLE, 0.84, [70, 13]), new Pet('cat', SVG_CAT, 0.9, [40, 12]), new Pet('penguin', SVG_PENGUIN, 0.82, [60, 20]), new Pet('pig', SVG_PIG, 0.92, [35, 18])];
+    allPets[0].face(1); allPets[1].face(1); allPets[2].face(-1); allPets[3].face(1); allPets[4].face(-1); allPets[5].face(1);
     allPets.forEach((p) => { if (S.petRoom[p.kind] !== S.curRoom || (S.work && S.work[p.kind])) { p.away = true; p.mode = 'away'; p.cls('gone', true); } });
     refreshPets(); updateDoor(); renderTags(); renderFlowers(false);
     if (!S.soundV2) { if (S.sound === 'none') S.sound = 'auto'; S.soundV2 = true; updateSoundBtn(); }

@@ -193,7 +193,8 @@
   .bubble.show { opacity: 1; transform: translateX(-50%) scale(calc(1 / var(--s, 1))) translateY(0); }
 
   .food { z-index: 9; font-size: 30px; line-height: 1; transform: translateX(-50%); transition: transform .35s; pointer-events: none; }
-  .food.dropIn { animation: foodDrop .55s cubic-bezier(.3,1.5,.6,1); }
+  .food.dropIn, .demaeDish.dropIn { animation: foodDrop .55s cubic-bezier(.3,1.5,.6,1); }
+  .demaeDish { position: absolute; line-height: 1; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 3px 2px rgba(0,0,0,.18)); }
   @keyframes foodDrop { from { transform: translate(-50%, -120px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
   .heart { z-index: 25; font-size: 18px; pointer-events: none; animation: rise 1.6s ease-out forwards; }
   @keyframes rise { from { opacity: 0; transform: translate(-50%, 0) scale(.6); } 20% { opacity: 1; } to { opacity: 0; transform: translate(calc(-50% + var(--dx, 0px)), -70px) scale(1.1); } }
@@ -1267,7 +1268,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.11.0';
+  const APP_VERSION = '2.12.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -1890,7 +1891,7 @@
 
   // 表示している部屋をきりかえる
   function applyRoom() {
-    document.querySelectorAll('.food, .tub, .screenPop, .bubbleUp, .droplet, .dropped, .ripple, .prankProp').forEach((e) => e.remove());
+    document.querySelectorAll('.food, .tub, .screenPop, .bubbleUp, .droplet, .dropped, .ripple, .prankProp, .demaeDish').forEach((e) => e.remove());
     allPets.forEach((p) => { p.cls('hiding', false); p.prankCatch = null; if (p.furnEnd) p.furnEnd(); });
     if (typeof renderFurn === 'function') { renderFurn(); renderHidden(); }
     room.dataset.theme = curTheme();
@@ -3666,6 +3667,7 @@
       else if (e.t === 'trick') add('trick', 'ハロウィンの トリック・オア・トリート！');
       else if (e.t === 'found') add('found', `かくしてあった ${e.n}を みつけたね`);
       else if (e.t === 'bond') add('bond' + e.k, `${nameOfKind(e.k)}と もっと なかよくなったね`);
+      else if (e.t === 'demae') add('demae', `松田くんが ${e.n}の 出前を もってきてくれたね`);
       else if (e.t === 'trip') add('trip', `${e.d}へ りょこうに いったね`);
       else if (e.t === 'walk') add('walk', e.n ? `おさんぽで ${e.f}${e.n > 1 ? ' など' : ''}に 会ったね` : 'おさんぽに いったね');
       else if (e.t === 'pairDance') add('pd', `${nameOfKind(e.a)}と${nameOfKind(e.b)}が おどってたよ`);
@@ -3928,6 +3930,7 @@
   function removeGuest(abort) {
     visitSeq++;
     if (guestActor) { guestActor.el.remove(); guestActor = null; } guestBusy = false;
+    document.querySelectorAll('.demaeDish').forEach((e) => e.remove());
     if (abort) allPets.forEach((p) => { if (p.mode === 'guard') { p.mode = 'idle'; } p.cls('angry', false); });
   }
   async function guestVisit(g) {
@@ -3956,6 +3959,7 @@
     if (g.act === 'gift') { a.say(`これ、どうぞ。${g.gift[1]}よ`, 2600); popItem(a.x, a.y + 20, g.gift[0]); addTreasure(g.gift[0], g.gift[1], g.name); }
     else if (g.act === 'letter') { a.say('はい、どうぞ！', 2000); dropLetter({ from: pick(LETTER_FRIENDS), body: pick(LETTER_BODIES), at: Date.now() }); }
     else if (g.act === 'draw') { a.say('ちょっと じっとしててね〜', 2400); a.cls('sit', true); await sleep(4200); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); a.cls('sit', false); await takeSnapshot({ sepia: true, label: `${g.name}の絵` }); a.say('できた！ アルバムに 入れておくね', 2600); }
+    else if (g.act === 'demae') { await demaeAct(a, stale); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); }
     else if (g.act === 'bread') { a.say('やきたてパン、どうぞ', 2200); pets.filter((p) => p.mode === 'idle').forEach((p, i) => setTimeout(() => { popItem(p.x, p.y + 12 * depthScale(p.y), '🥐'); p.say(pick(['おいしい〜', 'ふわふわ！', 'もぐもぐ']), 1800); p.hearts(2); }, 600 + i * 500)); }
     await sleep(3400); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my);
     const near = pets.filter((p) => p.mode === 'idle').sort((m, n) => Math.abs(m.x - a.x) - Math.abs(n.x - a.x))[0];
@@ -3985,7 +3989,7 @@
     if (Date.now() - appStart < 3 * 60000 || Date.now() - lastGuestAt < 8 * 60000) return;
     if (S.guestDay && S.guestDay.d === todayStr() && S.guestDay.n >= 3) return;
     if (Math.random() > 0.3) return;
-    guestVisit(pick(GUESTS.filter((g) => g.id !== lastGuestId && (!g.ev || g.ev === evNow()))));
+    guestVisit(pick(GUESTS.filter((g) => g.id !== lastGuestId && !g.sched && (!g.ev || g.ev === evNow()))));
   }, 60000);
 
 
@@ -5363,6 +5367,51 @@
   setInterval(() => { if (Date.now() - appStart > 2 * 60000 && idleFor() < 3 * 60000 && Math.random() < 0.35) trickOrTreat(); }, 45000);
   const OBAKE_SVG = `<svg viewBox="0 0 120 170"><path d="M22 160 L22 70 C22 30 98 30 98 70 L98 160 L86 150 L74 162 L60 150 L46 162 L34 150 Z" fill="#fbfaf6" stroke="#e6e0d6" stroke-width="2"/><ellipse cx="46" cy="76" rx="7" ry="9" fill="#2b2420"/><ellipse cx="74" cy="76" rx="7" ry="9" fill="#2b2420"/><ellipse cx="60" cy="96" rx="6" ry="5" fill="#2b2420" opacity=".8"/><ellipse cx="38" cy="90" rx="6" ry="3.5" fill="#f4a3a3" opacity=".6"/><ellipse cx="82" cy="90" rx="6" ry="3.5" fill="#f4a3a3" opacity=".6"/><path d="M90 120 h22 l-3 22 h-16 z" fill="#f08a2a"/><path d="M92 120 q9 -12 18 0" stroke="#5a3a2a" stroke-width="2.5" fill="none"/><path d="M96 130 l3 -3 l3 3Z M104 130 l3 -3 l3 3Z" fill="#4a2a10"/></svg>`;
   GUESTS.push({ id: 'obake', ev: 'halloween', name: 'おばけの子', who: 'となりの こども', act: 'gift', hello: 'トリック・オア・トリート！ …えへへ、ぼくだよ', bye: 'ハッピーハロウィン〜！', lines: ['こわい？ こわい？', 'おかし あつめてるんだ'], gift: ['🍭', 'ハロウィンの キャンディ'], svg: OBAKE_SVG });
+
+  // ---------- 出前の 松田くん（ごはんどきに ときどき） ----------
+  const MATSUDA_SVG = humanSVG({ hair: '#2b2420', top: '#f4f1ea', bottom: '#4a4a52', hat: '<rect x="30" y="40" width="60" height="8" rx="4" fill="#e8564a"/><path d="M88 42 l10 -4 l-2 8 Z" fill="#e8564a"/>', extra: '<rect x="45" y="104" width="30" height="10" rx="2" fill="#fff"/><text x="60" y="112" font-size="8" text-anchor="middle" fill="#c8483c" font-weight="700">松田</text><rect x="84" y="112" width="28" height="26" rx="2" fill="#c3c9d0" stroke="#8f969e" stroke-width="1.5"/><rect x="95" y="102" width="6" height="12" rx="1" fill="#8f969e"/><path d="M86 122 h24" stroke="#a5acb4" stroke-width="1.5"/>', face: '' });
+  const DEMAE_MENU = {
+    lunch: [['🍜', 'ラーメン'], ['🍛', 'カレー'], ['🍣', 'おすし'], ['🍕', 'ピザ'], ['🍱', 'からあげ べんとう'], ['🥟', 'ぎょうざ'], ['🍝', 'ナポリタン'], ['🍙', 'おにぎりセット']],
+    oyatsu: [['🍮', 'プリン'], ['🍡', 'おだんご'], ['🍩', 'ドーナツ'], ['🍧', 'かきごおり']],
+    dinner: [['🍜', 'みそラーメン'], ['🍛', 'カツカレー'], ['🍤', 'てんどん'], ['🍲', 'なべやき うどん'], ['🍣', 'とくじょう おすし'], ['🍕', 'ミックスピザ'], ['🥘', 'オムライス']],
+  };
+  const MATSUDA = { id: 'matsuda', sched: true, name: '松田くん', who: '出前の 松田くん', act: 'demae', hello: 'まいど〜！ 出前の 松田です！', bye: 'まいどあり〜！ また よろしく おねがいしまーす！',
+    lines: ['バイクで かっとばして きました！', 'あったかい うちに どうぞ〜！', 'おだいは… いつもの ツケで！', 'ここ、いつ来ても いい におい しますね〜'], svg: MATSUDA_SVG };
+  GUESTS.push(MATSUDA);
+  const demaeSlot = () => { const h = new Date().getHours(); return h >= 11 && h < 14 ? 'lunch' : h === 15 ? 'oyatsu' : h >= 17 && h < 20 ? 'dinner' : ''; };
+  async function demaeAct(a, stale) {
+    const slot = demaeSlot() || 'lunch', [e, n] = pick(DEMAE_MENU[slot]);
+    const ordered = Math.random() < 0.7;
+    a.say(ordered ? `おまちどおさま！ ${n}です！` : `${n}… あれ？ ちゅうもん してない？ …まあ いっか、サービスです！`, 2800);
+    if (Math.random() < 0.2) { await sleep(900); if (stale()) return; a.cls('nope', true); a.say('おっとっと！ …セーフ！ こぼれてない！', 2000); await sleep(950); a.cls('nope', false); }
+    await sleep(1600); if (stale()) return;
+    const dish = document.createElement('div'); dish.className = 'demaeDish dropIn'; dish.textContent = e; dish.style.fontSize = '38px';
+    const dx = clamp(a.x - 12, 22, 78), dy = clamp(a.y - 3, FLOOR.yMin, FLOOR.yMax); dish.style.left = dx + '%'; dish.style.bottom = dy + '%'; dish.style.zIndex = '40';
+    room.appendChild(dish);
+    const eaters = pets.filter((p) => p.mode === 'idle');
+    eaters.forEach((p, i) => { const ang = (i / Math.max(1, eaters.length)) * Math.PI * 2; p.moveTo(clamp(dx + Math.cos(ang) * 15, FLOOR.xMin, FLOOR.xMax), clamp(dy + Math.sin(ang) * 5, FLOOR.yMin, FLOOR.yMax), 8); });
+    await sleep(2000); if (stale()) { dish.remove(); return; }
+    eaters.forEach((p, i) => setTimeout(() => {
+      if (p.mode !== 'idle' || stale()) return;
+      p.lookAt(dx); p.cls('eat', true); let k = 0; const iv = setInterval(() => { p.cls('chomp', k++ % 2 === 0); if (k > 6) { clearInterval(iv); p.cls('chomp', false); p.cls('eat', false);
+        const full = getFull(p.kind) >= FULL_MAX; if (!full) addFull(p.kind);
+        p.happy(); p.hearts(3); p.say(full ? 'べつばら〜！' : pick([...(KIND_LINES[p.kind].eat || ['おいしい！']), `${n}、さいこう！`]), 2000); setMood(p, 'gokigen', 8); } }, 230);
+    }, i * 450));
+    await sleep(2400 + eaters.length * 450); dish.style.transition = 'transform .4s, opacity .4s'; dish.style.opacity = '0'; dish.style.transform = 'translateX(-50%) scale(.5)'; setTimeout(() => dish.remove(), 450);
+    S.demaeStamps = (S.demaeStamps || 0) + 1; save();
+    logEvent('demae', { n });
+    if (S.demaeStamps % 10 === 0) { await sleep(600); if (stale()) return; a.say('スタンプ まんたん！ デザート サービス！', 2600); popItem(a.x, a.y + 20, '🎫'); addTreasure('🎫', '松田くんの スタンプカード（まんたん）', '出前'); pets.filter((p) => p.mode === 'idle').forEach((p) => { p.hop(); }); }
+    else if (eaters.length) { await sleep(400); if (!stale()) a.say(`スタンプ おしときますね！ あと ${10 - (S.demaeStamps % 10)}こ！`, 2200); }
+  }
+  setInterval(() => {
+    if (guestBusy || outing || document.hidden || lightOff || breathing || talking || feeding || switching || decorating() || document.body.classList.contains('viewing')) return;
+    const slot = demaeSlot(); if (!slot || !pets.some((p) => p.mode === 'idle') || idleFor() > 10 * 60000) return;
+    if (Date.now() - appStart < 90000 || Date.now() - lastGuestAt < 4 * 60000) return;
+    const key = todayStr() + slot; if ((S.demaeDone || []).includes(key)) return;
+    if (Math.random() > 0.25) return;
+    S.demaeDone = (S.demaeDone || []).filter((k) => k.startsWith(todayStr())).concat(key); save();
+    guestVisit(MATSUDA);
+  }, 60000);
 
   // ---------- おへやカスタム（かぐを かって、おく。かぐで ふるまいが かわる） ----------
   const FURN = {

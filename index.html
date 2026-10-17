@@ -1274,6 +1274,7 @@
     <button class="actRow" id="btnTrip"><span class="aic">🧳</span><span class="at"><b>りょこう</b><small>みんなを つれて、でんしゃで おでかけ。3つの ばしょを めぐるよ</small></span></button>
     <button class="actRow" id="btnDance"><span class="aic">💃</span><span class="at"><b>みんなでおどる</b><small>おなじ部屋の みんなで ダンス。タップで手びょうし（1分）</small></span></button>
     <button class="actRow" id="btnStretch"><span class="aic">🙆</span><span class="at"><b>ストレッチ</b><small>くび・かた・のび〜（1分弱）</small></span></button>
+    <button class="actRow" id="btnTea"><span class="aic">🍵</span><span class="at"><b>おちゃタイム</b><small>みんなで あったかい お茶を ひといき（40秒）</small></span></button>
     <div class="actRow" id="napRow"><span class="aic">😴</span><span class="at"><b>お昼寝</b><small>みんなで ちょっとだけ眠る。とりの声で おこすね</small></span><span class="napChips"><button data-min="10">10分</button><button data-min="20">20分</button></span></div>
     <button class="actRow" id="btnSleepPrep"><span class="aic">🌙</span><span class="at"><b>おやすみの準備</b><small>あかりを落としながら、ゆっくり呼吸（1〜2分）</small></span></button>
   </div>
@@ -1357,7 +1358,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.15.0';
+  const APP_VERSION = '2.16.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -2945,6 +2946,36 @@
     if (run === breathRun) endBreath(true, 'からだ、ほぐれたね');
   });
 
+  // ---------- いっしょに：おちゃタイム ----------
+  const TEA_STEPS = [
+    ['しゅんしゅん…', 'おゆを わかしているよ', 5, false],
+    ['とぽぽぽ…', 'ゆのみに そそいで', 4, true],
+    ['ふー、ふー', 'ゆげを ふーっと さまして', 5, true],
+    ['ずずっ', 'ひとくち。あったかいね', 5, true],
+    ['ふー、ふー', 'もういちど ふーっと', 4, true],
+    ['ずずっ', 'もうひとくち', 5, true],
+    ['ほっ', 'ゆっくり ひといき', 7, false],
+  ];
+  const TEA_LINE = ['あちち', 'おいしいね', 'ほっとするね', 'ぽかぽか〜', 'しあわせ〜'];
+  $('#btnTea').addEventListener('click', async () => {
+    const run = beginActivity('おちゃタイム', 'tea'); if (!run) return;
+    const word = $('#breathWord'), cnt = $('#breathCount');
+    cnt.textContent = 'みんなで ひといき いれよう';
+    await Promise.all(pets.map((p) => p.moveTo(...BREATH_SPOTS[p.kind], 8)));
+    if (run !== breathRun) return;
+    pets.forEach((p) => p.face(p.x > 55 ? -1 : 1));
+    await sleep(1500);
+    for (let i = 0; i < TEA_STEPS.length; i++) {
+      const [w, how, sec, steam] = TEA_STEPS[i];
+      if (run !== breathRun) return;
+      word.textContent = w; cnt.textContent = how;
+      if (steam) pets.forEach((p, j) => setTimeout(() => { if (run === breathRun) noteFrom(p, '♨'); }, j * 300));
+      if (i === 3 && pets.length) { const p = pick(pets); setTimeout(() => { if (run === breathRun) p.say(pick(TEA_LINE), 2000); }, 1500); }
+      await sleep(sec * 1000);
+    }
+    if (run === breathRun) endBreath(true, 'お茶、おいしかったね');
+  });
+
   // ---------- いっしょに：みんなでおどる ----------
   const DZ = ['dz-bounce', 'dz-sway', 'dz-side', 'dz-wave', 'dz-spin', 'dz-pose'];
   const DZ_BPM = 112, DZ_BEAT = 60 / DZ_BPM;
@@ -3819,7 +3850,7 @@
   function closeCard() { $('#cardWrap').classList.remove('show'); }
 
   // ---------- きょうのひだまり ----------
-  const ACT_TEXT = { breath: 'いっしょに 深呼吸したね', relax: 'ぎゅっ→ふわっ、したね', botto: '窓の外を見て ぼーっとしたね', yura: 'みんなで ゆらゆらしたね', stretch: 'ストレッチしたね', nap: 'いっしょに お昼寝したね', sleepPrep: 'おやすみの準備をしたね', dance: 'みんなで おどったね' };
+  const ACT_TEXT = { breath: 'いっしょに 深呼吸したね', relax: 'ぎゅっ→ふわっ、したね', botto: '窓の外を見て ぼーっとしたね', yura: 'みんなで ゆらゆらしたね', stretch: 'ストレッチしたね', tea: 'いっしょに お茶したね', nap: 'いっしょに お昼寝したね', sleepPrep: 'おやすみの準備をしたね', dance: 'みんなで おどったね' };
   function todayLines() {
     const ev = (S.today && S.today.d === todayStr()) ? S.today.ev : [];
     const out = [], seen = new Set();

@@ -608,7 +608,8 @@
   @keyframes evBat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(18px,-10px); } }
   .costume { position: absolute; pointer-events: none; display: none; }
   .costume svg { width: 100%; height: 100%; overflow: visible; display: block; }
-  body.ev-halloween.ev-costume .pet:not(.guest) .costume { display: block; }
+  body.ev-halloween.ev-costume .pet:not(.guest) .costume.hw { display: block; }
+  body.ev-christmas.ev-costume .pet:not(.guest) .costume.xm { display: block; }
   .pet.mochi .costume { left: 30%; top: -24%; width: 42%; height: 42%; }
   .pet.shiba .costume { left: 37%; top: -6%; width: 26%; height: 26%; }
   .pet.poodle .costume { left: 36%; top: -16%; width: 30%; height: 30%; }
@@ -882,6 +883,25 @@
   .mmEat { background: var(--accent); color: #fff; }
   /* お昼寝 */
   .napChips { display: flex; gap: 6px; margin-left: auto; }
+  .napChips button { white-space: nowrap; flex-shrink: 0; }
+  .napChips button.on { background: rgba(232,145,107,0.18); border-color: #e8916b; font-weight: 700; }
+  .togTabs { display: flex; gap: 4px; margin: 0 0 10px; padding: 4px; background: rgba(232,145,107,0.13); border-radius: 14px; }
+  .togTabs button { flex: 1; border: 0; background: transparent; color: var(--ink); font-family: inherit; font-size: 14px; padding: 8px 0; border-radius: 10px; cursor: pointer; }
+  .togTabs button.on { background: #fff; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .actGroup.off { display: none; }
+  .moodPick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px 12px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .moodPick .mpq { font-size: 14px; font-weight: 700; }
+  #neoShade { position: fixed; inset: 0; z-index: 9999; background: #000; opacity: 0; transition: opacity 90s linear; display: none; align-items: flex-end; justify-content: center; padding-bottom: calc(env(safe-area-inset-bottom) + 48px); }
+  #neoShade.show { display: flex; }
+  #neoShade .neoTxt { color: rgba(255,255,255,0.32); font-size: 13px; text-align: center; line-height: 1.7; transition: opacity 2s; }
+  /* クリスマス */
+  body.ev-christmas .evDecor.christmas { display: block; }
+  .xmasTree { position: absolute; transform: translateX(-50%); font-size: 58px; line-height: 1; filter: drop-shadow(0 4px 3px rgba(0,0,0,.2)); transition: filter .6s; }
+  .room.dark .xmasTree { filter: drop-shadow(0 0 12px #ffd86b) drop-shadow(0 0 4px #fff2b0); }
+  .xmasItem { position: absolute; transform: translateX(-50%); font-size: 24px; line-height: 1; filter: drop-shadow(0 3px 2px rgba(0,0,0,.2)); }
+  .evLights circle { animation: evTwinkle 2.4s ease-in-out infinite; }
+  .evLights circle:nth-child(3n) { animation-delay: -.8s; } .evLights circle:nth-child(3n+1) { animation-delay: -1.6s; }
+  @keyframes evTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   .napChips button { border: 1.5px solid rgba(232,145,107,0.55); background: #fff; color: var(--ink); font-family: inherit; font-size: 13px; padding: 6px 10px; border-radius: 14px; cursor: pointer; }
   /* お客さん */
   .pet.guest { aspect-ratio: 120 / 170; }
@@ -1209,7 +1229,7 @@
       <input type="file" id="winPhotoFile" accept="image/*" hidden /></div></div>
     <div class="secLabel">季節の模様替え</div>
     <div class="field"><div class="prow"><div class="pchips" id="seasonChips"></div></div></div>
-    <div class="secLabel">きせつイベント（ハロウィンなど）</div>
+    <div class="secLabel">きせつイベント（ハロウィン・クリスマス）</div>
     <div class="field"><div class="prow"><div class="pchips" id="eventChips"></div></div></div>
     <div class="secLabel">そとの天気</div>
     <div class="field"><div class="prow"><div class="pchips" id="weatherChips"></div>
@@ -1260,23 +1280,30 @@
   <div class="secLabel">せいかく</div>
   <div class="field"><div class="prow"><div class="pchips" id="pmPersona"></div></div></div>
 </div>
+<div id="neoShade"><div class="neoTxt" id="neoTxt"></div></div>
 <div class="sheetBg" id="togetherBg"></div>
 <div class="sheet" id="togetherSheet">
   <div class="grab"></div>
   <h3>いっしょに</h3>
-  <div class="field acts">
-    <button class="actRow" id="btnBreath"><span class="aic">🍃</span><span class="at"><b>深呼吸</b><small>すって・とめて・はいて を5回（1分）</small></span></button>
+  <button id="btnBreath" hidden></button>
+  <div class="togTabs" id="togTabs"><button data-g="calm">ととのえる</button><button data-g="play">おでかけ・あそぶ</button></div>
+  <div class="field acts actGroup" data-g="calm">
+    <div class="moodPick" id="moodPick"><span class="mpq">いまの気分は？</span><span class="napChips"><button data-feel="tired">つかれた</button><button data-feel="sowa">そわそわ</button><button data-feel="nemu">ねむれない</button></span></div>
+    <div class="actRow" id="breathRow"><span class="aic">🍃</span><span class="at"><b>深呼吸</b><small id="breathSub">すって・とめて・はいて を5回（1分）</small></span><span class="napChips paceChips" id="paceChips"><button data-pace="normal">ふつう</button><button data-pace="slow">ゆっくり</button></span></div>
     <button class="actRow" id="btnRelax"><span class="aic">🤲</span><span class="at"><b>ぎゅっ→ふわっ</b><small>ちからを入れて、ぬく。手・肩・顔・ぜんぶ（1分）</small></span></button>
     <button class="actRow" id="btnBotto"><span class="aic">🏞️</span><span class="at"><b>ぼーっとタイム</b><small>窓の外をながめて、なにもしない（3分）</small></span></button>
     <button class="actRow" id="btnYura"><span class="aic">🌊</span><span class="at"><b>ゆらゆら</b><small>みんなといっしょに、からだを左右にゆらす（1分）</small></span></button>
-    <button class="actRow" id="btnWalk"><span class="aic">🐾</span><span class="at"><b>おさんぽ</b><small>みんなで お外へ。いろんな人や動物に 出会えるよ（2〜3分）</small></span></button>
-    <button class="actRow" id="btnKonbini"><span class="aic">🏪</span><span class="at"><b>コンビニ</b><small>ひだまりマートへ おかいもの。コインで すきなものを かって、みんなで たべよう</small></span></button>
-    <button class="actRow" id="btnTrip"><span class="aic">🧳</span><span class="at"><b>りょこう</b><small>みんなを つれて、でんしゃで おでかけ。3つの ばしょを めぐるよ</small></span></button>
-    <button class="actRow" id="btnDance"><span class="aic">💃</span><span class="at"><b>みんなでおどる</b><small>おなじ部屋の みんなで ダンス。タップで手びょうし（1分）</small></span></button>
     <button class="actRow" id="btnStretch"><span class="aic">🙆</span><span class="at"><b>ストレッチ</b><small>くび・かた・のび〜（1分弱）</small></span></button>
     <button class="actRow" id="btnTea"><span class="aic">🍵</span><span class="at"><b>おちゃタイム</b><small>みんなで あったかい お茶を ひといき（40秒）</small></span></button>
     <div class="actRow" id="napRow"><span class="aic">😴</span><span class="at"><b>お昼寝</b><small>みんなで ちょっとだけ眠る。とりの声で おこすね</small></span><span class="napChips"><button data-min="10">10分</button><button data-min="20">20分</button></span></div>
     <button class="actRow" id="btnSleepPrep"><span class="aic">🌙</span><span class="at"><b>おやすみの準備</b><small>あかりを落としながら、ゆっくり呼吸（1〜2分）</small></span></button>
+    <div class="actRow" id="neoRow"><span class="aic">🌌</span><span class="at"><b>ねおちモード</b><small>おやすみの準備のあと、音は そのまま だんだん くらく。じかんで とまるよ</small></span><span class="napChips"><button data-neo="15">15分</button><button data-neo="30">30分</button></span></div>
+  </div>
+  <div class="field acts actGroup" data-g="play">
+    <button class="actRow" id="btnWalk"><span class="aic">🐾</span><span class="at"><b>おさんぽ</b><small>みんなで お外へ。いろんな人や動物に 出会えるよ（2〜3分）</small></span></button>
+    <button class="actRow" id="btnKonbini"><span class="aic">🏪</span><span class="at"><b>コンビニ</b><small>ひだまりマートへ おかいもの。コインで すきなものを かって、みんなで たべよう</small></span></button>
+    <button class="actRow" id="btnTrip"><span class="aic">🧳</span><span class="at"><b>りょこう</b><small>みんなを つれて、でんしゃで おでかけ。3つの ばしょを めぐるよ</small></span></button>
+    <button class="actRow" id="btnDance"><span class="aic">💃</span><span class="at"><b>みんなでおどる</b><small>おなじ部屋の みんなで ダンス。タップで手びょうし（1分）</small></span></button>
   </div>
   <p class="note">やりたいときだけで大丈夫。途中でやめてもいいよ。さいごまでやると、窓辺に花が1りん さきます。</p>
 </div>
@@ -1358,7 +1385,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.16.0';
+  const APP_VERSION = '2.17.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -1874,14 +1901,15 @@
     pets.forEach((p) => p.face(p.x > 55 ? -1 : 1));
     await sleep(1200);
     const CYCLES = 5;
+    const [IN, HOLD, OUT] = S.breathPace === 'slow' ? [5, 3, 8] : [4, 2, 6];
     for (let i = 1; i <= CYCLES && run === breathRun; i++) {
       cnt.textContent = i + ' / ' + CYCLES;
-      word.textContent = 'すって'; setBreath(1.26, 4);
-      await sleep(4000); if (run !== breathRun) break;
+      word.textContent = 'すって'; setBreath(1.26, IN);
+      await sleep(IN * 1000); if (run !== breathRun) break;
       word.textContent = 'とめて';
-      await sleep(2000); if (run !== breathRun) break;
-      word.textContent = 'はいて'; setBreath(1, 6);
-      await sleep(6000);
+      await sleep(HOLD * 1000); if (run !== breathRun) break;
+      word.textContent = 'はいて'; setBreath(1, OUT);
+      await sleep(OUT * 1000);
     }
     if (run === breathRun) endBreath(true);
   });
@@ -2463,7 +2491,86 @@
   });
 
   // 「いっしょに」メニュー
-  function openTogether() { guideDone('together'); $('#togetherBg').classList.add('show'); $('#togetherSheet').classList.add('show'); }
+  function renderTogether() {
+    const g = S.togTab === 'play' ? 'play' : 'calm';
+    document.querySelectorAll('#togTabs [data-g]').forEach((b) => b.classList.toggle('on', b.dataset.g === g));
+    document.querySelectorAll('#togetherSheet .actGroup').forEach((el) => el.classList.toggle('off', el.dataset.g !== g));
+    const slow = S.breathPace === 'slow';
+    document.querySelectorAll('#paceChips [data-pace]').forEach((b) => b.classList.toggle('on', b.dataset.pace === (slow ? 'slow' : 'normal')));
+    $('#breathSub').textContent = slow ? 'すって・とめて・はいて を5回（1分20秒）' : 'すって・とめて・はいて を5回（1分）';
+  }
+  function openTogether() { guideDone('together'); renderTogether(); $('#togetherBg').classList.add('show'); $('#togetherSheet').classList.add('show'); }
+  $('#togTabs').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (!b) return; S.togTab = b.dataset.g; save(); renderTogether(); });
+  $('#breathRow').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pace]');
+    if (b) { S.breathPace = b.dataset.pace; save(); renderTogether(); }
+    $('#btnBreath').click();
+  });
+  // いまの気分 → だれかが おすすめしてくれる
+  const FEEL = {
+    tired: { hi: ['おつかれさま', 'きょうも がんばったね', 'ちょっと ひとやすみ しよ'], acts: [['ぎゅっ→ふわっ', '#btnRelax'], ['おちゃタイム', '#btnTea'], ['ストレッチ', '#btnStretch']] },
+    sowa: { hi: ['だいじょうぶ、ここに いるよ', 'いっしょに おちつこ', 'ゆっくりで いいよ'], acts: [['深呼吸', '#btnBreath'], ['ゆらゆら', '#btnYura'], ['ぼーっとタイム', '#btnBotto']] },
+    nemu: { hi: ['ねむれないの？', 'じゃあ、みんなで ねよっか', 'いっしょに いるからね'], acts: [['おやすみの準備', '#btnSleepPrep'], ['ねおちモード', 'neo']] },
+  };
+  $('#moodPick').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-feel]'); if (!b) return;
+    e.stopPropagation(); closeTogether();
+    const f = FEEL[b.dataset.feel], [label, sel] = pick(f.acts), sp = speaker();
+    if (sp) { sp.happy(); sp.say(pick(f.hi), 1800); setTimeout(() => sp.say(`${label}、しよっか`, 2000), 1900); }
+    setTimeout(() => { if (sel === 'neo') startNeo(15); else $(sel).click(); }, sp ? 3600 : 400);
+  });
+
+  // ---------- ねおちモード（おやすみの準備 → 音をながしたまま くらく → じかんで しずかに とまる） ----------
+  let neo = null;
+  window.__neoMuted = false;
+  async function neoLock(on) {
+    try {
+      if (on && 'wakeLock' in navigator) { neo.lock = await navigator.wakeLock.request('screen'); }
+      else if (!on && neo && neo.lock) { await neo.lock.release(); neo.lock = null; }
+    } catch (e) {}
+  }
+  async function startNeo(min) {
+    if (neo) return;
+    if (lightOff) { toast('あかりを つけてから はじめよう'); return; }
+    neo = { min, lock: null, timers: [] };
+    window.__neoMuted = false;
+    try { playSound(S.sound !== 'none' ? effectiveSound() : (curTheme() === 'den' ? 'fire' : 'rain')); } catch (e) {}
+    $('#btnSleepPrep').click();
+    const t0 = Date.now();
+    while (neo && !(lightOff && !breathing)) {
+      if (Date.now() - t0 > 240000 || (!breathing && !lightOff && Date.now() - t0 > 2500)) { stopNeo(); return; }
+      await sleep(800);
+    }
+    if (!neo) return;
+    const shade = $('#neoShade'), txt = $('#neoTxt');
+    shade.classList.add('show'); void shade.offsetWidth; shade.style.opacity = '0.92';
+    neoLock(true);
+    const endAt = Date.now() + min * 60000;
+    const upd = () => { const left = Math.max(0, Math.ceil((endAt - Date.now()) / 60000)); txt.innerHTML = `ねおちモード　のこり ${left}分<br>タップで おわる`; };
+    upd(); neo.timers.push(setInterval(upd, 20000));
+    neo.timers.push(setTimeout(() => {
+      if (!neo) return;
+      try { if (AC && master) { const t = AC.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.setTargetAtTime(0, t, 8); } } catch (e) {}
+      neo.timers.push(setTimeout(() => {
+        if (!neo) return;
+        window.__neoMuted = true; try { playSound('none'); } catch (e) {}
+        neo.timers.forEach((x) => { clearInterval(x); clearTimeout(x); });
+        txt.innerHTML = 'おやすみなさい<br>タップで もどる';
+        neoLock(false);
+      }, 35000));
+    }, min * 60000));
+  }
+  function stopNeo() {
+    if (!neo) return;
+    neo.timers.forEach((x) => { clearInterval(x); clearTimeout(x); });
+    neoLock(false); neo = null; window.__neoMuted = false;
+    const shade = $('#neoShade'); shade.style.transition = 'opacity .6s'; shade.style.opacity = '0';
+    setTimeout(() => { shade.classList.remove('show'); shade.style.transition = ''; }, 650);
+    try { playSound(S.sound !== 'none' ? effectiveSound() : 'none'); } catch (e) {}
+  }
+  $('#neoShade').addEventListener('click', (e) => { e.stopPropagation(); stopNeo(); });
+  document.querySelectorAll('#neoRow [data-neo]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); closeTogether(); setTimeout(() => startNeo(+b.dataset.neo), 350); }));
+  $('#neoRow').addEventListener('click', () => { closeTogether(); setTimeout(() => startNeo(15), 350); });
   function closeTogether() { $('#togetherBg').classList.remove('show'); $('#togetherSheet').classList.remove('show'); }
   $('#btnTogether').addEventListener('click', () => {
     if (breathing || talking) return;
@@ -3412,7 +3519,7 @@
     return viewType() === 'sea' ? 'wave' : 'river';
   }
   function syncAutoSound() {
-    if (!AC || !resumed || S.sound !== 'auto') return;
+    if (!AC || !resumed || S.sound !== 'auto' || window.__neoMuted) return;
     const k = effectiveSound(); if (k !== currentKind) playSound(k);
   }
   function ensureAudio() {
@@ -5524,7 +5631,13 @@
   }, 60000);
 
   // ---------- きせつイベント（だい1だん：ハロウィン） ----------
-  function evNow() { if (S.eventsOn === false) return ''; const d = new Date(); return d.getMonth() === 9 ? 'halloween' : ''; }
+  function evNow() {
+    if (S.eventsOn === false) return '';
+    const q = (location.search.match(/[?&]ev=(\w+)/) || [])[1];
+    if (q === 'halloween' || q === 'christmas') return q;
+    const d = new Date(), m = d.getMonth();
+    return m === 9 ? 'halloween' : (m === 11 && d.getDate() <= 25) ? 'christmas' : '';
+  }
   const COSTUME = {
     mochi: `<svg viewBox="0 0 60 60"><path d="M30 2 L46 44 H14 Z" fill="#6a4a9a"/><path d="M30 2 Q36 0 40 8" stroke="#6a4a9a" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="15" y="34" width="30" height="7" fill="#f0a040"/><ellipse cx="30" cy="46" rx="28" ry="7" fill="#5a3a8a"/><circle cx="24" cy="22" r="2.4" fill="#ffe27a"/></svg>`,
     shiba: `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="38" rx="26" ry="20" fill="#f08a2a"/><path d="M12 30 Q30 22 48 30" stroke="#d9741a" stroke-width="2" fill="none"/><path d="M30 18 v26" stroke="#d9741a" stroke-width="2"/><rect x="27" y="10" width="6" height="10" rx="2" fill="#6a8a3a"/><path d="M20 36 l4 -4 l4 4Z M32 36 l4 -4 l4 4Z" fill="#4a2a10"/><path d="M22 44 q8 6 16 0" stroke="#4a2a10" stroke-width="2.5" fill="none"/></svg>`,
@@ -5534,7 +5647,7 @@
     pig: `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="40" rx="24" ry="18" fill="#f08a2a"/><path d="M14 34 Q30 26 46 34" stroke="#d9741a" stroke-width="2" fill="none"/><rect x="27" y="14" width="6" height="10" rx="2" fill="#6a8a3a"/><path d="M21 38 l4 -4 l4 4Z M31 38 l4 -4 l4 4Z" fill="#4a2a10"/><path d="M23 46 q7 5 14 0" stroke="#4a2a10" stroke-width="2.5" fill="none"/></svg>`,
     cat: `<svg viewBox="0 0 60 60"><path d="M30 4 L45 42 H15 Z" fill="#2b2430"/><rect x="16" y="32" width="28" height="6" fill="#f0a040"/><ellipse cx="30" cy="44" rx="26" ry="6" fill="#1f1a24"/><circle cx="34" cy="20" r="3" fill="#ffe27a"/></svg>`,
   };
-  function addCostumes() { allPets.forEach((p) => { if (p.el.querySelector('.costume')) return; const c = document.createElement('div'); c.className = 'costume'; c.innerHTML = COSTUME[p.kind] || ''; p.el.querySelector('.flip').appendChild(c); }); }
+  function addCostumes() { allPets.forEach((p) => { if (p.el.querySelector('.costume.hw')) return; const c = document.createElement('div'); c.className = 'costume hw'; c.innerHTML = COSTUME[p.kind] || ''; p.el.querySelector('.flip').appendChild(c); }); }
   function buildEvDecor() {
     if (document.querySelector('.evDecor.halloween')) return;
     const d = document.createElement('div'); d.className = 'evDecor halloween';
@@ -5544,9 +5657,22 @@
       <div class="evBat" style="left:62%;top:16%">🦇</div><div class="evBat" style="left:24%;top:20%;animation-delay:-3s;font-size:14px">🦇</div>`;
     room.insertBefore(d, $('#shadeLayer'));
   }
+  const SANTA_HAT = '<svg viewBox="0 0 60 60"><path d="M12 44 Q20 8 42 8 Q54 10 51 24 L47 44 Z" fill="#d9483b"/><path d="M20 30 Q30 16 44 14" stroke="#b83a2f" stroke-width="2" fill="none"/><rect x="8" y="39" width="44" height="11" rx="5.5" fill="#fbfaf6"/><circle cx="51" cy="24" r="6.5" fill="#fbfaf6"/></svg>';
+  function addXmasCostumes() { allPets.forEach((p) => { if (p.el.querySelector('.costume.xm')) return; const c = document.createElement('div'); c.className = 'costume xm'; c.innerHTML = SANTA_HAT; p.el.querySelector('.flip').appendChild(c); }); }
+  function buildXmasDecor() {
+    if (document.querySelector('.evDecor.christmas')) return;
+    const d = document.createElement('div'); d.className = 'evDecor christmas';
+    const bulbs = Array.from({ length: 13 }, (_, i) => { const x = 4 + i * 8.1, y = 7 + Math.sin((i / 12) * Math.PI) * 13; return `<circle cx="${x}" cy="${y}" r="1.9" fill="${['#e8564a', '#f2c94c', '#5fb3a1', '#7fb6d9'][i % 4]}"/>`; }).join('');
+    d.innerHTML = `<div class="evGarland evLights"><svg viewBox="0 0 106 30" preserveAspectRatio="none"><path d="M2 6 Q53 30 104 6" stroke="#3f6b4a" stroke-width="1" fill="none"/>${bulbs}</svg></div>
+      <div class="xmasTree" style="left:11%;bottom:30%">🎄</div><div class="xmasItem" style="left:19%;bottom:29%">🎁</div><div class="xmasItem" style="left:6%;bottom:29%;font-size:20px">🎁</div>
+      <div class="xmasItem" style="left:80%;bottom:31%;font-size:26px">⛄</div><div class="xmasItem" style="left:57%;bottom:42%;font-size:20px">🧦</div>`;
+    room.insertBefore(d, $('#shadeLayer'));
+  }
   function applyEvent() {
     const ev = evNow();
     document.body.classList.toggle('ev-halloween', ev === 'halloween');
+    document.body.classList.toggle('ev-christmas', ev === 'christmas');
+    if (ev === 'christmas') { buildXmasDecor(); addXmasCostumes(); }
     document.body.classList.toggle('ev-costume', S.costumeOn !== false);
     room.classList.toggle('dark', lightOff || !!SKY[phase()].lamp);
     if (ev === 'halloween') { buildEvDecor(); addCostumes(); }
@@ -5582,6 +5708,9 @@
   setInterval(() => { if (Date.now() - appStart > 2 * 60000 && idleFor() < 3 * 60000 && Math.random() < 0.35) trickOrTreat(); }, 45000);
   const OBAKE_SVG = `<svg viewBox="0 0 120 170"><path d="M22 160 L22 70 C22 30 98 30 98 70 L98 160 L86 150 L74 162 L60 150 L46 162 L34 150 Z" fill="#fbfaf6" stroke="#e6e0d6" stroke-width="2"/><ellipse cx="46" cy="76" rx="7" ry="9" fill="#2b2420"/><ellipse cx="74" cy="76" rx="7" ry="9" fill="#2b2420"/><ellipse cx="60" cy="96" rx="6" ry="5" fill="#2b2420" opacity=".8"/><ellipse cx="38" cy="90" rx="6" ry="3.5" fill="#f4a3a3" opacity=".6"/><ellipse cx="82" cy="90" rx="6" ry="3.5" fill="#f4a3a3" opacity=".6"/><path d="M90 120 h22 l-3 22 h-16 z" fill="#f08a2a"/><path d="M92 120 q9 -12 18 0" stroke="#5a3a2a" stroke-width="2.5" fill="none"/><path d="M96 130 l3 -3 l3 3Z M104 130 l3 -3 l3 3Z" fill="#4a2a10"/></svg>`;
   GUESTS.push({ id: 'obake', ev: 'halloween', name: 'おばけの子', who: 'となりの こども', act: 'gift', hello: 'トリック・オア・トリート！ …えへへ、ぼくだよ', bye: 'ハッピーハロウィン〜！', lines: ['こわい？ こわい？', 'おかし あつめてるんだ'], gift: ['🍭', 'ハロウィンの キャンディ'], svg: OBAKE_SVG });
+  GUESTS.push({ id: 'santa', ev: 'christmas', name: 'サンタさん', who: 'ほっきょくから きた', act: 'gift', hello: 'ほっほっほ。メリークリスマス！', bye: 'よいこの みんな、また らいねん！',
+    lines: ['いい子に してたかな？', 'この部屋は あったかいのう', 'トナカイは そとで まっとるよ'], gift: ['🎁', 'サンタさんの プレゼント'],
+    svg: humanSVG({ hair: '#fbfaf6', top: '#d9483b', bottom: '#d9483b', hat: '<path d="M30 40 Q48 2 92 24 L90 42 Z" fill="#d9483b"/><rect x="27" y="35" width="66" height="11" rx="5.5" fill="#fbfaf6"/><circle cx="94" cy="24" r="6.5" fill="#fbfaf6"/><path d="M36 64 Q60 112 84 64 Q74 76 60 73 Q46 76 36 64 Z" fill="#fbfaf6"/>', extra: '<rect x="35" y="114" width="50" height="8" fill="#2b2420"/><rect x="54" y="113" width="12" height="10" rx="2" fill="none" stroke="#e7b84f" stroke-width="2.5"/>' }) });
 
   // ---------- 出前の 松田くん（ごはんどきに ときどき） ----------
   const MATSUDA_SVG = humanSVG({ hair: '#2b2420', top: '#f4f1ea', bottom: '#4a4a52', hat: '<rect x="30" y="40" width="60" height="8" rx="4" fill="#e8564a"/><path d="M88 42 l10 -4 l-2 8 Z" fill="#e8564a"/>', extra: '<rect x="45" y="104" width="30" height="10" rx="2" fill="#fff"/><text x="60" y="112" font-size="8" text-anchor="middle" fill="#c8483c" font-weight="700">松田</text><rect x="84" y="112" width="28" height="26" rx="2" fill="#c3c9d0" stroke="#8f969e" stroke-width="1.5"/><rect x="95" y="102" width="6" height="12" rx="1" fill="#8f969e"/><path d="M86 122 h24" stroke="#a5acb4" stroke-width="1.5"/>', face: '' });
@@ -6189,6 +6318,7 @@
     buildGarden(); ensureGarden(); applyGarden(); renderFurn();
     if (lastSeenAtLaunch) addDiary(lastSeenAtLaunch, Date.now()); renderDiaryBook();
     if (evNow() === 'halloween' && new Date().getDate() === 31) setTimeout(() => toast('🎃 ハッピーハロウィン！'), 3000);
+    if (evNow() === 'christmas' && new Date().getDate() >= 24) setTimeout(() => toast('🎄 メリークリスマス！'), 3000);
   })();
 
   function setupViewportTracking() {

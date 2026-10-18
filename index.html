@@ -414,16 +414,6 @@
   .pet.dz-spin .breath { animation: dzSpin calc(var(--beat, .536s) * 4) ease-in-out infinite; }
   @keyframes dzSpin { 0%, 50%, 100% { transform: rotateY(0) translateY(0); } 25% { transform: rotateY(180deg) translateY(calc(-7% * var(--amp))); } 49.9% { transform: rotateY(360deg); } }
   .pet.dz-pose .breath { transform: rotate(-8deg) scale(1.08); transition: transform .25s cubic-bezier(.3,1.8,.5,1); transform-origin: 50% 95%; }
-  .danceLights { position: absolute; inset: 0; z-index: 7; pointer-events: none; opacity: 0; transition: opacity 1.2s; mix-blend-mode: soft-light; overflow: hidden; }
-  .danceLights i { position: absolute; width: 70%; aspect-ratio: 1; border-radius: 50%; filter: blur(30px); animation: dzLight 7s ease-in-out infinite alternate; }
-  .danceLights i:nth-child(1) { background: #ff9fb8; left: -15%; top: 30%; }
-  .danceLights i:nth-child(2) { background: #8fd3ff; right: -15%; top: 45%; animation-delay: -2.5s; }
-  .danceLights i:nth-child(3) { background: #ffe27a; left: 25%; top: 60%; animation-delay: -5s; }
-  @keyframes dzLight { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(18%, -12%) scale(1.15); } 100% { transform: translate(-14%, 10%) scale(0.9); } }
-  body.dancing .danceLights { opacity: 0.85; }
-  .clapPop { position: absolute; z-index: 60; font-size: 22px; pointer-events: none; transform: translate(-50%, 50%); animation: clapPop .7s ease-out forwards; }
-  .clapPop.hit::after { content: 'ぴったり！'; position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: #e8916b; white-space: nowrap; text-shadow: 0 1px 0 #fff, 0 0 4px #fff; }
-  @keyframes clapPop { 0% { opacity: 0; transform: translate(-50%, 50%) scale(.5); } 25% { opacity: 1; transform: translate(-50%, 50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, 0%) scale(1); } }
 
   /* ===== おさんぽ ===== */
   .walkView { position: fixed; inset: 0; z-index: 120; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity .7s; background: #9ccbe8; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
@@ -583,19 +573,7 @@
   .bondHearts { color: #f08a8a; letter-spacing: 1px; }
   .bondHearts .off { color: #e6d6c8; }
   /* ===== ひみつの日記 ===== */
-  .diaryBook { position: absolute; left: 16%; bottom: 31%; z-index: 9; font-size: 26px; cursor: pointer; animation: gpulse 1.6s ease-in-out infinite; filter: drop-shadow(0 3px 3px rgba(0,0,0,.18)); }
-  .diaryList { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; max-height: 52vh; overflow-y: auto; }
-  .diaryList li { display: flex; gap: 10px; align-items: flex-start; background: #fbf4ea; border-radius: 12px; padding: 8px 10px; font-size: 13.5px; line-height: 1.55; }
-  .diaryList li time { flex: none; font-size: 11.5px; color: var(--ink2); width: 42px; padding-top: 2px; font-variant-numeric: tabular-nums; }
-  .diaryList li i { font-style: normal; flex: none; }
-  .diaryList .dday { background: none; padding: 6px 2px 0; font-size: 12px; color: var(--ink2); font-weight: 700; }
-  .diaryPaper { background: repeating-linear-gradient(#fffaf2 0 27px, #f1e4d2 27px 28px); border-radius: 12px; padding: 4px 10px 8px; }
-  .hiddenThing { position: absolute; z-index: 11; font-size: 18px; transform: translateX(-50%); cursor: pointer; opacity: .55; filter: saturate(.7); }
-  .hiddenThing::after { content: '✨'; position: absolute; left: 70%; top: -12px; font-size: 11px; animation: twinkle 2.4s ease-in-out infinite; }
   /* ===== いたずら ===== */
-  .prankProp { position: absolute; z-index: 12; font-size: 30px; transform: translateX(-50%); transform-origin: 50% 100%; transition: transform .5s cubic-bezier(.5,1.6,.6,1); pointer-events: none; }
-  .prankProp.fall { transform: translateX(-50%) rotate(88deg); }
-  .prankProp.left.fall { transform: translateX(-50%) rotate(-88deg); }
   .pet.hiding { opacity: .32 !important; transition: opacity .6s, left 1s, bottom 1s; }
   /* ===== きせつイベント（ハロウィン） ===== */
   .evDecor { position: absolute; inset: 0; pointer-events: none; z-index: 8; display: none; }
@@ -824,7 +802,6 @@
   .bubbleUp { position: absolute; width: var(--sz); height: var(--sz); border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.95); background: rgba(220,240,255,0.35); pointer-events: none; animation: rise 2.2s ease-out forwards; }
   .droplet { position: absolute; width: 5px; height: 7px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #9fd0f0; pointer-events: none; z-index: 40; animation: rise .9s ease-out forwards; }
   .popItem { position: absolute; z-index: 45; font-size: 26px; transform: translateX(-50%); pointer-events: none; animation: popUp 2.2s ease-out forwards; }
-  .popItem.cake { animation: popStay 6s ease-out forwards; font-size: 34px; z-index: 30; }
   @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.5); } 15% { opacity: 1; transform: translate(-50%, -6px) scale(1.15); } 80% { opacity: 1; transform: translate(-50%, -22px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -30px); } }
   @keyframes popStay { 0% { opacity: 0; transform: translate(-50%, -40px); } 10% { opacity: 1; transform: translate(-50%, 0); } 90% { opacity: 1; } 100% { opacity: 0; } }
   /* たからもの棚 */
@@ -838,7 +815,6 @@
   .teru .head::after { content: '・‿・'; position: absolute; left: 0; right: 0; top: 2px; text-align: center; font-size: 6px; color: #555; letter-spacing: -1px; }
   .teru .cloth { position: absolute; left: 0; top: 22px; width: 22px; height: 20px; background: #fff; clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); box-shadow: inset 0 0 0 1px #ddd; }
   /* おてがみ */
-  .envelope { position: absolute; right: 9%; bottom: 36.5%; z-index: 9; font-size: 26px; cursor: pointer; animation: bob 2.4s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
   .cardWrap { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(40,25,20,0.4); opacity: 0; pointer-events: none; transition: opacity .3s; }
   .cardWrap.show { opacity: 1; pointer-events: auto; }
   .card { width: 100%; max-width: 420px; max-height: 86vh; overflow-y: auto; background: #FBF1E4; border-radius: 20px; padding: 14px 14px 18px; box-shadow: 0 16px 40px rgba(40,20,10,0.35); transform: translateY(14px); transition: transform .3s; }
@@ -846,26 +822,12 @@
   .cardHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 4px; }
   .cardHead b { font-size: 16px; }
   .cardHead button { width: 30px; height: 30px; border-radius: 50%; border: 0; background: #f0e2d1; color: var(--ink2); font-size: 16px; cursor: pointer; }
-  .letterPaper { background: repeating-linear-gradient(#fffdf7 0 27px, #efe3cf 27px 28px); border-radius: 10px; padding: 16px 18px 10px; font-size: 15px; line-height: 28px; box-shadow: inset 0 0 0 1px #eadcc6; }
-  .letterPaper .from { text-align: right; font-size: 13px; color: var(--ink2); margin-top: 6px; }
-  .letterPaper .ldate { text-align: right; font-size: 11px; color: var(--ink2); }
-  .todayList { display: flex; gap: 12px; align-items: flex-start; background: #fff; border-radius: 14px; padding: 14px; }
-  .todayList .avatar { width: 44px; height: 40px; flex-shrink: 0; }
-  .todayList ul { padding-left: 16px; font-size: 14.5px; line-height: 1.9; }
   .todayFoot { text-align: center; font-size: 12.5px; color: var(--ink2); margin-top: 10px; }
   /* 写真・アルバム */
   .flash { position: fixed; inset: 0; z-index: 140; background: #fff; opacity: 0; pointer-events: none; }
   .flash.go { animation: flash .5s ease-out; }
   @keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
-  #albumSheet, #treasureSheet { max-height: 88%; overflow-y: auto; }
-  .albumGrid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-bottom: 6px; }
-  .albumCell { border: 0; background: none; padding: 0; font-family: inherit; color: var(--ink2); font-size: 11px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-  .snapBox { position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 2px 8px rgba(90,60,30,0.2); background: #EAD3B8; }
-  .snapBox.sepia { filter: sepia(.65) contrast(.95) saturate(.9); box-shadow: 0 0 0 5px #fffaf0, 0 2px 10px rgba(90,60,30,0.25); }
-  .snapInner { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; }
-  .snapInner > .room { position: absolute; inset: 0; height: 100%; }
-  .snapInner * { animation-play-state: paused !important; transition: none !important; }
-  .snapActions { text-align: center; margin-top: 10px; }
+  #treasureSheet { max-height: 88%; overflow-y: auto; }
   .treasureGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-bottom: 6px; }
   .tCell { border: 0; background: #fff; border-radius: 14px; padding: 10px 6px; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
   .tCell b { font-size: 26px; font-weight: normal; } .tCell span { font-size: 12px; text-align: center; line-height: 1.4; } .tCell small { font-size: 10px; color: var(--ink2); text-align: center; }
@@ -1151,7 +1113,6 @@
     <div class="shadeLayer" id="shadeLayer"></div>
     <div class="glow" id="glow"></div>
 
-    <div class="danceLights" id="danceLights"><i></i><i></i><i></i></div>
     <div class="breathUI">
       <div class="word" id="breathWord">すって</div>
       <div class="count" id="breathCount">1 / 5</div>
@@ -1162,10 +1123,7 @@
   <div class="hud">
     <div class="chip"><div class="nm" id="petName">もち</div><div class="tm" id="together">いっしょに 0分</div></div>
     <div class="roomNav"><button id="roomPrev" aria-label="まえの部屋">‹</button><span class="dots" id="roomDots"></span><button id="roomNext" aria-label="つぎの部屋">›</button></div>
-    <div class="hudBtns"><button class="roundBtn" id="cameraBtn" aria-label="写真をとる">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
-    </button>
-    <button class="roundBtn" id="settingsBtn" aria-label="設定">
+    <div class="hudBtns"><button class="roundBtn" id="settingsBtn" aria-label="設定">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>
     </button></div>
   </div>
@@ -1218,10 +1176,7 @@
       <div class="row"><label>窓辺にさいた花</label><span class="val" id="flowerVal">0りん</span></div>
     </div>
     <div class="field">
-      <div class="row"><button class="link" id="openToday">きょうのひだまり</button></div>
-      <div class="row"><button class="link" id="openAlbum">アルバム</button></div>
-      <div class="row"><button class="link" id="openTreasure">たからもの（おみやげ・おてがみ）</button></div>
-      <div class="row"><button class="link" id="openDiaryBtn">ひみつの にっき</button></div>
+      <div class="row"><button class="link" id="openTreasure">たからもの（おみやげ）</button></div>
       <div class="row"><button class="link" id="openDecoBtn">もようがえ（かぐを うごかす）</button></div>
     </div>
     <p class="note">キャラを長押しすると、その子だけのメニュー（ごはん・はなす・部屋・せいかく）が出ます。</p>
@@ -1308,7 +1263,6 @@
     <button class="actRow" id="btnWalk"><span class="aic">🐾</span><span class="at"><b>おさんぽ</b><small>みんなで お外へ。いろんな人や動物に 出会えるよ（2〜3分）</small></span></button>
     <button class="actRow" id="btnKonbini"><span class="aic">🏪</span><span class="at"><b>コンビニ</b><small>ひだまりマートへ おかいもの。コインで すきなものを かって、みんなで たべよう</small></span></button>
     <button class="actRow" id="btnTrip"><span class="aic">🧳</span><span class="at"><b>りょこう</b><small>みんなを つれて、でんしゃで おでかけ。3つの ばしょを めぐるよ</small></span></button>
-    <button class="actRow" id="btnDance"><span class="aic">💃</span><span class="at"><b>みんなでおどる</b><small>おなじ部屋の みんなで ダンス。タップで手びょうし（1分）</small></span></button>
   </div>
   <p class="note">やりたいときだけで大丈夫。途中でやめてもいいよ。さいごまでやると、窓辺に花が1りん さきます。</p>
 </div>
@@ -1369,8 +1323,6 @@
   <p class="note">バイトで もらった コインで おかいもの。</p>
 </div>
 <div class="cardWrap" id="cardWrap"><div class="card"><div class="cardHead"><b id="cardTitle"></b><button id="cardClose" aria-label="とじる">×</button></div><div id="cardBody"></div></div></div>
-<div class="sheetBg" id="albumBg"></div>
-<div class="sheet" id="albumSheet"><div class="grab"></div><h3>アルバム</h3><div class="albumGrid" id="albumGrid"></div></div>
 <div class="sheetBg" id="treasureBg"></div>
 <div class="sheet" id="treasureSheet"><div class="grab"></div><h3>たからもの</h3><div class="treasureGrid" id="treasureGrid"></div></div>
 <div class="sheetBg" id="mallowBg"></div>
@@ -1390,7 +1342,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.18.0';
+  const APP_VERSION = '2.19.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -1707,7 +1659,7 @@
       if (this.mode === 'prank') return;
       if (this.mode === 'furn' && this.furnEnd) this.furnEnd();
       if (this.mode === 'breath') return;
-      if (this.mode === 'sleep') { this.say('💭 ' + dreamOf(this), 3400, 'dream'); return; }
+      if (this.mode === 'sleep') { this.say(pick(['💤 すやすや…', '💤 むにゃむにゃ…', '💤 …すぅ…']), 2400, 'dream'); return; }
       if (this.mode === 'bath') return;
       if (this.mode === 'idle') { this.stopMove(); this.cls('sit', false); }
       if (moodTap(this)) return;
@@ -2020,7 +1972,7 @@
   function applyRoom() {
     document.querySelectorAll('.food, .tub, .screenPop, .bubbleUp, .droplet, .dropped, .ripple, .prankProp, .demaeDish').forEach((e) => e.remove());
     allPets.forEach((p) => { p.cls('hiding', false); p.prankCatch = null; if (p.furnEnd) p.furnEnd(); });
-    if (typeof renderFurn === 'function') { renderFurn(); renderHidden(); }
+    if (typeof renderFurn === 'function') renderFurn();
     room.dataset.theme = curTheme();
     refreshPets();
     allPets.forEach((p) => {
@@ -3110,134 +3062,6 @@
     h.style.setProperty('--dx', rand(-16, 16) + 'px');
     room.appendChild(h); setTimeout(() => h.remove(), 1700);
   }
-  // 音楽（WebAudioで合成。ほのぼのした ペンタトニックのループ）
-  const dzMusic = { on: false, out: null, timer: 0, step: 0, next: 0, t0: 0 };
-  const N = (m) => 440 * Math.pow(2, (m - 69) / 12);
-  const DZ_MEL = [
-    [72, 0, 76, 0, 79, 0, 76, 0, 77, 0, 76, 74, 72, 0, 0, 0],
-    [74, 0, 77, 0, 81, 0, 79, 0, 77, 76, 74, 0, 79, 0, 0, 0],
-    [72, 0, 76, 79, 84, 0, 81, 0, 79, 0, 76, 0, 77, 79, 0, 0],
-    [81, 79, 77, 76, 74, 0, 76, 0, 72, 0, 74, 0, 72, 0, 0, 0],
-  ];
-  const DZ_BASS = [48, 53, 55, 48];
-  function dzNote(freq, t, dur, type, peak) {
-    const o = AC.createOscillator(), g = AC.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0006, t + dur);
-    o.connect(g).connect(dzMusic.out); o.start(t); o.stop(t + dur + 0.05);
-  }
-  function dzTick(t, peak) {
-    const src = AC.createBufferSource(); src.buffer = dzMusic.noise;
-    const f = AC.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6500;
-    const g = AC.createGain(); g.gain.setValueAtTime(peak, t); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.05);
-    src.connect(f).connect(g).connect(dzMusic.out); src.start(t, Math.random(), 0.07);
-  }
-  function dzSchedule() {
-    if (!dzMusic.on) return;
-    const e8 = DZ_BEAT / 2;
-    while (dzMusic.next < AC.currentTime + 0.25) {
-      const st = dzMusic.step, bar = Math.floor(st / 16) % 4, i = st % 16, t = dzMusic.next;
-      const m = DZ_MEL[bar][i]; if (m) dzNote(N(m), t, e8 * 1.6, 'triangle', 0.32);
-      if (i % 4 === 0) dzNote(N(DZ_BASS[bar]), t, DZ_BEAT * 0.9, 'sine', 0.5);
-      if (i % 4 === 2) dzNote(N(DZ_BASS[bar] + 7), t, DZ_BEAT * 0.6, 'sine', 0.3);
-      if (i % 2 === 1) dzTick(t, 0.12);
-      dzMusic.step++; dzMusic.next += e8;
-    }
-  }
-  function startDanceMusic() {
-    ensureAudio(); if (!AC) return;
-    const vg = volGain();
-    dzMusic.out = AC.createGain(); dzMusic.out.gain.value = 0.22 * vg / 0.2; dzMusic.out.connect(AC.destination);
-    if (!dzMusic.noise) dzMusic.noise = noiseBuffer('white');
-    dzMusic.on = true; dzMusic.step = 0; dzMusic.next = dzMusic.t0 = AC.currentTime + 0.1;
-    dzMusic.timer = setInterval(dzSchedule, 80); dzSchedule();
-    if (master && S.sound !== 'none') { const t = AC.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(vg * 0.35, t, 0.4); }
-  }
-  function stopDanceMusic() {
-    if (!dzMusic.on) return;
-    dzMusic.on = false; clearInterval(dzMusic.timer);
-    const out = dzMusic.out; dzMusic.out = null;
-    if (out && AC) { const t = AC.currentTime; out.gain.setTargetAtTime(0, t, 0.25); setTimeout(() => out.disconnect(), 1500); }
-    if (AC && master && S.sound !== 'none') { const t = AC.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(volGain(), t, 0.6); }
-  }
-  // 次の拍まで待つ（音楽と動きをそろえる）
-  function beatDelay() {
-    if (!dzMusic.on || !AC) return 0;
-    const el = AC.currentTime - dzMusic.t0, b = Math.ceil(el / DZ_BEAT - 0.02);
-    return Math.max(0, (dzMusic.t0 + b * DZ_BEAT - AC.currentTime) * 1000);
-  }
-  function playClap() {
-    if (!AC) return; const k = volGain() / 0.2;
-    burst(1400, 0.06, 0.35 * k, 'bandpass'); burst(2400, 0.09, 0.22 * k, 'highpass', 0.012);
-  }
-  const dance = { claps: 0, hits: 0, lastLine: 0 };
-  function danceSpots(n) {
-    if (n > 4) return Array.from({ length: n }, (_, i) => [18 + i * (64 / (n - 1)), i % 2 ? 14 : 21]);
-    const xs = n === 2 ? [36, 64] : n === 3 ? [27, 50, 73] : [20, 40, 60, 80];
-    const ys = n === 2 ? [17, 17] : n === 3 ? [20, 14, 20] : [21, 15, 15, 21];
-    return xs.map((x, i) => [x, ys[i]]);
-  }
-  const DZ_PLAN = [
-    ['dz-bounce', 'ぴょんぴょん'], ['dz-sway', 'ゆらゆら〜'], ['dz-side', 'よこに ステップ'], ['dz-wave', 'ウェーブ！'],
-    ['dz-spin', 'くるっ'], ['dz-bounce', 'ぴょんぴょん'], ['dz-side', 'よこに ステップ'], ['dz-wave', 'ウェーブ！'],
-    ['dz-spin', 'くるっ'], ['dz-bounce', 'さいごまで〜！'],
-  ];
-  $('#btnDance').addEventListener('click', async () => {
-    wakeFurn();
-    if (!lightOff && !breathing && pets.filter((p) => p.mode === 'idle' || p.mode === 'social').length < 2) {
-      toast(!pets.length ? 'この部屋には だれもいないよ' : pets.length < 2 ? 'この部屋には ひとりだけ。だれかを よんでから おどろう' : 'いまは いそがしいみたい'); return;
-    }
-    const run = beginActivity('みんなで おどろう', 'dance'); if (!run) return;
-    const word = $('#breathWord'), cnt = $('#breathCount');
-    dance.claps = 0; dance.hits = 0; dance.lastLine = 0;
-    cnt.textContent = 'タップすると 手びょうし できるよ';
-    room.style.setProperty('--beat', DZ_BEAT + 's');
-    onActivityEnd = () => { stopDanceMusic(); document.body.classList.remove('dancing'); allPets.forEach(clearDance); };
-    const crew = pets.slice().sort((a, b) => a.x - b.x), spots = danceSpots(crew.length);
-    await Promise.all(crew.map((p, i) => p.moveTo(...spots[i], 9)));
-    if (run !== breathRun) return;
-    crew.forEach((p, i) => { p.face(p.x > 52 ? -1 : 1); p.el.style.setProperty('--amp', danceAmp(p)); p.el.style.setProperty('--dzd', (i * DZ_BEAT / 2) + 's'); });
-    crew[0].say(pick(['おどろ〜！', 'ミュージック、スタート！', 'いくよ〜♪']), 1600);
-    await sleep(1200); if (run !== breathRun) return;
-    startDanceMusic(); document.body.classList.add('dancing');
-    for (const n of ['1', '2', '3', '4']) { word.textContent = n; await sleep(DZ_BEAT * 1000); if (run !== breathRun) return; }
-    for (let k = 0; k < DZ_PLAN.length; k++) {
-      const [cls, label] = DZ_PLAN[k];
-      await sleep(beatDelay()); if (run !== breathRun) return;
-      crew.forEach((p) => setDance(p, cls));
-      word.textContent = label; cnt.textContent = `♪ ${k + 1} / ${DZ_PLAN.length}`;
-      for (let b = 0; b < 8; b++) {
-        if (b % 2 === 0) noteFrom(pick(crew));
-        if (b === 4 && Math.random() < 0.5) { const p = pick(crew); p.say(pick(DZ_LINE[personaKey(p)] || ['♪']), 1500); }
-        await sleep(DZ_BEAT * 1000); if (run !== breathRun) return;
-      }
-    }
-    word.textContent = 'ポーズ！'; cnt.textContent = '';
-    crew.forEach((p) => { setDance(p, 'dz-pose'); p.happy(2000); });
-    heartBetween(crew[0], crew[crew.length - 1], 4);
-    stopDanceMusic(); document.body.classList.remove('dancing');
-    await sleep(1800); if (run !== breathRun) return;
-    crew.forEach((p) => { clearDance(p); setMood(p, 'hashagi', 5); });
-    onActivityEnd = null;
-    const line = dance.hits >= 6 ? '手びょうし、ぴったりだったね！' : dance.claps >= 6 ? '手びょうし ありがとう！ たのしかった〜' : 'みんなで おどると たのしいね';
-    endBreath(true, line);
-  });
-  // ダンス中のタップ＝手びょうし
-  room.addEventListener('click', (e) => {
-    if (!breathing || currentAct !== 'dance' || !dzMusic.on) return;
-    if (e.target.closest('button')) return;
-    e.stopImmediatePropagation();
-    playClap(); dance.claps++;
-    const off = Math.abs(((AC.currentTime - dzMusic.t0) / DZ_BEAT + 0.5) % 1 - 0.5) * DZ_BEAT, hit = off < 0.11;
-    if (hit) dance.hits++;
-    const rm = room.getBoundingClientRect(), c = document.createElement('div');
-    c.className = 'clapPop' + (hit ? ' hit' : ''); c.textContent = '👏';
-    c.style.left = ((e.clientX - rm.left) / rm.width * 100) + '%'; c.style.bottom = ((rm.bottom - e.clientY) / rm.height * 100) + '%';
-    room.appendChild(c); setTimeout(() => c.remove(), 750);
-    pets.forEach((p) => { if (Math.random() < (hit ? 0.7 : 0.3)) noteFrom(p); });
-    if (hit && Date.now() - dance.lastLine > 6000 && dance.hits % 4 === 0) { dance.lastLine = Date.now(); const p = pick(pets); if (p) p.say(pick(['ノッてきた〜！', 'いい手びょうし！', 'たのしいね！']), 1500); }
-  }, true);
-
   // なかまどうし：ふたりで ちょっとだけ おどる（音楽なし）
   async function doDance(a, b) {
     const [x, y] = nextTo(a, b, 20);
@@ -3661,10 +3485,9 @@
     if (document.hidden) { window.__hiddenAt = Date.now(); save(); if (AC) AC.suspend(); }
     else { applyTime(); fetchWeather(false); if (AC && S.sound !== 'none') AC.resume();
       const gap = window.__hiddenAt ? Date.now() - window.__hiddenAt : 0;
-      if (gap > 20 * 60000 && typeof addDiary === 'function') addDiary(window.__hiddenAt, Date.now());
       if (typeof ensureKichi === 'function') setTimeout(ensureKichi, 1200);
       window.__hiddenAt = 0;
-      if (gap > 6 * 3600000 && typeof dropLetter === 'function') setTimeout(() => dropLetter({ ...letterFromPet(gap), at: Date.now() }), 1500); }
+    }
   });
 
   // ---------- 設定シート ----------
@@ -3862,24 +3685,6 @@
     return false;
   }
 
-  // ---------- 夢（寝ている子をタップ） ----------
-  const DREAMS = {
-    any: ['ふかふかの くもの上…', 'そらを とんでる…', '{f}と かけっこ…', 'おにぎりの山…', 'ひなたで ごろごろ…', 'おおきな ケーキ…'],
-    mochi: ['ぼく…おもちに なってる…？', 'つきで おもちつき…'], shiba: ['ほねが いっぱい…', 'さんぽ…むにゃ…'],
-    poodle: ['リボン…かわいい…', 'ふわふわ…もっと ふわふわ…'], cat: ['さかなの うみ…', 'はこ…ちょうどいい…'], penguin: ['こおりの うえで すべってる…', 'おさかなの パーティ…'], pig: ['どろんこ おふろ…', 'トリュフ みつけた…'], taabou: ['カブトムシの おうさま…', 'プリンの プール…', 'テストで 100てん… じゃなかった…', 'むにゃ… もう たべられない…'],
-  };
-  function dreamOf(p) {
-    const ev = (S.today && S.today.d === todayStr()) ? S.today.ev : [];
-    const pool = DREAMS.any.concat(DREAMS[p.kind] || []);
-    if (ev.some((e) => e.t === 'feed' && e.k === p.kind)) pool.push('ごはん…おいしかった…');
-    if (ev.some((e) => e.t === 'bath' && e.k === p.kind)) pool.push('おふろ…ぽかぽか…');
-    if (ev.some((e) => e.t === 'mallow')) pool.push('マシュマロ…とろとろ…');
-    const g = ev.filter((e) => e.t === 'guest').pop(); if (g) pool.push(`${g.n}…また来てね…`);
-    if (ev.some((e) => e.t === 'intruder')) pool.push('へんな人…まて〜…むにゃ');
-    const f = allPets.filter((q) => q !== p && !q.away);
-    return pick(pool).replace('{f}', f.length ? petName(pick(f)) : 'みんな');
-  }
-
   // ---------- おふろ ----------
   async function giveBath(p) {
     if (lightOff || p.mode === 'sleep') { toast('ぐっすり寝てるみたい'); return; }
@@ -3965,28 +3770,6 @@
   // ---------- 雨の日 ----------
   const RAIN_LINES = ['あめ、ふってるね', 'ぽつぽつ…', 'てるてるぼうず、つるしたよ', 'あめの音、おちつくね'];
 
-  // ---------- おてがみ ----------
-  const LETTER_FRIENDS = ['山のむこうの ふくろうより', '海べの かもめより', 'もりの くまより', 'となり町の りすより'];
-  const LETTER_BODIES = ['さいきん すずしくなりましたね。ひだまりの みんなは げんきですか？', 'こちらは きょうも いい天気です。たまには ゆっくり 休んでくださいね。', 'このあいだ きれいな夕日を見ました。いつか いっしょに 見たいです。', 'いつも なかよしで いいですね。また おてがみ かきます。'];
-  function letterFromPet(gap) {
-    const p = pick(allPets); const days = gap / 86400000;
-    const body = days >= 3 ? 'ゆっくり できたかな？ みんな げんきに まってたよ。また いっしょに のんびりしようね。'
-      : days >= 1 ? 'ひさしぶり！ まってたよ。きょうも むりしないでね。'
-      : 'おかえり。きょうも おつかれさま。ここで ひとやすみしていってね。';
-    return { from: petName(p), kind: p.kind, body: body + '　' + pick(SEASON_LINES[season()]) };
-  }
-  function dropLetter(letter) {
-    document.querySelectorAll('.envelope').forEach((e) => e.remove());
-    const env = document.createElement('div'); env.className = 'envelope'; env.textContent = '✉️';
-    env.addEventListener('click', (e) => { e.stopPropagation(); env.remove(); openLetter(letter, true); });
-    room.appendChild(env);
-  }
-  function openLetter(letter, fresh) {
-    $('#cardTitle').textContent = 'おてがみ';
-    $('#cardBody').innerHTML = `<div class="letterPaper"><p>${escapeHtml(letter.body)}</p><p class="from">${escapeHtml(letter.from)}${letter.kind ? '' : ''}</p><p class="ldate">${fmtDate(letter.at || Date.now())}</p></div>`;
-    $('#cardWrap').classList.add('show');
-    if (fresh) { addTreasure('✉️', `${letter.from}からの おてがみ`, 'おてがみ', { letter: { ...letter, at: Date.now() } }); logEvent('letter', { n: letter.from }); }
-  }
   function closeCard() { $('#cardWrap').classList.remove('show'); }
 
   // ---------- きょうのひだまり ----------
@@ -4029,100 +3812,8 @@
     if (feeds.length) out.push(feeds.length >= 2 ? 'みんなに ごはんを あげたね' : `${nameOfKind(feeds[0])}に ごはんを あげたね`);
     return out.slice(0, 4);
   }
-  function showToday() {
-    const lines = todayLines(), sp = speaker();
-    $('#cardTitle').textContent = 'きょうのひだまり';
-    $('#cardBody').innerHTML = `<div class="todayList">${sp ? `<div class="avatar">${SVGS[sp.kind]}</div>` : ''}<ul>${(lines.length ? lines : ['きょうは、のんびりした 一日だったね']).map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul></div><p class="todayFoot">あしたも、ここで まってるね</p>`;
-    $('#cardWrap').classList.add('show');
-    S.todayShown = todayStr(); save();
-  }
-  setInterval(() => {
-    const ph = phase();
-    if ((ph !== 'dusk' && ph !== 'night') || S.todayShown === todayStr() || document.hidden) return;
-    if (breathing || talking || feeding || switching || guestBusy || document.querySelector('.sheet.show') || $('#cardWrap').classList.contains('show') || document.body.classList.contains('viewing')) return;
-    const ev = (S.today && S.today.d === todayStr()) ? S.today.ev : [];
-    if (ev.length >= 2) showToday();
-  }, 45000);
-
-  // ---------- 記念日 ----------
-  const MILESTONES = [30, 100, 200, 365, 500, 730, 1000, 1095];
-  function checkAnniversary() {
-    if (lightOff || breathing) return;
-    S.adoptedAt = S.adoptedAt || {}; S.celebrated = S.celebrated || {};
-    pets.forEach((p) => {
-      const days = Math.floor((Date.now() - (S.adoptedAt[p.kind] || Date.now())) / 86400000);
-      const ms = MILESTONES.filter((m) => days >= m).pop();
-      if (!ms || (S.celebrated[p.kind] || 0) >= ms || p.mode !== 'idle') return;
-      S.celebrated[p.kind] = ms; save();
-      const cake = document.createElement('div'); cake.className = 'popItem cake'; cake.textContent = '🎂';
-      cake.style.left = clamp(p.x + 12, 10, 90) + '%'; cake.style.bottom = p.y + '%'; room.appendChild(cake); setTimeout(() => cake.remove(), 6000);
-      p.hop(); p.happy(3000); p.hearts(5);
-      p.say(`きょうで ${ms}日！ いっしょにいてくれて ありがと`, 3600);
-      logEvent('anniv', { k: p.kind, d: ms });
-    });
-  }
   const adoptDays = (p) => Math.floor((Date.now() - ((S.adoptedAt && S.adoptedAt[p.kind]) || Date.now())) / 86400000) + 1;
 
-  // ---------- 写真・アルバム ----------
-  async function takeSnapshot(opts = {}) {
-    const clone = room.cloneNode(true);
-    const src = room.querySelectorAll('canvas'), dst = clone.querySelectorAll('canvas');
-    dst.forEach((c, i) => {
-      try { const img = document.createElement('img'); img.src = c.classList.contains('winLive') ? src[i].toDataURL('image/png') : src[i].toDataURL('image/jpeg', 0.8); img.className = c.className; img.style.cssText = c.style.cssText; c.replaceWith(img); }
-      catch (e) { c.remove(); }
-    });
-    clone.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
-    clone.querySelectorAll('.ripple, .heart, .bubbleUp, .droplet').forEach((e) => e.remove());
-    clone.removeAttribute('id'); clone.classList.remove('switching');
-    const r = room.getBoundingClientRect();
-    const rec = { id: 'snap-' + Date.now(), at: Date.now(), w: Math.round(r.width), h: Math.round(r.height), html: clone.outerHTML, sepia: !!opts.sepia, label: opts.label || roomName(S.curRoom) };
-    await kvPut(rec);
-    S.snaps = [rec.id, ...(S.snaps || [])]; save();
-    return rec;
-  }
-  async function shutter() {
-    if (switching || document.body.classList.contains('viewing')) return;
-    const fl = $('#flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
-    playClick();
-    pets.filter((p) => p.mode === 'idle').forEach((p) => { p.face(1); p.happy(1200); });
-    await sleep(120);
-    await takeSnapshot();
-    logEvent('photo');
-    toast('アルバムに入れたよ（せってい → キャラ）');
-  }
-  function snapThumb(rec, width) {
-    const k = width / rec.w;
-    return `<div class="snapBox${rec.sepia ? ' sepia' : ''}" style="width:${width}px;height:${Math.round(rec.h * k)}px"><div class="snapInner" style="width:${rec.w}px;height:${rec.h}px;transform:scale(${k})">${rec.html}</div></div>`;
-  }
-  async function openAlbum() {
-    closeSheet();
-    const ids = S.snaps || [];
-    const grid = $('#albumGrid');
-    grid.innerHTML = ids.length ? '' : '<p class="note" style="text-align:center;padding:20px 0">まだ写真がないよ。右上のカメラで とってみてね。</p>';
-    const w = Math.floor((Math.min(window.innerWidth, 480) - 36 - 10) / 2);
-    for (const id of ids) {
-      const rec = await kvGet(id); if (!rec) continue;
-      const cell = document.createElement('button'); cell.className = 'albumCell';
-      cell.innerHTML = snapThumb(rec, w) + `<span>${fmtDate(rec.at)}・${escapeHtml(rec.label || '')}</span>`;
-      cell.addEventListener('click', () => openSnap(rec));
-      grid.appendChild(cell);
-    }
-    setTimeout(() => { $('#albumBg').classList.add('show'); $('#albumSheet').classList.add('show'); }, 300);
-  }
-  function openSnap(rec) {
-    const w = Math.min(window.innerWidth, 480) - 32;
-    $('#cardTitle').textContent = `${fmtDate(rec.at)}　${rec.label || ''}`;
-    $('#cardBody').innerHTML = snapThumb(rec, w - 28) + '<div class="snapActions"><button class="link" id="snapDel">この写真をけす</button></div>';
-    $('#cardWrap').classList.add('show');
-    let armed = false;
-    $('#snapDel').addEventListener('click', async (e) => {
-      e.stopPropagation();
-      if (!armed) { armed = true; e.target.textContent = 'もう一度タップで けす'; return; }
-      S.snaps = (S.snaps || []).filter((x) => x !== rec.id); save();
-      try { _db.transaction('kv', 'readwrite').objectStore('kv').delete(rec.id); } catch (err) {}
-      closeCard(); openAlbum();
-    });
-  }
   function openTreasures() {
     closeSheet();
     const list = S.treasures || [];
@@ -4133,16 +3824,12 @@
   $('#treasureGrid').addEventListener('click', (e) => {
     const b = e.target.closest('.tCell'); if (!b) return;
     const t = (S.treasures || [])[+b.dataset.i]; if (!t) return;
-    if (t.letter) { closeAll(); setTimeout(() => openLetter(t.letter, false), 300); }
-    else toast(`${t.n}（${t.from || ''}）`);
+    toast(`${t.n}（${t.from || ''}）`);
   });
-  function closeAll() { ['albumBg', 'albumSheet', 'treasureBg', 'treasureSheet'].forEach((id) => $('#' + id).classList.remove('show')); }
-  $('#albumBg').addEventListener('click', closeAll); $('#treasureBg').addEventListener('click', closeAll);
+  function closeAll() { ['treasureBg', 'treasureSheet'].forEach((id) => $('#' + id).classList.remove('show')); }
+  $('#treasureBg').addEventListener('click', closeAll);
   $('#cardWrap').addEventListener('click', (e) => { if (e.target.id === 'cardWrap' || e.target.closest('#cardClose')) closeCard(); });
   document.querySelector('.shelf').addEventListener('click', (e) => { e.stopPropagation(); openTreasures(); });
-  $('#cameraBtn').addEventListener('click', (e) => { e.stopPropagation(); shutter(); });
-  $('#openAlbum').addEventListener('click', openAlbum);
-  $('#openDiaryBtn').addEventListener('click', () => { closeSheet(); setTimeout(() => openDiary(false), 300); });
   $('#openDecoBtn').addEventListener('click', () => { closeSheet(); setTimeout(() => startDeco(), 300); });
   function renderEventChips() {
     const on = S.eventsOn !== false, cos = S.costumeOn !== false;
@@ -4155,7 +3842,6 @@
     save(); renderEventChips(); applyEvent();
   });
   $('#openTreasure').addEventListener('click', openTreasures);
-  $('#openToday').addEventListener('click', () => { closeSheet(); setTimeout(showToday, 300); });
 
   // ---------- 効果音（シャッター・ノック・鳥） ----------
   function burst(freq, dur, gain, type = 'lowpass', at = 0) {
@@ -4258,7 +3944,7 @@
     { id: 'hana', name: 'はなさん', who: 'おとなりの おばあちゃん', act: 'gift', hello: 'あら、みんな げんきそうね', bye: 'また お茶しに くるわね',
       lines: ['いいお部屋ねえ', 'ふふ、かわいいこと'], gift: ['🍵', 'はなさんの お茶っ葉'],
       svg: humanSVG({ hair: '#d9d4cc', top: '#b98aa8', bottom: '#7d6a7a', hat: '<circle cx="60" cy="28" r="9" fill="#d9d4cc"/>', extra: '<rect x="35" y="88" width="50" height="10" rx="5" fill="#a87896"/>' }) },
-    { id: 'post', name: 'ゆうびんやさん', who: '町の ゆうびんやさん', act: 'letter', hello: 'こんにちはー！ おてがみでーす', bye: 'では、またー！',
+    { id: 'post', name: 'ゆうびんやさん', who: '町の ゆうびんやさん', act: 'letter', hello: 'こんにちはー！ ちかくまで きたので ごあいさつでーす', bye: 'では、またー！',
       lines: ['きょうも いい天気ですね', 'ここは いつも ぽかぽかですね'],
       svg: humanSVG({ hair: '#3b2f2a', top: '#4f7fb8', bottom: '#3d5a80', hat: '<path d="M32 44 C34 22 86 22 88 44 Z" fill="#3d5a80"/><rect x="28" y="42" width="64" height="6" rx="3" fill="#2f4766"/>', extra: '<path d="M38 92 L84 132" stroke="#8a5a3a" stroke-width="4"/><rect x="74" y="122" width="22" height="18" rx="3" fill="#a87048"/>' }) },
     { id: 'artist', name: 'ソラさん', who: '旅の 絵かきさん', act: 'draw', hello: 'こんにちは。ちょっと 絵をかかせて もらってもいい？', bye: 'いい絵が かけたよ。ありがとう',
@@ -4302,8 +3988,8 @@
     gather.forEach((p, i) => { const side = i % 2 ? 1 : -1, off = 16 + Math.floor(i / 2) * 13; p.moveTo(clamp(58 + side * off, 12, 88), clamp(17 + rand(-3, 4), FLOOR.yMin, FLOOR.yMax), 8).then(() => { if (p.mode === 'idle') { p.lookAt(58); p.happy(); setMood(p, 'gokigen', 5); } }); });
     await sleep(3200); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my);
     if (g.act === 'gift') { a.say(`これ、どうぞ。${g.gift[1]}よ`, 2600); popItem(a.x, a.y + 20, g.gift[0]); addTreasure(g.gift[0], g.gift[1], g.name); }
-    else if (g.act === 'letter') { a.say('はい、どうぞ！', 2000); dropLetter({ from: pick(LETTER_FRIENDS), body: pick(LETTER_BODIES), at: Date.now() }); }
-    else if (g.act === 'draw') { a.say('ちょっと じっとしててね〜', 2400); a.cls('sit', true); await sleep(4200); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); a.cls('sit', false); await takeSnapshot({ sepia: true, label: `${g.name}の絵` }); a.say('できた！ アルバムに 入れておくね', 2600); }
+    else if (g.act === 'letter') { a.say(pick(['みんな げんきそうで よかった', 'きょうも いい天気ですね']), 2400); pets.filter((p) => p.mode === 'idle').forEach((p) => p.happy()); }
+    else if (g.act === 'draw') { a.say('ちょっと じっとしててね〜', 2400); a.cls('sit', true); await sleep(4200); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); a.cls('sit', false); a.say('できた！ じょうずに かけたよ', 2400); popItem(a.x, a.y + 20, '🖼️'); a.say('できた！ アルバムに 入れておくね', 2600); }
     else if (g.act === 'borrow') { await masaruAct(a, stale); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); }
     else if (g.act === 'demae') { await demaeAct(a, stale); if (stale()) return; if (guestAbort()) return guestLeave(a, g, true, my); }
     else if (g.act === 'bread') { a.say('やきたてパン、どうぞ', 2200); pets.filter((p) => p.mode === 'idle').forEach((p, i) => setTimeout(() => { popItem(p.x, p.y + 12 * depthScale(p.y), '🥐'); p.say(pick(['おいしい〜', 'ふわふわ！', 'もぐもぐ']), 1800); p.hearts(2); }, 600 + i * 500)); }
@@ -5443,9 +5129,7 @@
     clone.querySelectorAll('.wpet').forEach((e) => e.classList.remove('moving', 'jump', 'sway', 'slow'));
     clone.insertAdjacentHTML('beforeend', `<div class="tCaption">${escapeHtml(label)}　${fmtDate(Date.now())}</div>`);
     const html = `<div class="tripView show" style="position:absolute;inset:0;opacity:1">${uniq(clone.outerHTML)}</div>`;
-    const rec = { id: 'snap-' + Date.now(), at: Date.now(), w: Math.round(r.width), h: Math.round(r.height), html, sepia: false, label };
-    await kvPut(rec); S.snaps = [rec.id, ...(S.snaps || [])]; save();
-    trip.photos++; toast('アルバムに 入れたよ');
+    trip.photos++; toast('パシャッ！ いい おもいで');
   }
   async function endTrip(finished) {
     if (!tripping) return;
@@ -5481,7 +5165,7 @@
       $('#cardBody').innerHTML = `<div class="reportTop"><div class="avatar" style="font-size:40px;display:flex;align-items:center;justify-content:center">${d.icon}</div><div><b>${escapeHtml(d.name)}</b><span>${escapeHtml(back.map(petName).join('・'))}と いっしょに</span></div></div>
         <ul class="sumList">${trip.visited.map((v) => `<li><i>📍</i>${escapeHtml(v)}</li>`).join('')}</ul>
         ${trip.gifts.length ? `<p class="sumGift">おみやげ・おもいでの品：${trip.gifts.map(([e, n]) => `${e} ${escapeHtml(n)}`).join('、')}</p>` : ''}
-        ${trip.photos ? `<p class="sumGift">📷 しゃしん ${trip.photos}まい（アルバムに あるよ）</p>` : ''}<p class="todayFoot">また いっしょに いこうね</p>`;
+        ${trip.photos ? `<p class="sumGift">📷 しゃしん ${trip.photos}まい とったね</p>` : ''}<p class="todayFoot">また いっしょに いこうね</p>`;
       $('#cardWrap').classList.add('show');
     }, 2400);
   }
@@ -5523,146 +5207,12 @@
       ? `いつも ありがとう。きみが なでてくれると、すごく うれしいよ。きみの 絵を かいたから、もらってね。`
       : `きみと すごした まいにちが、ぜんぶ たからものです。これからも ずっと いっしょに いようね。`;
     addTreasure(lv === 3 ? '🖍️' : '💌', lv === 3 ? `${petName(p)}が かいた きみの絵` : `${petName(p)}からの だいじな てがみ`, 'なかよしの しるし', { by: p.kind });
-    dropLetter({ from: petName(p), kind: p.kind, body, at: Date.now() });
+    $('#cardTitle').textContent = `${petName(p)}から`; $('#cardBody').innerHTML = `<p style="line-height:1.9;font-size:15px;padding:4px 2px">${escapeHtml(body)}</p>`; $('#cardWrap').classList.add('show');
   }
 
-  // ---------- ひみつの日記（みていない あいだの できごと） ----------
-  const HIDE_ITEMS = [['🧦', 'くつした（かたほう）'], ['🦴', 'ほね'], ['🍪', 'クッキー'], ['🧸', 'ちいさな ぬいぐるみ'], ['🔑', 'ちいさな かぎ'], ['💍', 'キラキラの わっか'], ['🌰', 'どんぐり'], ['🎀', 'リボン']];
-  const DIARY_T = [
-    ['💤', '{a}が おひるねした'], ['🏃', '{a}と{b}が おいかけっこした'], ['🪟', '{a}が まどの外を ずっと 見てた'], ['🍳', '{a}が りょうりに ちょうせんした（こげた）'],
-    ['🎵', '{a}が はなうたを うたってた'], ['🪞', '{a}が きみの まねを してた'], ['🐾', '{a}が {b}の しっぽで あそんだ'], ['👾', 'へんな ともだちが きた…？'],
-    ['🚪', '{a}が ドアの前で きみを まってた'], ['📚', '{a}が 本を ひらいて、そのまま ねた'], ['🧶', '{a}が けいとを ころがして あそんだ'], ['🍃', '{a}と{b}が ないしょばなしを してた'],
-  ];
-  const DIARY_NIGHT = [['🌙', '{a}が ねごとを いってた「…もっと たべる…」'], ['⭐', '{a}が よなかに ほしを かぞえてた'], ['💤', 'みんな くっついて ねてた']];
-  function makeDiary(from, to) {
-    const gap = to - from; if (gap < 20 * 60000) return [];
-    const crew = allPets.filter((p) => !atWork(p.kind)); if (!crew.length) return [];
-    const n = Math.min(4, 1 + Math.floor(gap / (40 * 60000)));
-    const times = Array.from({ length: n }, () => from + Math.random() * gap).sort((a, b) => a - b);
-    const used = new Set(), out = [];
-    times.forEach((t, i) => {
-      const h = new Date(t).getHours(), night = h >= 23 || h < 6;
-      const a = pick(crew), b = pick(crew.filter((x) => x !== a)) || a;
-      let tpl;
-      if (i === n - 1 && !S.hidden && Math.random() < 0.6) {
-        const [e, nm] = pick(HIDE_ITEMS), rm = pick(ROOM_DEFS).id;
-        S.hidden = { room: rm, x: rand(18, 82), y: rand(FLOOR.yMin + 1, FLOOR.yMax - 1), e, n: nm, by: a.kind };
-        tpl = ['📦', `{a}が ${rm === S.curRoom ? 'この部屋' : roomName(rm)}に なにかを かくした…`];
-      } else {
-        const pool = (night ? DIARY_NIGHT : DIARY_T).filter((x) => !used.has(x[1]) && (crew.length > 1 || !x[1].includes('{b}')));
-        tpl = pick(pool.length ? pool : DIARY_T.slice(0, 1));
-      }
-      used.add(tpl[1]);
-      out.push({ at: t, e: tpl[0], t: tpl[1].replace('{a}', petName(a)).replace('{b}', petName(b)) });
-    });
-    return out;
-  }
-  function addDiary(from, to) {
-    const list = makeDiary(from, to); if (!list.length) return;
-    S.diary = list.concat(S.diary || []).sort((x, y) => y.at - x.at).slice(0, 40);
-    S.diaryNew = (S.diaryNew || 0) + list.length; save();
-    renderDiaryBook(); renderHidden();
-  }
-  function renderDiaryBook() {
-    document.querySelectorAll('.diaryBook').forEach((e) => e.remove());
-    if (!S.diaryNew) return;
-    const b = document.createElement('div'); b.className = 'diaryBook'; b.textContent = '📔'; b.title = 'ひみつの にっき';
-    b.addEventListener('click', (e) => { e.stopPropagation(); openDiary(true); });
-    room.appendChild(b);
-  }
-  function openDiary(fresh) {
-    const list = S.diary || [];
-    const hm = (t) => new Date(t).toTimeString().slice(0, 5);
-    let lastDay = '', html = '';
-    list.slice(0, fresh ? Math.max(S.diaryNew || 0, 4) : 40).forEach((d) => {
-      const day = fmtDate(d.at); if (day !== lastDay) { html += `<li class="dday">${escapeHtml(day)}</li>`; lastDay = day; }
-      html += `<li><time>${hm(d.at)}</time><i>${d.e}</i><span>${escapeHtml(d.t)}</span></li>`;
-    });
-    $('#cardTitle').textContent = 'ひみつの にっき';
-    $('#cardBody').innerHTML = list.length ? `<div class="diaryPaper"><ul class="diaryList">${html}</ul></div><p class="todayFoot">${S.hidden ? 'どこかに なにか かくしてあるみたい…' : 'みてない あいだも、みんな げんきに すごしてたよ'}</p>`
-      : '<p class="note" style="text-align:center;padding:16px 0">まだ なにも かいてないよ。しばらく アプリを とじていると、るすの あいだの できごとが かかれるよ。</p>';
-    $('#cardWrap').classList.add('show');
-    if (fresh && S.diaryNew) { S.diaryNew = 0; save(); renderDiaryBook(); logEvent('diary'); }
-  }
-  function renderHidden() {
-    document.querySelectorAll('.hiddenThing').forEach((e) => e.remove());
-    const h = S.hidden; if (!h || h.room !== S.curRoom) return;
-    const el = document.createElement('div'); el.className = 'hiddenThing'; el.textContent = h.e;
-    el.style.left = h.x + '%'; el.style.bottom = h.y + '%';
-    el.addEventListener('click', (e) => { e.stopPropagation(); findHidden(); });
-    room.appendChild(el);
-  }
-  function findHidden() {
-    const h = S.hidden; if (!h) return;
-    S.hidden = null; addTreasure(h.e, h.n, 'かくしてあった', { by: h.by }); save();
-    popItem(h.x, h.y + 6, h.e); renderHidden();
-    const p = allPets.find((q) => q.kind === h.by);
-    if (p && !p.away && p.mode === 'idle') { p.lookAt(h.x); p.say(pick(['みつかっちゃった〜', 'あっ、それ ぼくの！…えへへ', 'ばれた〜']), 2200); p.happy(); addBond(p, 2); }
-    else toast(`${h.n}が でてきた！（${petName(allPets.find((q) => q.kind === h.by))}が かくしてたみたい）`);
-    logEvent('found', { n: h.n });
-  }
-
-  // ---------- いたずら（ときどき。タップで つかまえる） ----------
-  let lastPrankAt = Date.now();
   function decorating() { return document.body.classList.contains('decorating'); }
+  // ほかに なにも おきていない（季節イベントなどを はじめてよい）
   function prankOk() { return !(document.hidden || lightOff || breathing || talking || feeding || switching || outing || guestBusy || decorating() || document.querySelector('.sheet.show') || $('#cardWrap').classList.contains('show') || document.body.classList.contains('viewing')); }
-  async function doPrank(p, type) {
-    if (!p || p.mode !== 'idle' || !prankOk()) return;
-    lastPrankAt = Date.now();
-    p.mode = 'prank'; p.stopMove(); p.hush(); p.cls('sit', false);
-    const still = () => p.mode === 'prank' && !p.away;
-    let caught = false, prop = null;
-    const done = (line) => { if (prop) { prop.classList.remove('fall'); setTimeout(() => prop && prop.remove(), 700); } p.cls('sleep', false); p.cls('hiding', false); p.prankCatch = null; if (p.mode === 'prank') p.mode = 'idle'; if (line) p.say(line, 2000); };
-    p.prankCatch = () => { caught = true; };
-    logEvent('prank', { k: p.kind, t: type });
-    if (type === 'sleep') {
-      p.cls('sleep', true);
-      for (let i = 0; i < 40 && still() && !caught; i++) await sleep(500);
-      if (!still()) return done();
-      if (caught) { p.cls('sleep', false); p.hop(); addBond(p, 1); return done(personaKey(p) === 'cool' ? '……ねてない' : 'ばれた？ えへへ'); }
-      return done('ふぁ〜 よくねた（ふり）');
-    }
-    if (type === 'hide') {
-      const left = p.x < 50; await p.moveTo(left ? 7 : 93, FLOOR.yMax + 2, 9);
-      if (!still()) return done(); p.cls('hiding', true); p.face(left ? 1 : -1);
-      for (let i = 0; i < 50 && still() && !caught; i++) await sleep(500);
-      if (!still()) return done();
-      p.cls('hiding', false);
-      if (caught) { p.hop(); p.hearts(3); addBond(p, 1); return done('みつかった〜！'); }
-      await p.moveTo(rand(35, 65), rand(FLOOR.yMin + 3, FLOOR.yMax - 3), 6);
-      return done('だれも さがして くれない…');
-    }
-    if (type === 'knock') {
-      prop = document.createElement('div'); prop.className = 'prankProp'; prop.textContent = '🪴';
-      const px = clamp(p.x + (p.x > 50 ? -15 : 15), 10, 90); prop.style.left = px + '%'; prop.style.bottom = (p.y + 0.5) + '%'; prop.style.zIndex = '35'; if (px < p.x) prop.classList.add('left'); room.appendChild(prop);
-      p.lookAt(px); await sleep(700); if (!still()) return done();
-      p.hop(); await sleep(200); prop.classList.add('fall'); popItem(px, p.y + 2, '💨');
-      await sleep(500); p.face(px > p.x ? -1 : 1); p.say(pick(['……（しらんぷり）', 'ぼく じゃないよ', '♪〜（くちぶえ）']), 2400);
-      for (let i = 0; i < 40 && still() && !caught; i++) await sleep(500);
-      if (!still()) return done();
-      if (caught) { p.cls('nope', true); setTimeout(() => p.cls('nope', false), 900); addBond(p, 1); return done('ごめんなさい… なおすね'); }
-      return done('……なおしといた');
-    }
-    if (type === 'snack') {
-      await p.moveTo(clamp(rand(60, 80), FLOOR.xMin, FLOOR.xMax), FLOOR.yMax, 5); if (!still()) return done();
-      p.face(1); await sleep(500); popItem(p.x, p.y + 14, '🍪'); p.cls('eat', true);
-      for (let i = 0; i < 3; i++) { p.cls('chomp', true); await sleep(320); p.cls('chomp', false); await sleep(320); }
-      p.cls('eat', false); p.face(-1);
-      for (let i = 0; i < 24 && still() && !caught; i++) await sleep(500);
-      if (!still()) return done();
-      if (caught) { addBond(p, 1); p.cls('nope', true); setTimeout(() => p.cls('nope', false), 900); return done('た、たべてないよ？（くちに クッキー）'); }
-      return done('ごちそうさま…（ないしょ）');
-    }
-    done();
-  }
-  setInterval(() => {
-    if (!prankOk() || idleFor() > 5 * 60000 || Date.now() - lastPrankAt < 4 * 60000 || Math.random() > 0.18) return;
-    const idle = pets.filter((p) => p.mode === 'idle'); if (!idle.length) return;
-    const p = pick(idle), pk = personaKey(p);
-    const type = pk === 'cool' || moodOf(p) === 'nemui' ? pick(['sleep', 'sleep', 'knock']) : pk === 'amae' ? pick(['hide', 'hide', 'snack']) : pk === 'genki' ? pick(['knock', 'snack', 'hide']) : pick(['sleep', 'snack', 'hide', 'knock']);
-    doPrank(p, type);
-  }, 60000);
-
   // ---------- きせつイベント（だい1だん：ハロウィン） ----------
   function evNow() {
     if (S.eventsOn === false) return '';
@@ -6339,17 +5889,16 @@
     // 記念日の起点（はじめて会った日）
     S.adoptedAt = Object.assign({}, S.adoptedAt || {}); allPets.forEach((p) => { if (!S.adoptedAt[p.kind]) S.adoptedAt[p.kind] = Date.now(); });
     renderShelf(); renderTags();
-    // 久しぶりに開いたら、おてがみ（＋あまえたい気分）
+    // 久しぶりに開いたら、みんな あまえたい気分
     const gap = lastSeenAtLaunch ? Date.now() - lastSeenAtLaunch : 0;
-    if (gap > 6 * 3600000) { setTimeout(() => dropLetter({ ...letterFromPet(gap), at: Date.now() }), 2500); if (gap > 12 * 3600000) allPets.forEach((p) => setMood(p, 'amaetai', 10)); }
+    if (gap > 12 * 3600000) allPets.forEach((p) => setMood(p, 'amaetai', 10));
     save();
-    setTimeout(checkAnniversary, 6000); setInterval(checkAnniversary, 10 * 60000);
     renderWorkBar(); setTimeout(checkWork, 2500);
-    renderFurn(); renderHidden(); applyEvent();
+    renderFurn(); applyEvent();
     wxUpdate(true);
     setTimeout(ensureKichi, 1500);
     buildGarden(); ensureGarden(); applyGarden(); renderFurn();
-    if (lastSeenAtLaunch) addDiary(lastSeenAtLaunch, Date.now()); renderDiaryBook();
+
     if (evNow() === 'halloween' && new Date().getDate() === 31) setTimeout(() => toast('🎃 ハッピーハロウィン！'), 3000);
     if (evNow() === 'christmas' && new Date().getDate() >= 24) setTimeout(() => toast('🎄 メリークリスマス！'), 3000);
   })();

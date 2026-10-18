@@ -1207,7 +1207,7 @@
     <div class="field"><div class="row volRow"><span class="vmin">🔈</span><input type="range" id="volSlider" min="0" max="100" step="1" /><span class="vmax">🔊</span></div></div>
     <div class="field">
       <div class="row"><button class="link" id="guideAgain">つかいかたの案内をもう一度</button></div>
-      <div class="row"><button class="link" id="exportBtn">データを書き出す</button></div>
+      <div class="row"><button class="link" id="exportBtn">データを書き出す（バックアップ）</button></div>
       <div class="row"><button class="link" id="importBtn">データを取り込む</button></div>
       <div class="row"><span class="bkNote" id="bkNote"></span></div>
     </div>
@@ -1342,7 +1342,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.19.0';
+  const APP_VERSION = '2.20.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';

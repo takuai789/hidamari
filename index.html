@@ -1022,6 +1022,10 @@
     background: var(--accent); color: #fff; border: 0; border-radius: 14px; padding: 14px 18px; font-family: inherit; font-size: 14px; font-weight: 600;
     box-shadow: 0 8px 28px rgba(232,145,107,0.45); cursor: pointer; transform: translateY(140%); transition: transform 0.35s cubic-bezier(.32,.72,0,1); }
   #updateBanner.show { transform: translateY(0); }
+  .bkNote { font-size:12px; opacity:.7; }
+  .bkNote.due { color:#c2410c; opacity:1; font-weight:700; }
+  #settingsBtn.bkdot { position:relative; }
+  #settingsBtn.bkdot::after { content:''; position:absolute; top:4px; right:4px; width:9px; height:9px; border-radius:50%; background:#f97316; box-shadow:0 0 0 2px #fff; }
 </style>
 </head>
 <body>
@@ -1250,6 +1254,7 @@
       <div class="row"><button class="link" id="guideAgain">つかいかたの案内をもう一度</button></div>
       <div class="row"><button class="link" id="exportBtn">データを書き出す</button></div>
       <div class="row"><button class="link" id="importBtn">データを取り込む</button></div>
+      <div class="row"><span class="bkNote" id="bkNote"></span></div>
     </div>
     <p class="note">「おと」は、へやの音 → 雨 → 焚き火 → 波 → 川 → なし の順に切りかわります。「へやの音」は窓の景色に合わせて自動で変わります。窓の写真はこの端末の中だけに保存され、書き出しには入りません。</p>
     <div id="versionLabel"></div>
@@ -1385,7 +1390,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.17.0';
+  const APP_VERSION = '2.18.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
@@ -3664,7 +3669,7 @@
 
   // ---------- 設定シート ----------
   const NAME_FIELDS = [['#nameInput', 'name', 0], ['#shibaInput', 'shibaName', 1], ['#poodleInput', 'poodleName', 2], ['#catInput', 'catName', 3], ['#penguinInput', 'penguinName', 4], ['#pigInput', 'pigName', 5], ['#taabouInput', 'taabouName', 6]];
-  function openSheet() { NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); renderPersona(); renderWinSetting(); renderSeasonWeather(); if (typeof renderEventChips === 'function') renderEventChips(); ROOM_DEFS.forEach((r, i) => { $('#room' + i).value = roomName(r.id); }); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
+  function openSheet() { if (typeof renderBk === 'function') renderBk(); NAME_FIELDS.forEach(([sel, key]) => { $(sel).value = S[key]; }); renderHud(); renderPersona(); renderWinSetting(); renderSeasonWeather(); if (typeof renderEventChips === 'function') renderEventChips(); ROOM_DEFS.forEach((r, i) => { $('#room' + i).value = roomName(r.id); }); $('#sheetBg').classList.add('show'); $('#sheet').classList.add('show'); }
   function closeSheet() {
     let changed = null;
     NAME_FIELDS.forEach(([sel, key, i]) => { const el = $(sel); el.blur(); const v = el.value.trim(); if (v && v !== S[key]) { S[key] = v; changed = allPets[i]; } });
@@ -3680,14 +3685,42 @@
   ['#room0', '#room1', '#room2', '#room3', '#room4'].forEach((sel) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); }));
   NAME_FIELDS.forEach(([sel]) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') closeSheet(); }));
 
+
+  // ---------- バックアップ（全アプリ共通の作法） ----------
+  // iPhone：共有メニュー →「"ファイル"に保存」→ iCloud Drive「アプリのバックアップ」フォルダ
+  // Mac：ダウンロード。ファイル名は「アプリ名_YYYY-MM-DD.json」でそろえる。
+  function bkName(app) { const d = new Date(); return `${app}_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.json`; }
+  async function bkSave(app, text) { // 戻り値 'ok' | 'cancel'
+    const name = bkName(app);
+    if (navigator.maxTouchPoints > 0) {
+      try {
+        const file = new File([text], name, { type: 'application/json' });
+        if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); return 'ok'; }
+      } catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+    }
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    return 'ok';
+  }
+  const BK_KEY = 'hidamari.lastBackupAt', BK_DAYS = 30;
+  function bkMark() { try { localStorage.setItem(BK_KEY, String(Date.now())); } catch (e) {} }
+  function bkDays() { let t = 0; try { t = Number(localStorage.getItem(BK_KEY) || 0); } catch (e) {} return t ? Math.floor((Date.now() - t) / 86400000) : null; }
+  function bkDue() { const d = bkDays(); return d === null || d >= BK_DAYS; }
+  function bkText() { const d = bkDays(); return d === null ? 'まだ一度もバックアップしていません' : d === 0 ? '前回のバックアップ：今日' : `前回のバックアップから ${d}日`; }
+  function renderBk() {
+    const el = $('#bkNote'); if (el) { el.textContent = bkText(); el.classList.toggle('due', bkDue()); }
+    $('#settingsBtn').classList.toggle('bkdot', bkDue() && (S.totalSec || 0) > 3600);
+  }
   const SCHEMA = 'hidamari.v1';
-  $('#exportBtn').addEventListener('click', () => {
+  $('#exportBtn').addEventListener('click', async () => {
     const data = { schema: SCHEMA, exportedAt: new Date().toISOString(), pet: { ...S } };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob); const a = document.createElement('a');
-    a.href = url; a.download = 'hidamari-sync.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    if (await bkSave('ひだまり', JSON.stringify(data, null, 2)) !== 'ok') return;
+    bkMark(); renderBk();
     toast('書き出したよ');
   });
+  renderBk();
   $('#importBtn').addEventListener('click', () => $('#importFile').click());
   $('#importFile').addEventListener('change', async (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;

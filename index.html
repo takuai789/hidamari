@@ -988,6 +988,9 @@
   .bkNote.due { color:#c2410c; opacity:1; font-weight:700; }
   #settingsBtn.bkdot { position:relative; }
   #settingsBtn.bkdot::after { content:''; position:absolute; top:4px; right:4px; width:9px; height:9px; border-radius:50%; background:#f97316; box-shadow:0 0 0 2px #fff; }
+
+  /* キーボードが出ているときも、シートが画面の上にはみ出さないように（見えている高さに収めて中をスクロール） */
+  .sheet { max-height: calc(var(--app-height, 100vh) - var(--safe-top, env(safe-area-inset-top, 0px)) - 16px) !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 </style>
 </head>
 <body>
@@ -1342,7 +1345,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ---------- バージョン ----------
-  const APP_VERSION = '2.22.0';
+  const APP_VERSION = '2.23.0';
 
   // ---------- IndexedDB（DB名・キーは変えない） ----------
   const DB_NAME = 'hidamari-db';
